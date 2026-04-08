@@ -1,0 +1,21 @@
+{
+  "metadata": {"title": "ICC Two-Panel", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "template",
+    "template_name": "two_panel",
+    "replacements": {
+      "{{title}}": "계열사 거래 원가 단절 — 문제 진단과 솔루션 매핑",
+      "{{breadcrumb}}": "4. 원가관리 > 4.2 진단+솔루션",
+      "{{left_header}}": "문제 진단 (6대 단절 지점)",
+      "{{left_item_0}}": "자재유형 HAWA(구매품)로 분류\n→ 조달유형 F, 제조원가 인식 불가",
+      "{{left_item_1}}": "PO Type NB(표준구매)\n→ 이전가격이 단일 재료비로 축약",
+      "{{left_item_2}}": "이동유형 101 GR at PO Price\n→ 표준원가 = 이전가격 (단일값)",
+      "{{left_item_3}}": "CK11N 원가추정: 구매가 기반\n→ Component Split 생성 자체가 불가",
+      "{{left_item_4}}": "CO-PA COGS = 단일 VV001\n→ 재료비/노무비/경비 구분 불가",
+      "{{left_item_5}}": "그룹 연결: IC이익 제거 시\n→ 원가유형별 배분 근거 없음",
+      "{{right_header}}": "솔루션 매핑 (환경별)",
+      "{{right_content}}": "ECC 환경:\n• Sol.C: CO-PA 유도규칙 (COPA0001)\n  → KEKO/KEPH에서 Component Pull\n  → Quick Win, ABAP Exit 필요\n\nS/4HANA Brownfield:\n• Sol.A: BAdI CKML_CROSS_COMPANY\n  → ML 실제원가 기반 전 Component 전달\n• Sol.B: 다중 평가 (Group View)\n  → IC이익 제거 + 제조원가 가시화\n\nS/4HANA Greenfield:\n• Sol.D: Advanced IC STO (OP2022+)\n  → 법적+그룹 View 동시 반영\n  → SAP Note 3233845 참조\n\n공통 전제: 자재원장(ML) 활성화 필수",
+      "{{takeaway}}": "핵심: 문제는 SAP 표준이 회사코드 간 원가 Component를 전달하지 않는 구조 — 환경에 맞는 솔루션 선택이 관건"
+    }
+  }]
+}

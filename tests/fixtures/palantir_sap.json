@@ -1,0 +1,76 @@
+{
+  "metadata": {
+    "title": "Palantir 연동 SAP 전환 생산성 향상 방안",
+    "client": "HD현대",
+    "date": "2026년 4월"
+  },
+  "slides": [
+    {
+      "type": "content",
+      "title": "Palantir Foundry 연동으로 ECC→S/4HANA 전환 개발 생산성 30~50% 향상 가능",
+      "breadcrumb": "2. 추진 전략 > 2.3 생산성 향상 방안",
+      "header_message": "기존 SAP 전환 도구(LSMW, BODS, ChaRM)의 한계를 Palantir의 Ontology, Pipeline, AIP로 보완하여 데이터/테스트/분석 영역의 생산성을 극대화",
+      "layout": "columns",
+      "n_cols": 3,
+      "elements": [
+        {
+          "type": "card",
+          "header": "① 데이터 마이그레이션 가속",
+          "subtitle": "Pipeline Builder + Ontology",
+          "style": "default",
+          "content": [
+            {"type": "kpi", "value": "~40%", "text": "데이터 준비 기간 단축"}
+          ],
+          "bullets": [
+            "ECC 데이터 자동 추출 (RFC/JDBC)",
+            "S/4HANA 타겟 구조 자동 매핑",
+            "재사용 가능한 클렌징 Rule 라이브러리",
+            "데이터 Lineage 자동 추적",
+            "LSMW/BODS 대비 반복 작업 80% 감소"
+          ],
+          "col": 0
+        },
+        {
+          "type": "card",
+          "header": "② 테스트/검증 자동화",
+          "subtitle": "AIP + Code Workbook",
+          "style": "accent",
+          "content": [
+            {"type": "kpi", "value": "2~3x", "text": "Reconciliation 반복 속도"}
+          ],
+          "bullets": [
+            "AI 기반 테스트 케이스 자동 생성",
+            "트랜잭션 패턴 기반 UAT 시나리오",
+            "비기술 인력의 검증 참여 가능",
+            "자동 Delta Check (ECC↔S/4)",
+            "ECATT 대비 커버리지 3배 확대"
+          ],
+          "col": 1
+        },
+        {
+          "type": "card",
+          "header": "③ 커스텀 코드 전환 지원",
+          "subtitle": "AIP (LLM) + Process Mining",
+          "style": "default",
+          "content": [
+            {"type": "kpi", "value": "500+", "text": "RICEF 객체 영향도 자동 분석"}
+          ],
+          "bullets": [
+            "ABAP→S/4 호환성 AI 영향도 평가",
+            "SAP Readiness Check 보완 분석",
+            "프로세스 마이닝 (Celonis 대체)",
+            "Cutover 시퀀스 Ontology 모델링",
+            "병렬 워크스트림 자동 조율"
+          ],
+          "col": 2
+        },
+        {
+          "type": "takeaway_bar",
+          "message": "핵심: Palantir는 ChaRM/SPDD/BASIS 도구를 대체하지 않음 — '데이터 레이어 + 분석 오케스트레이션'에 집중, 500+ RICEF 대규모 전환에 최적",
+          "style": "dark"
+        }
+      ],
+      "footnote": "출처: Palantir Foundry 공식 문서, Merck/Airbus 사례 참고 (2025), PwC 내부 분석"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "metadata": {"title": "Tier 1 컴포넌트 테스트", "client": "HD현대", "date": "2026.04"},
+  "slides": [
+    {
+      "type": "content",
+      "title": "2×2 Numbered Quadrant + RAG 상태 테이블",
+      "breadcrumb": "테스트 > Tier 1 컴포넌트",
+      "layout": "stacked",
+      "sections": [
+        {"height_ratio": 0.5, "layout": "full", "elements": [
+          {"type": "numbered_quadrant", "items": [
+            {"number": "01", "title": "데이터 마이그레이션", "bullets": ["Pipeline Builder 적용", "자동 프로파일링", "클렌징 Rule 200+"], "style": "accent"},
+            {"number": "02", "title": "테스트 자동화", "bullets": ["AIP 테스트 생성", "UAT 커버리지 90%+", "Regression 사전 식별"], "style": "dark"},
+            {"number": "03", "title": "커스텀 코드 분석", "bullets": ["LLM 영향도 평가", "500+ RICEF 전수", "호환성 등급 분류"], "style": "grey"},
+            {"number": "04", "title": "Cutover 관리", "bullets": ["Ontology 시퀀싱", "다운타임 50% 감소", "Safe Landing 보장"], "style": "default"}
+          ]}
+        ]},
+        {"height_ratio": 0.35, "layout": "full", "elements": [
+          {"type": "rag_table", "items": [
+            {"name": "데이터 품질 (오류율)", "status": "green", "trend": "up", "note": "15% → 3% 개선 완료"},
+            {"name": "테스트 커버리지", "status": "amber", "trend": "up", "note": "60% 달성, 목표 90%"},
+            {"name": "RICEF 분석 진척", "status": "amber", "trend": "flat", "note": "350/500 완료 (70%)"},
+            {"name": "Cutover 리허설", "status": "red", "trend": "down", "note": "1차 실패, 재수행 필요"},
+            {"name": "변화관리 교육", "status": "green", "trend": "up", "note": "전 부서 완료"}
+          ]}
+        ]},
+        {"height_ratio": 0.15, "layout": "full", "elements": [
+          {"type": "takeaway_bar", "message": "4대 영역 중 Cutover 리허설이 Red — 2차 리허설 일정 재수립 및 롤백 시나리오 보강 필요", "style": "dark"}
+        ]}
+      ],
+      "footnote": "출처: 프로젝트 주간 보고 (2026.04.08)"
+    },
+    {
+      "type": "content",
+      "title": "Harvey Ball 벤더 평가 + Funnel 전환 분석",
+      "breadcrumb": "테스트 > Harvey Ball + Funnel",
+      "layout": "stacked",
+      "sections": [
+        {"height_ratio": 0.45, "layout": "full", "elements": [
+          {"type": "harvey_ball_matrix",
+           "row_headers": ["Palantir Foundry", "SAP BTP", "Celonis", "Snowflake"],
+           "col_headers": ["데이터 통합", "AI/ML", "프로세스 마이닝", "SAP 연동", "비용"],
+           "scores": [
+             [100, 75, 50, 75, 50],
+             [75, 50, 25, 100, 75],
+             [50, 25, 100, 50, 75],
+             [100, 75, 0, 25, 50]
+           ]}
+        ]},
+        {"height_ratio": 0.4, "layout": "full", "elements": [
+          {"type": "funnel",
+           "stages": [
+             {"label": "전체 RICEF 객체", "value": "523건", "conversion": "100%"},
+             {"label": "영향도 High", "value": "198건", "conversion": "38%"},
+             {"label": "코드 수정 필요", "value": "87건", "conversion": "17%"},
+             {"label": "재개발 필요", "value": "23건", "conversion": "4%"}
+           ]}
+        ]},
+        {"height_ratio": 0.15, "layout": "full", "elements": [
+          {"type": "takeaway_bar", "message": "Palantir가 데이터 통합 + AI에서 최고 점수 — SAP 연동은 SAP BTP 보완 필요 | RICEF 4%만 재개발 → 영향 최소", "style": "dark"}
+        ]}
+      ],
+      "footnote": "출처: 벤더 평가 워크숍 결과 (2026.03), RICEF 영향도 분석 보고서"
+    },
+    {
+      "type": "content",
+      "title": "수직 프로세스 흐름 — 데이터 마이그레이션 5단계",
+      "breadcrumb": "테스트 > Vertical Flow",
+      "layout": "full", "n_cols": 1,
+      "elements": [
+        {"type": "vertical_flow", "steps": [
+          {"label": "데이터 프로파일링", "detail": "ECC 29개 시스템 자동 스캔\n데이터 품질 리포트 생성\n이상치 식별 및 분류", "style": "accent"},
+          {"label": "클렌징 Rule 설계", "detail": "재사용 Rule 라이브러리 구축\n업무 담당자 검증 워크숍\n자동 클렌징 파이프라인", "style": "accent"},
+          {"label": "타겟 매핑", "detail": "S/4HANA 구조 Ontology 매핑\n필드 변환 규칙 정의\nLineage 자동 추적 설정", "style": "default"},
+          {"label": "테스트 검증", "detail": "자동 Reconciliation 실행\nDelta Check (ECC↔S/4)\nUAT 시나리오 병행", "style": "default"},
+          {"label": "Go-Live 전환", "detail": "Cutover 시퀀스 실행\n실시간 모니터링 대시보드\n롤백 시나리오 대기", "style": "default"}
+        ]},
+        {"type": "takeaway_bar", "message": "5단계 순차 실행 — 각 단계 완료 후 품질 게이트 통과 필수, 1~2단계에서 Quick Win 확보 후 확산", "style": "dark"}
+      ],
+      "footnote": "출처: PwC SAP Data Migration Methodology"
+    }
+  ]
+}

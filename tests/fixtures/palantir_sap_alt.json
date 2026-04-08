@@ -1,0 +1,62 @@
+{
+  "metadata": {
+    "title": "Palantir 연동 SAP 전환 생산성 향상 방안 (Alt)",
+    "client": "HD현대",
+    "date": "2026년 4월"
+  },
+  "slides": [
+    {
+      "type": "content",
+      "title": "SAP 전환 5대 병목 구간에 Palantir를 적용, 전체 프로젝트 기간 30% 단축",
+      "breadcrumb": "2. 추진 전략 > 2.3 Palantir 연동 방안",
+      "header_message": "ECC→S/4HANA 전환의 핵심 병목은 데이터·테스트·코드 전환 — 기존 도구(LSMW, BODS)로는 대규모 전환에 한계, Palantir Foundry가 보완",
+      "layout": "full",
+      "n_cols": 1,
+      "elements": [
+        {
+          "type": "framework_matrix",
+          "row_headers": ["데이터 프로파일링", "데이터 클렌징/전환", "테스트 자동화", "커스텀 코드 분석", "Cutover 관리"],
+          "col_headers": ["기존 도구", "Pain Point", "Palantir 대안", "기대 효과"],
+          "cells": [
+            [
+              {"text": "LSMW\nSAP BODS"},
+              {"text": "수작업 매핑\n3~4주 소요", "highlight": true},
+              {"text": "Pipeline Builder\n자동 프로파일링"},
+              {"text": "기간 60% 단축", "style": "accent"}
+            ],
+            [
+              {"text": "LSMW + Excel\n수작업 검증"},
+              {"text": "반복 작업 과다\n오류율 15%+", "highlight": true},
+              {"text": "Ontology 매핑\n재사용 Rule"},
+              {"text": "오류율 3% 이하", "style": "accent"}
+            ],
+            [
+              {"text": "ECATT\nSolMan"},
+              {"text": "테스트 커버리지\n30% 미만", "highlight": true},
+              {"text": "AIP 자동 생성\nCode Workbook"},
+              {"text": "커버리지 90%+", "style": "accent"}
+            ],
+            [
+              {"text": "Readiness Check\n수동 리뷰"},
+              {"text": "500+ RICEF\n전수 분석 불가", "highlight": true},
+              {"text": "AIP (LLM)\n영향도 자동 평가"},
+              {"text": "전수 분석 완료\n2주 내", "style": "accent"}
+            ],
+            [
+              {"text": "Excel 기반\n수동 스케줄"},
+              {"text": "의존성 누락\n다운타임 리스크", "highlight": true},
+              {"text": "Ontology 모델링\n시퀀스 최적화"},
+              {"text": "다운타임 50%↓", "style": "accent"}
+            ]
+          ]
+        },
+        {
+          "type": "takeaway_bar",
+          "message": "Palantir는 ChaRM·SPDD·BASIS를 대체하지 않음 — 데이터 레이어와 분석 오케스트레이션에 집중하여 기존 SAP 도구를 보완하는 포지션",
+          "style": "dark"
+        }
+      ],
+      "footnote": "출처: Palantir Foundry 공식 문서, Merck/Airbus 파일럿 사례 (2025), PwC Global SAP Practice 내부 분석"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "metadata": {"title": "Variance Analysis", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "표준원가 vs 실제원가 — 3계층 차이분석으로 원가 동인을 정조준한다",
+    "breadcrumb": "5. 원가관리 > 5.1 Variance Analysis Framework",
+    "header_message": "재료비·노무비·경비 각각을 가격차이와 수량/효율차이로 분해하고, SAP CO(CKM3N/KO88)로 추적하여 책임부서별 시정조치를 도출",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.12,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Quantify", "description": "CKM3N 차이 집계"},
+            {"label": "Isolate", "description": "가격 vs 효율 분리"},
+            {"label": "Attribute", "description": "구매/생산/관리 귀속"},
+            {"label": "Act", "description": "시정조치+표준 갱신"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.58,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["재료비\nMaterial", "노무비\nLabor", "제조경비\nOverhead"],
+           "col_headers": ["가격/단가 차이", "수량/효율 차이", "SAP 분석", "시정조치"],
+           "cells": [
+             [{"text": "Price Variance\n(표준단가-실제단가)\n×실제수량"},
+              {"text": "Usage Variance\n(표준수량-실제수량)\n×표준단가", "highlight": true},
+              {"text": "CKM3N: Input Price\nMvt 101(GR) 시점\nMvt 261(GI) 시점"},
+              {"text": "구매: 계약 재협상\n설계: BOM 정확도\n품질: Scrap 관리", "style": "default"}],
+             [{"text": "Rate Variance\n(표준임률-실제임률)\n×실제시간"},
+              {"text": "Efficiency Variance\n(표준시간-실제시간)\n×표준임률", "highlight": true},
+              {"text": "KSB1: 실제 활동량\nKSBL: 계획 vs 실적\nRouting 표준시간"},
+              {"text": "HR: 인력 배치 최적화\n생산: OEE 개선\n공정: Routing 갱신", "style": "default"}],
+             [{"text": "Spending Variance\n예산 배부액\nvs 실제 발생액"},
+              {"text": "Volume Variance\n(실제조업도-기준조업도)\n×표준배부율\n+Efficiency Var.", "highlight": true},
+              {"text": "S_ALR_87013611\n원가센터 계획/실적\nKO88 Order 정산"},
+              {"text": "관리: Flex Budget\n생산: 가동률 제고\n설비: 예방정비 강화", "style": "default"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.18,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "Materiality 기준", "style": "default",
+           "bullets": ["Line-item: >$5K or >3%", "Escalation: >$50K or >5%", "Process 재설계: 3개월 연속"], "col": 0},
+          {"type": "card", "header": "SAP 핵심 T-Code", "style": "accent",
+           "bullets": ["CKM3N: 자재원장 차이 분석", "KO88: 생산오더 정산", "CKMLCP: 실제원가 마감"], "col": 1},
+          {"type": "card", "header": "컨설팅 Rule", "style": "default",
+           "bullets": ["가격차이 = 구매 Story", "효율차이 = 생산 Story", "혼동 금지 — 분리 보고"], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.12,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "핵심: 차이 총액이 아닌 '가격 vs 효율' 분리가 관건 — 가격은 구매팀, 효율은 생산팀 책임으로 명확히 귀속해야 시정조치 실행력 확보", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: SAP CO Product Costing Documentation, CKM3N Variance Categories, PwC Manufacturing CoE Practice"
+  }]
+}

@@ -1,0 +1,25 @@
+{
+  "metadata": {"title": "ICC v2 - fullscreen", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "계열사 거래 원가 Component Split 단절 — 솔루션 적합성 비교",
+    "breadcrumb": "4. 원가관리 > 4.2 솔루션 비교",
+    "layout": "fullscreen",
+    "n_cols": 1,
+    "elements": [
+      {"type": "framework_matrix",
+       "row_headers": ["대상 환경", "전제 조건", "개발 범위", "Component 전달", "CO-PA 반영", "권장도"],
+       "col_headers": ["Sol.A: BAdI CKML", "Sol.B: 다중 평가", "Sol.C: CO-PA 유도", "Sol.D: Adv. IC STO"],
+       "cells": [
+         [{"text": "ECC + S/4"}, {"text": "S/4HANA"}, {"text": "ECC + S/4"}, {"text": "S/4 OP2022+"}],
+         [{"text": "ML 실제원가\nBF LOG_MM_SIT"}, {"text": "ML 다중통화\n병행평가 설정"}, {"text": "IC 청구 활성\nVF21 프로세스"}, {"text": "ML + Adv.STO\nNote 3233845"}],
+         [{"text": "ABAP 개발\n(BAdI 구현)", "highlight": true}, {"text": "Config 중심\n(개발 최소)"}, {"text": "ABAP Exit\nCOPA0001/0002", "highlight": true}, {"text": "Config + ML\n(표준 기능)"}],
+         [{"text": "실제원가 기준\n전 Component", "style": "accent"}, {"text": "그룹 View에서\nIC이익 제거"}, {"text": "표준원가 기준\nKEPH 테이블 참조"}, {"text": "실제+표준\n자동 전달", "style": "accent"}],
+         [{"text": "실제원가 CO-PA\n값 필드 매핑"}, {"text": "그룹 CO-PA만\n법적 View 미반영"}, {"text": "법적 CO-PA\n직접 매핑", "style": "accent"}, {"text": "법적+그룹\n동시 반영", "style": "accent"}],
+         [{"text": "★★★\nML 보유 시 최우선", "style": "accent"}, {"text": "★★\nS/4 그룹보고용"}, {"text": "★★★\nECC Quick Win", "style": "accent"}, {"text": "★★★★\nS/4 신규 최적", "style": "accent"}]
+       ]},
+      {"type": "takeaway_bar", "message": "Greenfield → Sol.D | Brownfield S/4 → Sol.A+B | ECC 유지 → Sol.C | 공통: 자재원장(ML) 활성화 필수", "style": "dark"}
+    ],
+    "footnote": "출처: SAP KBA 3348356, SAP Help Portal (Adv. IC STO), ERP Corp Controlling Guide"
+  }]
+}

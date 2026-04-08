@@ -1,0 +1,55 @@
+{
+  "metadata": {"title": "ICC Cost Issue v1", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "계열사 간 재고이전 시 원가 구성요소 단절 — 현황·원인·해법",
+    "breadcrumb": "4. 원가관리 > 4.2 계열사 거래 이슈",
+    "header_message": "제조법인 → 판매법인 STO 시 원가 Component Split이 소멸되어 판매법인의 수익성 분석(CO-PA) 및 원가 최적화가 불가능한 구조적 문제",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.55,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["출고 (제조법인)", "입고 (판매법인)", "CO-PA 영향", "경영 의사결정"],
+           "col_headers": ["SAP 표준 처리", "핵심 문제점", "영향도"],
+           "cells": [
+             [{"text": "이동유형 643 (GI)\nPO Type: NB\nVF21 회사간 청구\n원가 Component Split 보유"},
+              {"text": "CK11N 원가추정에\n재료비·노무비·경비\n세분화 가능 (KEPH)"},
+              {"text": "정상\n(문제없음)"}],
+             [{"text": "이동유형 101 (GR)\nPO 가격 = 이전가격\n자재원장: 단일 표준원가\n조달유형 F (외부구매)", "highlight": true},
+              {"text": "이전가격이 단일 '재료비'\n로 축약 → Component Split\n완전 소멸", "highlight": true},
+              {"text": "심각\n(구조적 단절)", "style": "accent"}],
+             [{"text": "COGS = 단일 원가요소\n(VV001 하나에 집계)\nAccount-based: 단일 G/L"},
+              {"text": "제품별 수익성 분석 시\n매출-이전가격 = 마진\n원가 구조 분석 불가", "highlight": true},
+              {"text": "심각\n(분석 불가)", "style": "accent"}],
+             [{"text": "원가 절감 기회 식별 불가\n제조 효율성 벤치마크 불가\n그룹 연결 시 배분 근거 없음"},
+              {"text": "판매법인이 제조법인에\n원가 절감 요청 시\n데이터 근거 부재", "highlight": true},
+              {"text": "높음\n(전략적 한계)", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.3,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "Solution A", "subtitle": "BAdI CKML_CROSS_COMPANY", "style": "default",
+           "bullets": ["자재원장 실제원가 필수", "BF LOG_MM_SIT 활성화", "ABAP 개발 필요", "실제 Component Split 전달"], "col": 0},
+          {"type": "card", "header": "Solution B", "subtitle": "다중 평가 (Group View)", "style": "accent",
+           "bullets": ["법적평가 + 그룹평가 병행", "그룹 View에서 IC 이익 제거", "제조원가 구조 가시화", "S/4HANA 권장"], "col": 1},
+          {"type": "card", "header": "Solution C", "subtitle": "CO-PA 커스텀 유도규칙", "style": "default",
+           "bullets": ["VF21 시점 COPA 유도", "KEKO/KEPH 테이블 참조", "ECC 환경 최적", "ABAP Exit: COPA0001"], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "권장: S/4HANA 전환 시 Solution B(다중 평가) + Solution A(BAdI) 병행 적용 — ECC 환경은 Solution C(CO-PA 유도규칙)로 Quick Win 확보", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: SAP KBA 3348356, SAP S/4HANA OP2022 Release Note, PwC SAP Controlling Practice"
+  }]
+}

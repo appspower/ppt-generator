@@ -1,0 +1,74 @@
+# PPT Generator - Consulting Grade
+
+## Project Summary
+컨설팅 품질의 PowerPoint 프레젠테이션을 생성하는 렌더링 라이브러리.
+**Claude Code가 두뇌(리서치, 구조화, 품질검증)**, 코드는 도구(렌더링).
+
+## Architecture (핵심)
+```
+사용자 ↔ Claude Code (리서치/구조화/검증) → ppt_builder 라이브러리 → .pptx
+```
+- 별도 LLM API 없음. Claude Code 자체가 오케스트레이터
+- `ppt_builder/`는 독립 라이브러리 — 나중에 웹앱에서도 재사용 가능
+
+## Tech Stack
+- **Language**: Python 3.11+
+- **PPT Engine**: python-pptx
+- **Charts**: matplotlib (PNG export)
+- **Validation**: Pydantic 2.x
+- **Orchestrator**: Claude Code (리서치, 구조화, 실행, 검증)
+
+## Current Phase
+Phase 4 - 템플릿 확장 + 품질 고도화
+
+## Document Hierarchy
+
+| 문서 | 역할 | 변경 빈도 |
+|---|---|---|
+| `CLAUDE.md` (이 파일) | 현재 상태 + 네비게이션 허브 | 매 세션 |
+| `docs/01_VISION.md` | 왜 만드는가 - 핵심 원칙과 북극성 | 거의 불변 |
+| `docs/02_PRD.md` | 무엇을 만드는가 - 기능 범위, 슬라이드 타입 | 드물게 변경 |
+| `docs/03_TECH_SPEC.md` | 어떻게 만드는가 - 아키텍처, 폴더 구조 | 가끔 변경 |
+| `docs/04_DECISION_LOG.md` | 결정 이력 | 추가만 (append-only) |
+| `docs/05_SLIDE_TYPES.md` | 슬라이드 타입 카탈로그 상세 정의 | 필요시 확장 |
+| `docs/06_TEMPLATE_CATALOG.md` | 템플릿+컴포넌트 마스터 리스트 (50+항목) | 구현 시 업데이트 |
+| `docs/07_WORKFLOW.md` | 6단계 PPT 생성 프로세스 (ANALYZE→REFINE) | 프로세스 변경 시 |
+| `docs/slide_designer.md` | Claude Code용 화면 구성 판단 가이드 | 패턴 추가 시 |
+| `ppt_builder/template/metadata.json` | 35개 템플릿 메타데이터 (태깅) | 템플릿 추가 시 |
+| `ppt_builder/evaluate.py` | 자동 품질 평가 (Step 5) | 평가 기준 변경 시 |
+
+## Document Maintenance Rules
+- **기능 추가/변경** → `02_PRD.md` 업데이트 + `04_DECISION_LOG.md` 추가
+- **기술 결정** → `03_TECH_SPEC.md` 업데이트 + `04_DECISION_LOG.md` 추가
+- **코드 작성 완료** → `CLAUDE.md` 현재 상태 섹션 업데이트
+- **01_VISION.md** → 명시적 피벗 결정 없이 절대 수정하지 않음
+- **04_DECISION_LOG.md** → 추가만 가능, 삭제/수정 금지
+
+## Folder Structure
+```
+PPT/
+├── CLAUDE.md
+├── docs/
+│   ├── 01_VISION.md
+│   ├── 02_PRD.md
+│   ├── 03_TECH_SPEC.md
+│   ├── 04_DECISION_LOG.md
+│   ├── 05_SLIDE_TYPES.md
+│   └── references/              ← 레퍼런스 캡처 이미지
+├── ppt_builder/                 ← 핵심 렌더링 라이브러리 (독립적)
+│   ├── __init__.py              ← render_presentation() 공개 API
+│   ├── models/                  ← Pydantic 스키마
+│   ├── assembler/               ← 슬라이드 타입별 렌더러
+│   └── charts/                  ← matplotlib 차트 생성
+├── templates/                   ← .pptx 마스터 템플릿
+├── output/                      ← 생성된 PPT
+├── tests/
+├── requirements.txt
+└── run.py                       ← CLI 진입점
+```
+
+## Conventions
+- 모든 슬라이드 타이틀은 **액션 타이틀** (인사이트 문장형, 라벨 아님)
+- 슬라이드 스키마는 JSON으로 정의, Pydantic 모델로 검증
+- 한글/영문 혼용 가능, 코드와 변수명은 영문
+- `ppt_builder/`는 Claude Code에 종속되지 않는 순수 라이브러리로 유지

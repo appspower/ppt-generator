@@ -1,0 +1,48 @@
+{
+  "metadata": {"title": "Rich v2", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "5대 전환 병목을 Palantir가 정조준 — 기존 도구 한계와 해법",
+    "breadcrumb": "2. 추진 전략 > 2.3 병목 해소",
+    "header_message": "SAP 전환의 핵심 병목 5개를 기존 도구·Pain Point·Palantir 대안·기대 효과의 4차원으로 분석하여 투입 우선순위를 결정",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.6,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["데이터 프로파일링", "데이터 클렌징", "테스트/검증", "커스텀 코드", "Cutover"],
+           "col_headers": ["기존 도구", "Pain Point", "Palantir 대안", "효과"],
+           "cells": [
+             [{"text": "LSMW\nBODS"}, {"text": "수작업 매핑\n3~4주 소요", "highlight": true}, {"text": "Pipeline Builder\n자동 프로파일링"}, {"text": "기간 60%↓", "style": "accent"}],
+             [{"text": "LSMW+Excel"}, {"text": "반복 과다\n오류 15%+", "highlight": true}, {"text": "Ontology 매핑\n재사용 Rule"}, {"text": "오류 3%↓", "style": "accent"}],
+             [{"text": "ECATT\nSolMan"}, {"text": "커버리지\n30% 미만", "highlight": true}, {"text": "AIP 자동생성\nCode Workbook"}, {"text": "90%+ 달성", "style": "accent"}],
+             [{"text": "Readiness Check"}, {"text": "500+ RICEF\n전수 불가", "highlight": true}, {"text": "AIP (LLM)\n자동 영향도"}, {"text": "전수 분석\n2주 내", "style": "accent"}],
+             [{"text": "Excel 스케줄"}, {"text": "의존성 누락\nDT 리스크", "highlight": true}, {"text": "Ontology 모델링\n시퀀스 최적화"}, {"text": "DT 50%↓", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.25,
+        "layout": "full",
+        "elements": [
+          {"type": "numbered_circle", "style": "accent",
+           "items": [
+             "Phase 1 (Q2): 데이터 프로파일링·클렌징에 Pipeline Builder 우선 투입 → Quick Win 확보",
+             "Phase 2 (Q3): AIP 테스트 자동화 + RICEF 영향도 분석 → Build 단계 병렬 적용",
+             "Phase 3 (Q4): Ontology Cutover 시퀀싱으로 Go-Live 리스크 최소화 → Safe Landing"
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "3단계 순차 투입 전략: Quick Win(데이터) → 확대(테스트/코드) → 안착(Cutover) — 전체 기간 30% 단축", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry Docs, PwC Global SAP Practice (2025)"
+  }]
+}

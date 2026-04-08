@@ -1,0 +1,50 @@
+{
+  "metadata": {"title": "Rich v3", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 연동 효과 — 4대 KPI 개선과 적용 영역 매핑",
+    "breadcrumb": "3. 성과 분석 > 3.1 KPI + 적용 영역",
+    "header_message": "Palantir Foundry 3대 모듈(Pipeline·AIP·Ontology)의 적용 효과를 4대 KPI로 정량화하고, 5대 전환 영역별 적용 범위를 매트릭스로 제시",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.25,
+        "layout": "columns", "n_cols": 4,
+        "elements": [
+          {"type": "card", "header": "전환 기간", "style": "default",
+           "content": [{"type": "kpi", "value": "30%↓", "text": "18개월→12개월"}], "col": 0},
+          {"type": "card", "header": "테스트 커버리지", "style": "accent",
+           "content": [{"type": "kpi", "value": "90%+", "text": "ECATT 30%→AIP 90%"}], "col": 1},
+          {"type": "card", "header": "데이터 오류율", "style": "default",
+           "content": [{"type": "kpi", "value": "80%↓", "text": "15%→3%"}], "col": 2},
+          {"type": "card", "header": "RICEF 분석", "style": "default",
+           "content": [{"type": "kpi", "value": "2주", "text": "수동 2개월→자동 2주"}], "col": 3}
+        ]
+      },
+      {
+        "height_ratio": 0.55,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["데이터 프로파일링", "클렌징/전환", "테스트 자동화", "코드 분석", "Cutover"],
+           "col_headers": ["Pipeline Builder", "AIP (LLM)", "Ontology"],
+           "cells": [
+             [{"text": "자동 추출·매핑\nJDBC/RFC", "style": "accent"}, {"text": "-"}, {"text": "데이터 모델링\n스키마 매핑"}],
+             [{"text": "클렌징 Rule 실행\n반복 자동화", "style": "accent"}, {"text": "-"}, {"text": "재사용 Rule 관리\nLineage 추적", "style": "accent"}],
+             [{"text": "-"}, {"text": "테스트케이스 생성\nUAT 시나리오", "style": "accent"}, {"text": "테스트 범위 매핑\n커버리지 분석"}],
+             [{"text": "-"}, {"text": "ABAP 호환성 평가\n영향도 자동 분류", "style": "accent"}, {"text": "객체 의존성 분석\n변경 영향 추적"}],
+             [{"text": "마이그레이션 파이프라인\n자동 실행"}, {"text": "시뮬레이션 분석\n리스크 예측"}, {"text": "시퀀스 최적화\n다운타임 최소화", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.2,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Pipeline은 데이터 영역, AIP는 테스트/코드 영역, Ontology는 전 영역 — 3대 모듈이 상호 보완하여 End-to-End 생산성 향상 실현", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry 아키텍처 설계, PwC SAP Practice 내부 분석 (2025)"
+  }]
+}

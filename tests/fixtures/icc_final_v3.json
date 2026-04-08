@@ -1,0 +1,37 @@
+{
+  "metadata": {"title": "ICC v3 - sidebar", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "원가 Component Split 단절 — 프로세스 상세와 대응 방안",
+    "breadcrumb": "4. 원가관리 > 4.2 프로세스 상세",
+    "layout": "sidebar",
+    "sidebar_items": ["1. 프로세스 현황", "2. 단절 원인", "3. 비즈니스 영향", "4. 솔루션 옵션"],
+    "sidebar_active": 1,
+    "n_cols": 1,
+    "elements": [
+      {"type": "card", "header": "단절 원인 상세 — SAP 표준 처리의 구조적 한계", "style": "accent",
+       "bullets": [
+         "제조법인: 자재유형 FERT, 조달유형 E (자가 생산)",
+         "  → CK11N 원가추정: 재료비 45% / 노무비 25% / 경비 20% / 판관비 10%",
+         "  → 출고: 이동유형 643, Outbound Delivery 기반",
+         "  → IC 청구: VF21, 조건유형 IV01 (이전가격 = 단일값)"
+       ]},
+      {"type": "card", "header": "판매법인 수신 — 외부 구매품으로 처리됨", "style": "default",
+       "bullets": [
+         "자재유형: HAWA (구매품), 조달유형 F (외부 구매)",
+         "PO Type: NB (표준 구매오더), PO 가격 = 이전가격",
+         "입고: 이동유형 101, PO 가격으로 재고 평가 → 표준원가 = 이전가격",
+         "결과: 이전가격이 100% '재료비'로 집계 → 노무비·경비 완전 소멸"
+       ]},
+      {"type": "card", "header": "CO-PA 영향 — 수익성 분석 구조 왜곡", "style": "default",
+       "bullets": [
+         "Costing-based CO-PA: COGS = 단일 VV001 (원가 구조 없음)",
+         "Account-based (S/4): 단일 G/L 계정 집계 (Component 없음)",
+         "마진 분석: 매출 - 이전가격 = 마진 (원가 동인 분석 불가)",
+         "그룹 연결: IC 이익 제거 시 원가 유형별 배분 근거 부재"
+       ]},
+      {"type": "takeaway_bar", "message": "핵심: SAP 표준은 회사코드 간 원가 Component를 전달하지 않음 — BAdI(ML), 다중평가, CO-PA 유도규칙으로 보완 필요", "style": "dark"}
+    ],
+    "footnote": "출처: SAP Standard Documentation, KBA 3348356, PwC SAP CO/COPA Practice"
+  }]
+}

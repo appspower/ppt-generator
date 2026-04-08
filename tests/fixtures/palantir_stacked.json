@@ -1,0 +1,69 @@
+{
+  "metadata": {"title": "Palantir SAP 복합 구성", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir Foundry 4단계 적용으로 SAP 전환 생산성 30% 향상",
+    "breadcrumb": "2. 추진 전략 > 2.3 Palantir 적용 방안",
+    "header_message": "전환 라이프사이클 전 구간에 Palantir 3대 모듈(Pipeline·AIP·Ontology)을 단계별 투입, 데이터·테스트·코드·Cutover 병목을 동시 해소",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.2,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process",
+           "steps": [
+             {"label": "Discover", "description": "데이터 프로파일링"},
+             {"label": "Design", "description": "Ontology 매핑 설계"},
+             {"label": "Build & Test", "description": "AIP 테스트 자동화"},
+             {"label": "Go-Live", "description": "Cutover 최적화"}
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.65,
+        "layout": "columns",
+        "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "데이터 레이어", "subtitle": "Pipeline Builder + Ontology", "style": "default",
+           "content": [{"type": "kpi", "value": "40%↓", "text": "데이터 준비 기간 단축"}],
+           "bullets": [
+             "ECC 29개 시스템 자동 프로파일링",
+             "S/4HANA 타겟 구조 Ontology 매핑",
+             "재사용 클렌징 Rule 200+ 구축",
+             "데이터 Lineage 전 과정 추적",
+             "마이그레이션 자동 Reconciliation"
+           ], "col": 0},
+          {"type": "card", "header": "AI 분석 레이어", "subtitle": "AIP (LLM) + Process Mining", "style": "accent",
+           "content": [{"type": "kpi", "value": "90%+", "text": "테스트 커버리지 달성"}],
+           "bullets": [
+             "트랜잭션 패턴 기반 테스트 자동 생성",
+             "500+ RICEF 호환성 LLM 전수 평가",
+             "프로세스 마이닝으로 최적 경로 도출",
+             "Code Workbook 비기술 인력 참여",
+             "Regression 리스크 사전 식별"
+           ], "col": 1},
+          {"type": "card", "header": "오케스트레이션", "subtitle": "Ontology + Cutover 시퀀싱", "style": "default",
+           "content": [{"type": "kpi", "value": "50%↓", "text": "Cutover 다운타임"}],
+           "bullets": [
+             "비즈니스 객체 의존성 모델링",
+             "Cutover 시퀀스 자동 최적화",
+             "병렬 워크스트림 실시간 조율",
+             "롤백 시나리오 사전 시뮬레이션",
+             "Go-Live 대시보드 실시간 모니터링"
+           ], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar",
+           "message": "핵심: Palantir는 ChaRM/SPDD/BASIS를 대체하지 않음 — 데이터+분석 오케스트레이션에 집중하여 기존 SAP 도구를 보완, 500+ RICEF 대규모 전환에 최적",
+           "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry 공식 문서, Merck·Airbus 파일럿 사례 (2025), PwC Global SAP Practice"
+  }]
+}

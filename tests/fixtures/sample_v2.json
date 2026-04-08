@@ -1,0 +1,155 @@
+{
+  "metadata": {
+    "title": "디지털 전환 전략 보고서",
+    "client": "ABC Corporation",
+    "date": "2026년 4월",
+    "accent_color": "#D04A02"
+  },
+  "slides": [
+    {
+      "type": "cover",
+      "title": "디지털 전환 전략 보고서",
+      "subtitle": "2026년 1분기 성과 리뷰 및 향후 전략 방향",
+      "author": "전략컨설팅팀",
+      "date": "2026년 4월"
+    },
+    {
+      "type": "content",
+      "title": "디지털 전환 ROI 340% 달성, 2027년 목표 1년 앞당김",
+      "header_message": "1분기 디지털 전환 핵심 성과 요약",
+      "layout": "full",
+      "n_cols": 1,
+      "elements": [
+        {
+          "type": "bullet",
+          "items": [
+            "클라우드 마이그레이션 완료 – IT 운영비 15% 절감 (연간 12억원)",
+            "디지털 채널 전환율 45% → 67% 상승, 대면 의존도 감소",
+            "신규 디지털 제품 3건 출시, 전체 매출 12% 기여",
+            "내부 업무 자동화율 38%, 전년 대비 2배 향상",
+            "데이터 기반 의사결정 체계 구축, KPI 실시간 모니터링 가동"
+          ]
+        }
+      ],
+      "footnote": "출처: 사내 디지털 전환 추진단 (2026.03)"
+    },
+    {
+      "type": "section_divider",
+      "section_number": 1,
+      "title": "현황 분석"
+    },
+    {
+      "type": "content",
+      "title": "부문별 디지털 성숙도 – B2B 최고, 내부운영 최저",
+      "layout": "full",
+      "n_cols": 1,
+      "elements": [
+        {
+          "type": "table",
+          "data": {
+            "headers": ["부문", "디지털 성숙도", "전년 대비", "목표 달성률", "핵심 과제"],
+            "rows": [
+              ["B2B 영업", "Level 4 (최적화)", "+1.2", "95%", "AI 리드 스코어링"],
+              ["B2C 마케팅", "Level 3 (표준화)", "+0.8", "82%", "개인화 엔진 고도화"],
+              ["공급망 관리", "Level 3 (표준화)", "+1.5", "78%", "실시간 재고 예측"],
+              ["내부 운영", "Level 2 (개별화)", "+0.5", "61%", "RPA 확대"],
+              ["고객 서비스", "Level 3 (표준화)", "+1.0", "88%", "AI 챗봇 정확도"]
+            ]
+          }
+        }
+      ],
+      "footnote": "출처: 내부 디지털 성숙도 진단 (2026.03), Level 1~5 기준"
+    },
+    {
+      "type": "content",
+      "title": "3대 핵심 성과 지표 – 매출, 비용, 고객만족 동시 개선",
+      "layout": "columns",
+      "n_cols": 3,
+      "elements": [
+        {
+          "type": "card",
+          "header": "매출 성장",
+          "style": "default",
+          "content": [{"type": "kpi", "value": "+23%", "text": "전년 동기 대비"}],
+          "bullets": ["B2B 엔터프라이즈 업셀 주도", "디지털 신제품 3건 기여"],
+          "col": 0
+        },
+        {
+          "type": "card",
+          "header": "비용 절감",
+          "style": "default",
+          "content": [{"type": "kpi", "value": "-15%", "text": "IT 운영비 절감"}],
+          "bullets": ["클라우드 마이그레이션 효과", "RPA 40건 자동화"],
+          "col": 1
+        },
+        {
+          "type": "card",
+          "header": "고객 만족",
+          "style": "accent",
+          "content": [{"type": "kpi", "value": "4.3/5.0", "text": "NPS 점수"}],
+          "bullets": ["디지털 채널 CSAT 92%", "응답 시간 3분 → 40초"],
+          "col": 2
+        }
+      ]
+    },
+    {
+      "type": "section_divider",
+      "section_number": 2,
+      "title": "전략 방향"
+    },
+    {
+      "type": "content",
+      "title": "2단계 전략: '효율화' → '혁신' 전환 본격화",
+      "layout": "columns",
+      "n_cols": 2,
+      "elements": [
+        {
+          "type": "card",
+          "header": "1단계: 효율화 (완료)",
+          "style": "default",
+          "bullets": [
+            "클라우드 마이그레이션 100% 완료",
+            "핵심 업무 프로세스 디지털화",
+            "데이터 웨어하우스 구축",
+            "기본 자동화 (RPA) 도입"
+          ],
+          "col": 0
+        },
+        {
+          "type": "card",
+          "header": "2단계: 혁신 (진행 중)",
+          "style": "accent",
+          "bullets": [
+            "AI/ML 기반 의사결정 시스템",
+            "고객 경험 초개인화",
+            "디지털 신규 사업 모델",
+            "생태계 플랫폼 전략"
+          ],
+          "col": 1
+        }
+      ]
+    },
+    {
+      "type": "content",
+      "title": "실행 로드맵 – 4단계 순차 추진",
+      "layout": "process",
+      "n_cols": 1,
+      "elements": [
+        {
+          "type": "process_flow",
+          "steps": [
+            {"label": "Q2 2026", "description": "AI 파일럿 3건"},
+            {"label": "Q3 2026", "description": "플랫폼 MVP"},
+            {"label": "Q4 2026", "description": "전사 확산"},
+            {"label": "Q1 2027", "description": "ROI 검증"}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "conclusion",
+      "title": "Thank you",
+      "subtitle": "전략컨설팅팀 | strategy@abc.com"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "metadata": {"title": "Predictive Maintenance", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "AI 기반 예지정비 도입으로 비계획 다운타임 30~50% 감소, 유지보수 비용 20~40% 절감",
+    "breadcrumb": "6. 디지털 전환 > 6.1 예지정비 전략",
+    "header_message": "기존 사후/예방정비의 과잉정비·돌발고장 문제를 IoT 센서 + AI 이상탐지 + SAP PM 연동으로 해결, 18~24개월 내 ROI 달성",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Phase 1", "description": "IoT 센서 배포 (0~6M)"},
+            {"label": "Phase 2", "description": "ML 모델 훈련 (6~12M)"},
+            {"label": "Phase 3", "description": "SAP PM 연동 (12~18M)"},
+            {"label": "Phase 4", "description": "전사 확산 (18~24M)"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.35,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "AS-IS: 사후/예방정비 문제점", "subtitle": "Reactive + Time-based Preventive", "style": "default",
+           "bullets": [
+             "비계획 다운타임: 전체 설비 가동시간의 15~20%",
+             "크레인/용접기 돌발 고장 → 생산 지연 ($50만~$200만/일)",
+             "예방정비 과잉: 건전 설비의 20~30% 불필요 정비",
+             "안전사고 리스크: 밀폐 구역 설비 열화 미감지",
+             "예비부품 과다 재고 → 재고 비용 15~20% 낭비",
+             "정비 이력: 수기 기록 → 분석/추적 불가"
+           ], "col": 0},
+          {"type": "card", "header": "TO-BE: AI 예지정비 체계", "subtitle": "IoT + ML Anomaly Detection + SAP PM", "style": "accent",
+           "bullets": [
+             "진동·열화상·전류 센서 → Edge 수집 → Palantir 분석",
+             "ML 이상탐지: Isolation Forest + LSTM 시계열 예측",
+             "RUL(잔여수명) 자동 산출 → SAP PM 자동 Work Order",
+             "모바일 알림 → 정비 기사 즉시 대응",
+             "디지털 트윈: 설비 상태 실시간 시뮬레이션",
+             "통합 패턴: 센서→Palantir→REST API→SAP PM→WO"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.35,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["크레인", "용접기", "환기시스템", "펌프", "CNC 절단기"],
+           "col_headers": ["센서 유형", "ML 모델", "예상 효과", "업계 벤치마크"],
+           "cells": [
+             [{"text": "와이어로프 진동\n기어박스 가속도"},
+              {"text": "LSTM 시계열\n피로도 예측"},
+              {"text": "다운타임 40%↓\n수명 20%↑", "style": "accent"},
+              {"text": "SHI: 고장 감지\n리드타임 40%↑"}],
+             [{"text": "전극 전류 분석\n아크 안정성"},
+              {"text": "Isolation Forest\n이상치 탐지"},
+              {"text": "품질 불량 30%↓\n소모품 비용↓", "style": "accent"},
+              {"text": "HHI HiMSEN:\n비계획정비 30%↓"}],
+             [{"text": "모터 베어링 진동\n온도 모니터링"},
+              {"text": "주파수 분석\n베어링 열화 예측"},
+              {"text": "안전사고 35%↓\n가동률 15%↑"},
+              {"text": "밀폐구역 필수\n규제 대응"}],
+             [{"text": "임펠러 캐비테이션\n압력/유량 센서"},
+              {"text": "진동 패턴\n캐비테이션 감지"},
+              {"text": "수명 25%↑\n에너지 10%↓"},
+              {"text": "Kawasaki:\n다운타임 25%↓"}],
+             [{"text": "스핀들 열변위\n절삭력 센서"},
+              {"text": "열변위 보정\n마모 예측"},
+              {"text": "정밀도 유지\n공구 수명 20%↑", "style": "accent"},
+              {"text": "DSME SVESSEL:\nOPEX 15~20%↓"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.2,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "5대 핵심 설비 × IoT+ML+SAP PM 통합으로 비계획 다운타임 30~50%↓, 유지보수 비용 20~40%↓ — Payback 18~24개월, 500+ 자산 모니터링 체계 구축", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HHI HiMSEN IoT 사례 (2021~), SHI Smart Yard 이니셔티브 (2022), IACS 디지털화 보고서 (2023), PwC Industrial IoT Practice"
+  }]
+}

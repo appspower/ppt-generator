@@ -1,0 +1,32 @@
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Output (generated PPTs — don't track)
+output/
+tests/round1/
+tests/round*/
+
+# External templates (large files)
+templates/external/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reference images (large, not code)
+docs/references/완성본/
+docs/references/슬라이드 렌더러/
+docs/references/폴더 구조/
+docs/references/업무지침_스킬/
+docs/references/spec/
+docs/references/components/

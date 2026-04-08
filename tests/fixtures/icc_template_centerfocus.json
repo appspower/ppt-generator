@@ -1,0 +1,21 @@
+{
+  "metadata": {"title": "ICC Center Focus", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "template",
+    "template_name": "center_focus",
+    "replacements": {
+      "{{title}}": "원가 Component Split 단절 — 4대 영향 영역",
+      "{{breadcrumb}}": "4. 원가관리 > 4.2 영향 분석",
+      "{{center_label}}": "원가 Split\n단절",
+      "{{label_0}}": "CO-PA 수익성 분석",
+      "{{top_left}}": "COGS = 단일 VV001\n재료비/노무비/경비 구분 불가\n제품별 마진 구조 분석 불가\n→ 의사결정 근거 부재",
+      "{{label_1}}": "원가 절감 기회",
+      "{{top_right}}": "제조원가 동인 파악 불가\n노무비/경비 비중 미식별\n공정 효율성 벤치마크 불가\n→ 절감 타겟 설정 불가",
+      "{{label_2}}": "그룹 연결 회계",
+      "{{bottom_left}}": "IC 이익 제거 시 배분 기준 부재\n원가유형별 환원 불가\nIFRS 15 인식 복잡도 증가\n→ 연결 감사 리스크",
+      "{{label_3}}": "제조-판매 협업",
+      "{{bottom_right}}": "원가 절감 협의 데이터 없음\n이전가격 근거 불투명\n제조법인 효율성 평가 불가\n→ 경영 의사결정 지연",
+      "{{takeaway}}": "4대 영역 모두 '원가 구조 가시성 부재'가 근본 원인 — Component Split 전달이 선행되어야 모든 영역 해소"
+    }
+  }]
+}

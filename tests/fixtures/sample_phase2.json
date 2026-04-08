@@ -1,0 +1,137 @@
+{
+  "metadata": {
+    "title": "Phase 2 통합 테스트 - 템플릿 인젝션",
+    "client": "HD현대",
+    "date": "2026년 4월"
+  },
+  "slides": [
+    {
+      "type": "cover",
+      "title": "ERP 전환 프로젝트 전략 보고서",
+      "subtitle": "HD현대 S/4HANA 전환 Phase 2",
+      "author": "전략컨설팅팀",
+      "date": "2026년 4월"
+    },
+    {
+      "type": "content",
+      "title": "4단계 추진 로드맵 – Blueprint에서 Go-Live까지",
+      "breadcrumb": "1. 개요 > 1.1 로드맵",
+      "layout": "full",
+      "n_cols": 1,
+      "elements": [
+        {
+          "type": "chevron_process",
+          "steps": [
+            {"label": "Blueprint", "description": "Q2 '26 프로세스 설계"},
+            {"label": "Build", "description": "Q3 '26 시스템 구축"},
+            {"label": "Test", "description": "Q4 '26 통합 테스트"},
+            {"label": "Go-Live", "description": "Q1 '27 전사 전환"}
+          ]
+        },
+        {
+          "type": "takeaway_bar",
+          "message": "Big Bang Go-Live 방식 채택 — 하이브리드 대비 6개월 단축",
+          "style": "accent"
+        }
+      ]
+    },
+    {
+      "type": "section_divider",
+      "section_number": 2,
+      "title": "시스템 아키텍처"
+    },
+    {
+      "type": "template",
+      "template_name": "hub_spoke",
+      "replacements": {
+        "{{title}}": "시스템 통합 아키텍처 – S/4HANA 중심 허브 구조",
+        "{{hub_label}}": "S/4HANA\nCore ERP",
+        "{{spoke_1}}": "PLM\n(설계)",
+        "{{spoke_2}}": "MES\n(생산)",
+        "{{spoke_3}}": "SRM\n(구매)",
+        "{{spoke_4}}": "WMS\n(물류)",
+        "{{spoke_5}}": "Palantir\n(분석)",
+        "{{spoke_6}}": "IoT\n(설비)"
+      }
+    },
+    {
+      "type": "template",
+      "template_name": "timeline",
+      "replacements": {
+        "{{title}}": "프로젝트 추진 경과 – 2024년부터 2028년까지",
+        "{{year_1}}": "2024",
+        "{{year_2}}": "2025",
+        "{{year_3}}": "2026",
+        "{{year_4}}": "2027",
+        "{{year_5}}": "2028",
+        "{{content_1}}": "현황 분석\n레거시 진단\nAS-IS 프로세스",
+        "{{content_2}}": "Blueprint\n표준 설계\n갭 분석",
+        "{{content_3}}": "Build & Test\n시스템 구축\n통합 테스트",
+        "{{content_4}}": "Go-Live\n전사 전환\n안정화",
+        "{{content_5}}": "최적화\nAI 고도화\n확산"
+      }
+    },
+    {
+      "type": "template",
+      "template_name": "comparison",
+      "replacements": {
+        "{{title}}": "Go-Live 전략 비교 – Big Bang vs Hybrid",
+        "{{option_a_title}}": "Option A: Hybrid (단계적)",
+        "{{option_a_content}}": "• 모듈별 순차 전환\n• 리스크 분산\n• 18개월 소요\n• 병행 운영 비용 발생",
+        "{{option_b_title}}": "Option B: Big Bang (일괄)",
+        "{{option_b_content}}": "• 전 모듈 동시 전환\n• 데이터 정합성 우위\n• 12개월 소요\n• 집중 리소스 필요",
+        "{{comparison_summary}}": "Big Bang이 데이터 정합성, 비용, 일정 면에서 우위 — 단, 충분한 테스트 기간 확보 필수",
+        "{{verdict}}": "Big Bang 추천"
+      }
+    },
+    {
+      "type": "template",
+      "template_name": "before_after",
+      "replacements": {
+        "{{title}}": "공급망 관리 혁신 – AS-IS vs TO-BE",
+        "{{before_content}}": "• 29개 분산 시스템\n• 수작업 데이터 연계\n• 재고 정확도 65%\n• 공급업체 협업 불가\n• 납기 지연 월 15건",
+        "{{after_content}}": "• S/4HANA 단일 플랫폼\n• 실시간 데이터 연동\n• 재고 정확도 95%\n• Supplier 360 포탈\n• AI 기반 납기 예측"
+      }
+    },
+    {
+      "type": "template",
+      "template_name": "swot",
+      "replacements": {
+        "{{title}}": "디지털 전환 SWOT 분석",
+        "{{q1_title}}": "Strengths (강점)",
+        "{{q1_content}}": "• 조선업 도메인 전문성\n• 경영진 강력한 의지\n• PwC 글로벌 네트워크",
+        "{{q2_title}}": "Weaknesses (약점)",
+        "{{q2_content}}": "• 레거시 시스템 복잡도\n• 변화관리 저항\n• 내부 IT 인력 부족",
+        "{{q3_title}}": "Opportunities (기회)",
+        "{{q3_content}}": "• AI/ML 기술 발전\n• 스마트 야드 트렌드\n• 규제 환경 변화",
+        "{{q4_title}}": "Threats (위협)",
+        "{{q4_content}}": "• 글로벌 경기 불확실성\n• 사이버 보안 리스크\n• 경쟁사 디지털화 가속"
+      }
+    },
+    {
+      "type": "template",
+      "template_name": "process_grid",
+      "replacements": {
+        "{{title}}": "6대 핵심 추진 과제",
+        "{{breadcrumb}}": "3. 추진 과제",
+        "{{grid0_header}}": "Engineering",
+        "{{grid0_content}}": "• PLM-ERP 통합\n• 3D 모델 기반 설계\n• BOM 자동 생성",
+        "{{grid1_header}}": "Procurement",
+        "{{grid1_content}}": "• 전략 구매 최적화\n• Supplier 360\n• 원가 분석 고도화",
+        "{{grid2_header}}": "Production",
+        "{{grid2_content}}": "• MES 연동 실시간\n• 공정 자동 스케줄\n• 스마트 야드",
+        "{{grid3_header}}": "Quality",
+        "{{grid3_content}}": "• 인라인 품질 검사\n• SPC 자동화\n• 불량 추적",
+        "{{grid4_header}}": "Logistics",
+        "{{grid4_content}}": "• 납기 예측 AI\n• 운송 최적화\n• 실시간 재고",
+        "{{grid5_header}}": "Safety",
+        "{{grid5_content}}": "• 예지 정비 체계\n• IoT 설비 모니터링\n• 안전 관리 디지털화"
+      }
+    },
+    {
+      "type": "conclusion",
+      "title": "Thank you",
+      "subtitle": "전략컨설팅팀 | strategy@hdhyundai.com"
+    }
+  ]
+}

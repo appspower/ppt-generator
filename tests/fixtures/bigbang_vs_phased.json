@@ -1,0 +1,74 @@
+{
+  "metadata": {"title": "Big Bang vs Phased", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "S/4HANA 전환 Big Bang vs Phased — 조직 규모·복잡도·리스크에 따른 최적 경로 선택",
+    "breadcrumb": "2. 추진 전략 > 2.5 전환 방식 비교",
+    "header_message": "Big Bang(일괄 전환)은 빠르지만 리스크 집중, Phased(단계 전환)는 안전하지만 장기·고비용 — 5대 기준으로 최적 경로를 판단",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "현황 진단", "description": "ECC 복잡도 평가"},
+            {"label": "경로 선택", "description": "Big Bang vs Phased"},
+            {"label": "설계·구축", "description": "12~42개월"},
+            {"label": "Go-Live", "description": "전환·안정화"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.4,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "Big Bang (System Conversion)", "subtitle": "전 모듈 일괄 전환 | SUM+DMO 기반 In-Place", "style": "default",
+           "bullets": [
+             "방식: 기존 ECC를 S/4HANA로 기술적 변환 (데이터 전량 이관)",
+             "기간: 12~18개월 (압축 시 9~12개월, 리스크 ↑)",
+             "비용: $1,500~$4,500/사용자 — 상대적 저비용",
+             "장점: 단일 Cutover → 병행운영 불필요, 히스토리 유지",
+             "단점: All-or-Nothing → 실패 시 전사 영향, 데이터 품질 이슈 후발견",
+             "성공률: 60~65% On-time 달성 (30~40% 일정 초과)",
+             "적합: 단일 국가, 낮은 프로세스 복잡도, 강한 IT 역량"
+           ], "col": 0},
+          {"type": "card", "header": "Phased / SDT (Selective Data Transition)", "subtitle": "단계적 파 전환 | 신규 S/4 + 선택적 데이터 이관", "style": "accent",
+           "bullets": [
+             "방식: 신규 S/4HANA 구축 → 사업단위/지역별 Wave 전환",
+             "기간: 24~48개월 (Wave당 6~12개월)",
+             "비용: $3,000~$8,000+/사용자 — 통합 비용 15~25% 추가",
+             "장점: 리스크 분산, Wave별 학습효과, Clean Core 실현",
+             "단점: Dual-System 운영 필요 (IDoc/API 브릿지), 마스터 데이터 거버넌스",
+             "성공률: 75% On-time/Wave — Big Bang 대비 안정적",
+             "적합: 다국적, 복수 ERP, 프로세스 혁신 목표, M&A 복잡성"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.32,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["조직 규모", "프로세스 복잡도", "리스크 허용도", "예산 규모", "전환 동인"],
+           "col_headers": ["Big Bang 유리", "Phased/SDT 유리"],
+           "cells": [
+             [{"text": "매출 $1B 미만\n단일 ERP 운영"}, {"text": "매출 $1B+\n복수 ERP/국가", "highlight": true}],
+             [{"text": "Low~Medium\n표준 프로세스 중심"}, {"text": "High\n산업 특화·커스텀 다수", "highlight": true}],
+             [{"text": "High\n집중 리소스 투입 가능", "style": "accent"}, {"text": "Low~Medium\n리스크 분산 필수"}],
+             [{"text": "$2M~$8M\n비용 효율 우선"}, {"text": "$8M~$30M+\n장기 투자 가능"}],
+             [{"text": "2027 ECC EOL 대응\n기한 압박", "highlight": true}, {"text": "프로세스 혁신·Clean Core\n전략적 전환", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.18,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "HD현대 권장: Phased(SDT) — Multi-Yard 글로벌 운영 + 조선업 특화 프로세스 + Clean Core 전략 → HD현대중공업 파일럿 후 타 법인 확산이 Safe Landing 최적 경로", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: SAP RISE Migration Guide (2025), Gartner S/4HANA Migration Report, PwC Global SAP Practice 내부 분석"
+  }]
+}

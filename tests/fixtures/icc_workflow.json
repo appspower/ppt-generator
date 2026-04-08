@@ -1,0 +1,74 @@
+{
+  "metadata": {"title": "ICC Cost Component", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "계열사 거래 시 원가 Component Split이 소멸되는 구조 — 4가지 해법과 환경별 최적 조합",
+    "breadcrumb": "4. 원가관리 > 4.2 IC 거래 Cost Component 단절",
+    "header_message": "제조법인의 원가 세분화(재료비 45%·노무비 25%·경비 30%)가 판매법인에서 이전가격 단일값으로 축약 — CO-PA 수익성 분석 구조 왜곡",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "제조법인 생산", "description": "CK11N Split 보유"},
+            {"label": "STO 출고 (643)", "description": "VF21 IC 청구 IV01"},
+            {"label": "판매법인 입고 (101)", "description": "★ Split 소멸 ★"},
+            {"label": "CO-PA 매출원가", "description": "단일 VV001 집계"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.33,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "제조법인 (Supplying Entity)", "subtitle": "조달유형 E · 자재유형 FERT · 원가 세분화 보유", "style": "default",
+           "bullets": [
+             "CK11N/CK40N 원가추정: Component Split 상세",
+             "  재료비(원자재·부자재): 45% | KEPH 테이블",
+             "  노무비(직접·간접): 25% | 활동유형별 단가",
+             "  제조경비(감가·전력·외주): 30% | 원가센터 배부",
+             "출고: 이동유형 643 (Cross-company GI)",
+             "IC 청구: VF21, 조건유형 IV01 (이전가격)",
+             "KEKO/KEPH에 원가 구조 완전 보존"
+           ], "col": 0},
+          {"type": "card", "header": "판매법인 (Receiving Entity)", "subtitle": "조달유형 F · 자재유형 HAWA · ★ Component 소멸", "style": "accent",
+           "bullets": [
+             "PO Type: NB (표준 구매오더)",
+             "입고: 이동유형 101, PO 가격으로 재고 평가",
+             "표준원가 = 이전가격 (단일값, Split 없음)",
+             "  재료비: 100% ← 이전가격 전액 재료비 처리",
+             "  노무비: 0% | 경비: 0% ← 완전 소멸",
+             "CO-PA: COGS = 단일 VV001, 구조 분석 불가",
+             "근본 원인: SAP 표준은 CC간 Split 미전달"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.42,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["대상 환경", "전제 조건", "개발 범위", "Component 전달", "권장도"],
+           "col_headers": ["Sol.A\nBAdI CKML", "Sol.B\n다중 평가", "Sol.C\nCO-PA 유도", "Sol.D\nAdv. IC STO"],
+           "cells": [
+             [{"text": "ECC\nS/4HANA"}, {"text": "S/4HANA\nOnly"}, {"text": "ECC\nS/4HANA"}, {"text": "S/4HANA\nOP2022+"}],
+             [{"text": "ML 실제원가 활성\nBF LOG_MM_SIT", "highlight": true}, {"text": "ML 다중통화\n병행평가 Config"}, {"text": "IC 청구(VF21)\n프로세스 활성", "highlight": true}, {"text": "ML + Adv.STO\nNote 3233845"}],
+             [{"text": "ABAP 개발\nBAdI 구현 필요"}, {"text": "Config 중심\n개발 최소"}, {"text": "ABAP Exit\nCOPA0001/0002"}, {"text": "Config + ML\n표준 기능"}],
+             [{"text": "실제원가 기준\n전 Component", "style": "accent"}, {"text": "그룹 View에서\nIC이익 제거"}, {"text": "표준원가 기준\nKEPH 참조", "style": "accent"}, {"text": "실제+표준\n자동 전달", "style": "accent"}],
+             [{"text": "★★★\nML 있으면 최우선"}, {"text": "★★\n그룹보고 전용"}, {"text": "★★★\nECC Quick Win"}, {"text": "★★★★\nGreenfield 최적", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "환경별 최적: Greenfield S/4 → Sol.D(Adv.STO) | Brownfield S/4 → Sol.A(BAdI)+B(다중평가) | ECC 유지 → Sol.C(CO-PA유도) Quick Win | 공통 전제: 자재원장(ML) 활성화", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: SAP KBA 3348356, S/4HANA OP2022 Release Note (Note 3233845), ERP Corp Controlling Guide, PwC SAP CO Practice"
+  }]
+}
