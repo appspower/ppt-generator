@@ -137,6 +137,9 @@ class Canvas:
         border: float | None = 0.75,
         border_color: str | RGBColor = "grey_mid",
         shape: Literal["rect", "rounded"] = "rect",
+        corner_label: str = "",
+        corner_label_color: str | RGBColor = "grey_700",
+        corner_label_size: float = 8,
     ):
         """굵고 각진 사각형. 둥근 모서리는 명시적으로 요청해야 적용됨.
 
@@ -146,6 +149,9 @@ class Canvas:
             border: 테두리 두께 pt (None=없음, 1.5pt가 기본 굵기)
             border_color: 테두리 색
             shape: "rect" (기본, 각진) | "rounded" (둥근)
+            corner_label: 우상단 작은 마커 텍스트 (예: "01"). 빈 문자열이면 미표시.
+            corner_label_color: 마커 색
+            corner_label_size: 마커 폰트 pt
         """
         mso_shape = (
             MSO_SHAPE.ROUNDED_RECTANGLE if shape == "rounded" else MSO_SHAPE.RECTANGLE
@@ -171,6 +177,23 @@ class Canvas:
         else:
             box.line.color.rgb = color(border_color)
             box.line.width = Pt(border)
+
+        # 우상단 corner label (별도 textbox로 그림 — box의 text frame은 건드리지 않음)
+        if corner_label:
+            label_w = max(0.35, len(corner_label) * 0.09 + 0.1)
+            label_h = 0.22
+            self.text(
+                corner_label,
+                x=x + w - label_w - 0.08,
+                y=y + 0.06,
+                w=label_w,
+                h=label_h,
+                size=corner_label_size,
+                bold=True,
+                color=corner_label_color,
+                align="right",
+                anchor="top",
+            )
 
         self._drawn.append(("box", x, y, w, h))
         return box

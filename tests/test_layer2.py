@@ -25,8 +25,10 @@ from ppt_builder.primitives import COLORS, Canvas, color
 from ppt_builder.design_check import (
     DesignDecision,
     DesignReport,
+    check_head_message_ending,
     decide_density,
     decide_emphasis_color,
+    decide_head_message_form,
     decide_layout_archetype,
     decide_number_marker,
     inspect_design,
@@ -301,6 +303,121 @@ def test_pattern_process_builds(tmp_path: Path):
     process_flow(slide, spec)
     out = _save(prs, tmp_path, "proc.pptx")
     assert out.exists()
+
+
+# ============================================================
+# 신규 — 헤더 구조 / corner_label / 어미 검사
+# ============================================================
+
+
+def test_slide_header_new_fields_default():
+    """SlideHeader 새 필드(category, nav_path)가 default로 추가되어야 함."""
+    h = SlideHeader(title="t")
+    assert h.category == ""
+    assert h.nav_path == []
+    assert h.breadcrumb == ""  # 하위 호환 필드도 존재
+
+
+def test_slide_header_with_full_structure():
+    h = SlideHeader(
+        title="...구축",
+        category="1. Foo",
+        nav_path=["A", "B", "C"],
+    )
+    assert h.category == "1. Foo"
+    assert h.nav_path == ["A", "B", "C"]
+
+
+def test_canvas_box_corner_label(tmp_path: Path):
+    """corner_label 옵션이 textbox를 추가로 만들어야 함."""
+    prs, slide = _new_slide()
+    c = Canvas(slide)
+    c.box(x=1, y=1, w=3, h=2, corner_label="01")
+    out = _save(prs, tmp_path, "corner.pptx")
+    re = Presentation(out)
+    # box + corner label textbox = 2개 이상
+    assert len(re.slides[0].shapes) >= 2
+    # corner label 텍스트가 어디에 있어야 함
+    found = any(
+        s.has_text_frame and "01" in s.text_frame.text
+        for s in re.slides[0].shapes
+    )
+    assert found
+
+
+def test_check_head_message_ending_korean_pass():
+    """한국어 단호 어미는 통과 (None 반환)."""
+    for ok_text in [
+        "Palantir 단일 플랫폼으로 SAP 전환 효과를 확보",
+        "3대 병목을 단일 Ontology로 해소함",
+        "프로세스 마이닝으로 변형을 사전 발견",
+        "데이터 정합성 및 일관성을 확보",
+    ]:
+        assert check_head_message_ending(ok_text) is None
+
+
+def test_check_head_message_ending_korean_fail():
+    """단호 어미 없는 한국어는 LOW issue 반환."""
+    for bad_text in [
+        "Palantir와 SAP 전환의 새로운 가능성",
+        "3대 병목을 해결하는 방법론에 대하여",
+    ]:
+        issue = check_head_message_ending(bad_text)
+        assert issue is not None
+        assert issue.severity == "low"
+        assert issue.category == "tone"
+
+
+def test_check_head_message_ending_english_skip():
+    """영문 텍스트는 검사 skip (None 반환)."""
+    assert check_head_message_ending("How Palantir helps SAP migration") is None
+    assert check_head_message_ending("") is None
+
+
+def test_decide_head_message_form_returns_examples():
+    """6개 intent 모두 example과 preferred_endings를 가져야 함."""
+    for intent in ["executive", "timeline", "comparison", "process", "quadrant", "data"]:
+        d = decide_head_message_form(intent=intent)
+        assert "preferred_endings" in d.recommendation
+        assert "example" in d.recommendation
+        assert len(d.recommendation["preferred_endings"]) > 0
+
+
+def test_inspect_design_catches_bad_head_ending(tmp_path: Path):
+    """헤더 영역에 단호어미 없는 한국어 head text가 있으면 LOW issue."""
+    prs, slide = _new_slide()
+    c = Canvas(slide)
+    # 헤더 영역(y < 1.2") 에 큰 폰트(>= 13pt) 한국어 텍스트
+    c.text(
+        "Palantir와 SAP 전환의 새로운 가능성에 대하여",
+        x=0.3, y=0.6, w=9.4, h=0.5, size=14, bold=True,
+    )
+    # 본문 더미
+    c.text(
+        "본문 채움 텍스트입니다 본문 채움 텍스트입니다 본문 채움 텍스트입니다",
+        x=0.3, y=2.0, w=9.4, h=0.5, size=10,
+    )
+    out = _save(prs, tmp_path, "bad_head.pptx")
+    report = inspect_design(str(out))
+    assert any(i.category == "tone" for i in report.issues)
+
+
+def test_inspect_design_passes_good_head_ending(tmp_path: Path):
+    """단호어미가 있는 head는 tone issue를 만들지 않아야 함."""
+    prs, slide = _new_slide()
+    c = Canvas(slide)
+    c.text(
+        "Palantir 단일 플랫폼으로 SAP 전환 효과를 확보",
+        x=0.3, y=0.6, w=9.4, h=0.5, size=14, bold=True,
+    )
+    c.text(
+        "본문 채움 텍스트 본문 채움 텍스트 본문 채움 텍스트",
+        x=0.3, y=2.0, w=9.4, h=0.5, size=10,
+    )
+    out = _save(prs, tmp_path, "good_head.pptx")
+    report = inspect_design(str(out))
+    tone_issues = [i for i in report.issues if i.category == "tone"]
+    assert len(tone_issues) == 0
 
 
 def test_pattern_quadrant_builds(tmp_path: Path):

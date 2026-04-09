@@ -36,8 +36,30 @@ from .primitives import Canvas
 
 @dataclass
 class SlideHeader:
+    """컨설팅 슬라이드 헤더 — 레퍼런스 분석 기반 재구조화.
+
+    레이아웃:
+        ┌──────────────────────────────────────────────────┐
+        │ category (라인 위 좌측, 11pt)   nav_path (우측) │
+        │ ──────────────────────────────────────  (라인)   │
+        │ head_message (라인 아래, 14pt 굵게, 한국어 어미) │
+        └──────────────────────────────────────────────────┘
+
+    Fields:
+        title: head message — 라인 아래 큰 글씨, 슬라이드 결론 한 문장
+            (예: "...구축", "...지원", "...임" 등 한국어 단호한 어미)
+        category: 라인 위 좌측 — 슬라이드 소분류
+            (예: "1. 일반 현황 - PwC Global 소개")
+        nav_path: 라인 위 우측 — 다단계 nav, "/"로 join
+            (예: ["1. 제안사 소개", "2. 협력사 소개"])
+        breadcrumb: deprecated — 하위 호환을 위해 유지. 비어있으면 무시.
+            기존 spec에서 breadcrumb만 채운 경우 nav_path 첫 항목으로 fallback
+        underline: 라인 표시 여부
+    """
     title: str
-    breadcrumb: str = ""
+    category: str = ""
+    nav_path: list[str] = field(default_factory=list)
+    breadcrumb: str = ""  # deprecated, 하위 호환
     underline: bool = True
 
 
@@ -55,17 +77,48 @@ class SlideFooter:
 
 
 def _draw_header(c: Canvas, header: SlideHeader):
-    c.title(
-        header.title,
-        x=0.3, y=0.2, w=9.4, h=0.45, size=15,
-        underline=header.underline, underline_color="grey_700",
-    )
-    if header.breadcrumb:
+    """레퍼런스 컨설팅 슬라이드 헤더 구조 (3단):
+       1) 라인 위 좌측 category, 우측 nav_path
+       2) 가는 회색 라인
+       3) 라인 아래 head message (title 필드)
+
+    하위 호환: category가 비어 있으면 breadcrumb를 fallback으로 사용
+    """
+    # 1) 라인 위 좌측 — category
+    cat = header.category or header.breadcrumb
+    if cat:
         c.text(
-            header.breadcrumb,
-            x=0.3, y=0.75, w=9.4, h=0.25,
-            size=9, color="grey_700", align="left",
+            cat,
+            x=0.3, y=0.18, w=5.5, h=0.26,
+            size=10, bold=True, color="grey_900", anchor="middle",
         )
+
+    # 1) 라인 위 우측 — nav_path
+    if header.nav_path:
+        nav_str = "  /  ".join(header.nav_path)
+        c.text(
+            nav_str,
+            x=5.8, y=0.18, w=3.9, h=0.26,
+            size=9, color="grey_700", align="right", anchor="middle",
+        )
+
+    # 2) 가는 회색 라인 (cat 또는 nav 있을 때만)
+    line_y = 0.5
+    if header.underline and (cat or header.nav_path):
+        c.box(
+            x=0.3, y=line_y, w=9.4, h=0.012,
+            fill="grey_700", border=None,
+        )
+
+    # 3) 라인 아래 — head message (title)
+    head_y = 0.6 if (cat or header.nav_path) else 0.2
+    c.text(
+        header.title,
+        x=0.3, y=head_y, w=9.4, h=0.5,
+        size=14, bold=True, color="grey_900",
+        font="Arial",  # 한글 가독성: Arial로 설정 (한글은 시스템 fallback)
+        anchor="middle",
+    )
 
 
 def _draw_footer(c: Canvas, footer: SlideFooter):
@@ -133,8 +186,8 @@ def executive_summary(slide: Slide, spec: ExecutiveSpec):
     _draw_header(c, spec.header)
 
     # ----- Hero (좌) -----
-    HX, HY = 0.3, 1.15
-    HW, HH = 4.45, 5.15
+    HX, HY = 0.3, 1.25
+    HW, HH = 4.45, 5.05
     c.box(x=HX, y=HY, w=HW, h=HH, fill="grey_800", border=None)
     c.label_chip(
         spec.hero_label,
@@ -155,38 +208,38 @@ def executive_summary(slide: Slide, spec: ExecutiveSpec):
         x=HX + 0.3, y=HY + 1.95, w=HW - 0.6, h=0.012,
         fill="grey_400", border=None,
     )
-    # bottlenecks
-    item_h = 1.05
-    item_y = HY + 2.12
+    # bottlenecks (Hero 박스 5.05" 안에 3개 균등 배치)
+    item_h = 0.96
+    item_y = HY + 2.06
     for i, b in enumerate(spec.bottlenecks):
         iy = item_y + i * item_h
         c.circle(
-            x=HX + 0.3, y=iy + 0.04, d=0.38,
+            x=HX + 0.3, y=iy + 0.02, d=0.36,
             fill="grey_900", border=1.0, border_color="grey_400",
             text=b.get("num", f"{i+1:02d}"),
             text_color="white", text_size=10,
         )
         c.text(
             b["title"],
-            x=HX + 0.78, y=iy, w=HW - 1.1, h=0.27,
+            x=HX + 0.76, y=iy, w=HW - 1.1, h=0.25,
             size=11, bold=True, color="white", anchor="top",
         )
         if b.get("kpi"):
             c.text(
                 b["kpi"],
-                x=HX + 0.78, y=iy + 0.27, w=HW - 1.1, h=0.2,
+                x=HX + 0.76, y=iy + 0.25, w=HW - 1.1, h=0.2,
                 size=8, bold=True, color="grey_200", anchor="top",
             )
         for bi, bul in enumerate(b.get("bullets", [])):
             c.text(
                 f"▪  {bul}",
-                x=HX + 0.78, y=iy + 0.5 + bi * 0.25,
+                x=HX + 0.76, y=iy + 0.46 + bi * 0.23,
                 w=HW - 1.0, h=0.22,
                 size=8, color="grey_200", anchor="top",
             )
 
     # ----- KPI grid (우상) -----
-    R_X, R_W, R_Y = 4.95, 4.75, 1.15
+    R_X, R_W, R_Y = 4.95, 4.75, 1.25
     c.section_label("정량 효과", x=R_X, y=R_Y, w=R_W, size=10)
     KPI_AREA_Y = R_Y + 0.34
     n_kpis = len(spec.kpis)
@@ -271,13 +324,13 @@ def timeline_phases(slide: Slide, spec: TimelineSpec):
     if spec.intro:
         c.text(
             spec.intro,
-            x=0.3, y=1.05, w=9.4, h=0.32,
+            x=0.3, y=1.20, w=9.4, h=0.30,
             size=10, color="grey_900", anchor="top",
         )
 
     # ----- 가로 chevron -----
     n = len(spec.phases)
-    CHEV_Y = 1.5
+    CHEV_Y = 1.55
     CHEV_H = 0.5
     chev_overlap = 0.1
     chev_w = (9.4 + chev_overlap * (n - 1)) / n
@@ -293,8 +346,8 @@ def timeline_phases(slide: Slide, spec: TimelineSpec):
         )
 
     # ----- 각 단계 상세 카드 -----
-    CARD_Y = 2.2
-    CARD_H = 4.3
+    CARD_Y = 2.25
+    CARD_H = 4.25
     card_gap = 0.15
     card_w = (9.4 - card_gap * (n - 1)) / n
     for i, p in enumerate(spec.phases):
@@ -389,7 +442,7 @@ def comparison_matrix(slide: Slide, spec: ComparisonSpec):
     if spec.intro:
         c.text(
             spec.intro,
-            x=0.3, y=1.05, w=9.4, h=0.32,
+            x=0.3, y=1.20, w=9.4, h=0.30,
             size=10, color="grey_900", anchor="top",
         )
 
@@ -402,9 +455,9 @@ def comparison_matrix(slide: Slide, spec: ComparisonSpec):
     GRID_W = 9.4 - LABEL_W - 0.1
     COL_W = (GRID_W - 0.1 * (n - 1)) / n
 
-    GRID_Y = 1.6
+    GRID_Y = 1.7
     HEADER_H = 0.6
-    ROW_H = (4.5 - HEADER_H) / n_crit
+    ROW_H = (4.4 - HEADER_H) / n_crit
 
     # ----- 헤더: 옵션명 -----
     for i, opt in enumerate(spec.options):
@@ -488,13 +541,13 @@ def process_flow(slide: Slide, spec: ProcessSpec):
     if spec.intro:
         c.text(
             spec.intro,
-            x=0.3, y=1.05, w=9.4, h=0.32,
+            x=0.3, y=1.20, w=9.4, h=0.30,
             size=10, color="grey_900", anchor="top",
         )
 
     n = len(spec.steps)
     # ----- 상단 arrow_chain (단계명) -----
-    chain_y = 1.6
+    chain_y = 1.65
     chain_h = 0.55
     c.arrow_chain(
         [s["name"] for s in spec.steps],
@@ -506,7 +559,7 @@ def process_flow(slide: Slide, spec: ProcessSpec):
 
     # ----- 각 단계 아래 상세 callout -----
     detail_y = chain_y + chain_h + 0.25
-    detail_h = 4.05
+    detail_h = 4.00
     gap = 0.15
     box_w = (9.4 - gap * (n - 1)) / n
 
@@ -610,15 +663,15 @@ def quadrant_story(slide: Slide, spec: QuadrantSpec):
     if spec.intro:
         c.text(
             spec.intro,
-            x=0.3, y=1.05, w=9.4, h=0.32,
+            x=0.3, y=1.20, w=9.4, h=0.30,
             size=10, color="grey_900", anchor="top",
         )
 
     # ----- 2×2 grid -----
     GRID_X = 1.2
-    GRID_Y = 1.6
+    GRID_Y = 1.7
     GRID_W = 7.4
-    GRID_H = 4.4
+    GRID_H = 4.3
     cell_gap = 0.12
     cell_w = (GRID_W - cell_gap) / 2
     cell_h = (GRID_H - cell_gap) / 2

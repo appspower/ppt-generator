@@ -234,6 +234,100 @@ def decide_density(
     )
 
 
+# 한국어 컨설팅 단호 어미 화이트리스트 — 레퍼런스 분석 기반
+KOREAN_DEFINITIVE_ENDINGS = (
+    "임", "함", "됨", "음",
+    "구축", "확보", "지원", "제공", "달성", "수립", "도출", "정의",
+    "강화", "개선", "절감", "단축", "확대", "수행", "적용", "고도화",
+    "활용", "이행", "추진", "운영", "실시", "마련", "체계화",
+    "필요", "권장", "예상", "기대",
+    "있음", "없음",
+    "발견", "분류", "검증", "확인", "분석", "차별화", "우위",
+    "압축", "자동화", "통합", "정합화", "최적화", "표준화",
+)
+
+
+def check_head_message_ending(text: str) -> Optional[DesignIssue]:
+    """head message 텍스트가 컨설팅 톤 한국어 어미로 끝나는지 검사.
+
+    한국어 텍스트가 아니거나 검증을 건너뛸 경우 None 반환.
+    검사 통과: None. 미통과: LOW severity DesignIssue.
+    """
+    if not text or not text.strip():
+        return None
+    text = text.strip().rstrip(".")
+    # 한국어 비율로 한국어 텍스트인지 판단
+    kr_chars = sum(1 for ch in text if 0xAC00 <= ord(ch) <= 0xD7A3)
+    if kr_chars / max(len(text), 1) < 0.3:
+        # 영문/숫자 위주 → 검사 skip
+        return None
+    # 어미 매칭
+    for ending in KOREAN_DEFINITIVE_ENDINGS:
+        if text.endswith(ending):
+            return None
+    return DesignIssue(
+        severity="low",
+        category="tone",
+        message=f"Head message가 컨설팅 단호 어미로 끝나지 않음: \"...{text[-10:]}\"",
+        suggestion="\"...임\", \"...구축\", \"...지원\" 등 단호한 한국어 어미 권장",
+    )
+
+
+def decide_head_message_form(
+    *,
+    intent: Literal[
+        "executive", "timeline", "comparison", "process", "quadrant", "data"
+    ],
+) -> DesignDecision:
+    """슬라이드 의도별로 head message 어미 추천.
+
+    레퍼런스 분석 기반: PwC 컨설팅 산출물의 head message 어미 패턴.
+    """
+    forms = {
+        "executive": {
+            "preferred_endings": ["임", "함", "구축", "확보"],
+            "tone": "결론 단정, 임팩트 숫자 포함",
+            "example": "Palantir 투입으로 SAP 전환 일정 14% 단축, 테스트 70%↓, DT 50%↓",
+            "anti_pattern": "물음표나 슬로건 형태 (예: '어떻게 할 것인가?')",
+        },
+        "timeline": {
+            "preferred_endings": ["수립", "체계화", "이행", "추진"],
+            "tone": "단계적 실행 의지",
+            "example": "3단계 Quick Win 전략으로 2~3주 내 가치 입증 후 점진 확대",
+            "anti_pattern": "단계 나열만 (예: 'L1, L2, L3, L4')",
+        },
+        "comparison": {
+            "preferred_endings": ["임", "차별화", "우위", "확보"],
+            "tone": "비교 결론 단호",
+            "example": "Palantir의 차별점은 Ontology+AIP+Workshop 단일 플랫폼 통합임",
+            "anti_pattern": "모호한 평가 (예: '각자 장단점이 있음')",
+        },
+        "process": {
+            "preferred_endings": ["수행", "구축", "자동화", "압축"],
+            "tone": "프로세스 결과 명시",
+            "example": "Blueprint→결함 등록 5단계 자동 파이프라인으로 공수 70% 절감",
+            "anti_pattern": "단계 명사형만 (예: '5단계 프로세스')",
+        },
+        "quadrant": {
+            "preferred_endings": ["분류", "우선순위화", "권장", "도출"],
+            "tone": "사분면 → 의사결정 권고",
+            "example": "8개 모듈을 ROI×난이도로 분류 — Quick Win 영역에서 시작 권장",
+            "anti_pattern": "사분면 라벨만 (예: '4개 영역의 모듈')",
+        },
+        "data": {
+            "preferred_endings": ["증명", "확인", "도출", "발견"],
+            "tone": "데이터 → 인사이트",
+            "example": "월별 결함 추이가 6개월 후 안정화되는 패턴을 확인",
+            "anti_pattern": "차트 설명만 (예: '월별 결함 그래프')",
+        },
+    }
+    rec = forms[intent]
+    return DesignDecision(
+        rationale=f"{intent} 슬라이드 head message 어미 권장: {', '.join(rec['preferred_endings'])}",
+        recommendation=rec,
+    )
+
+
 def decide_layout_archetype(
     *,
     intent: Literal[
@@ -346,6 +440,9 @@ def inspect_design(
         font_sizes: list[float] = []
         total_chars = 0
 
+        # head message 후보 — 헤더 영역(y < 1.2")에서 가장 큰 폰트 텍스트
+        head_candidates: list[tuple[float, str]] = []  # (font_size, text)
+
         # ---------- 2. 영역별 점유 ----------
         # 4분면 (TL, TR, BL, BR) 각 영역의 사용 면적
         quadrants = {"TL": 0.0, "TR": 0.0, "BL": 0.0, "BR": 0.0}
@@ -383,9 +480,17 @@ def inspect_design(
             if shape.has_text_frame:
                 txt = shape.text_frame.text.strip()
                 total_chars += len(txt)
+                # head message 후보: 헤더 영역(y < 1.2") + 폰트 ≥ 13pt + 길이 10자 이상
+                shape_y = (shape.top or 0) / 914400
+                max_font = 0.0
                 for p in shape.text_frame.paragraphs:
                     if p.font.size:
-                        font_sizes.append(p.font.size / 12700)
+                        sz = p.font.size / 12700
+                        font_sizes.append(sz)
+                        if sz > max_font:
+                            max_font = sz
+                if shape_y < 1.2 and max_font >= 13 and len(txt) >= 10:
+                    head_candidates.append((max_font, txt))
 
         # ---------- 1. 금지색 ----------
         if forbidden_hits:
@@ -479,6 +584,18 @@ def inspect_design(
                         suggestion="텍스트 압축 또는 영역 확장",
                     )
                 )
+
+        # ---------- 6. Head message 어미 검사 ----------
+        if head_candidates:
+            # 가장 큰 폰트 = head message로 추정
+            head_candidates.sort(reverse=True)
+            head_text = head_candidates[0][1]
+            metrics[f"slide_{sn}_head"] = head_text[:50]
+            ending_issue = check_head_message_ending(head_text)
+            if ending_issue:
+                # 슬라이드 번호 prefix
+                ending_issue.message = f"Slide {sn}: " + ending_issue.message
+                issues.append(ending_issue)
 
     return DesignReport(issues=issues, metrics=metrics)
 

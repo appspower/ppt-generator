@@ -57,8 +57,9 @@ FOOTER = SlideFooter(
 def build_executive():
     spec = ExecutiveSpec(
         header=SlideHeader(
-            title="Palantir 투입으로 SAP 전환 일정 14% · 테스트 70% · DT 50% 단축",
-            breadcrumb="① Palantir 활용안 — Executive Summary",
+            title="Palantir 단일 플랫폼으로 SAP 전환 일정 14% · 테스트 70% · DT 50% 단축 효과를 확보",
+            category="1. Palantir 활용안 — Executive Summary",
+            nav_path=["1. 제안 개요", "2. 활용 전략"],
         ),
         hero_label="WHY NOW",
         hero_headline="SAP 전환의 3대 병목을\n단일 Ontology로 해소",
@@ -118,8 +119,9 @@ def build_executive():
 def build_timeline():
     spec = TimelineSpec(
         header=SlideHeader(
-            title="Palantir 4단계 도입 로드맵 — Quick Win에서 AI 지능화까지",
-            breadcrumb="② 도입 로드맵 — PMO View",
+            title="Quick Win에서 AI 지능화까지 4단계 의존성 체인으로 점진 확대를 추진",
+            category="2. 도입 로드맵 — PMO View",
+            nav_path=["2. 활용 전략", "3. 단계별 추진 계획"],
         ),
         intro="각 단계 산출물이 다음 단계의 입력 — Level 1 미완료 시 Level 2 이후 착수 불가 (의존성 체인)",
         phases=[
@@ -177,8 +179,9 @@ def build_timeline():
 def build_comparison():
     spec = ComparisonSpec(
         header=SlideHeader(
-            title="SAP 전환 도구 비교 — Palantir의 차별점은 단일 플랫폼 통합",
-            breadcrumb="③ Tooling 비교 — IT View",
+            title="Palantir는 Ontology+AIP+Workshop 단일 플랫폼으로 3사 도구를 통합 — 차별적 우위 확보",
+            category="3. Tooling 비교 — IT View",
+            nav_path=["2. 활용 전략", "4. 기술 스택 비교"],
         ),
         intro="SAP 전환 핵심 영역에서 시장 대표 도구와 Palantir Foundry+AIP의 역할을 정량 비교",
         criteria_labels=[
@@ -224,8 +227,9 @@ def build_comparison():
 def build_process():
     spec = ProcessSpec(
         header=SlideHeader(
-            title="AIP 테스트 자동화 프로세스 — Blueprint에서 결함 등록까지 5단계",
-            breadcrumb="④ 테스트 자동화 흐름 — Engineer View",
+            title="Blueprint→결함 등록 5단계 자동 파이프라인으로 테스트 작성 공수 70% 절감을 달성",
+            category="4. 테스트 자동화 흐름 — Engineer View",
+            nav_path=["2. 활용 전략", "5. 모듈별 상세 설계"],
         ),
         intro="기존 수작업 3~6개월을 5단계 자동 파이프라인으로 압축 — 각 단계별 도구와 산출물",
         steps=[
@@ -278,8 +282,9 @@ def build_process():
 def build_quadrant():
     spec = QuadrantSpec(
         header=SlideHeader(
-            title="8개 Palantir 활용 모듈을 ROI × 구현 난이도로 우선순위화",
-            breadcrumb="⑤ 모듈 우선순위 — Investment View",
+            title="8개 Palantir 활용 모듈을 ROI×난이도로 분류, Quick Win 영역에서 시작을 권장",
+            category="5. 모듈 우선순위 — Investment View",
+            nav_path=["2. 활용 전략", "6. 투자 우선순위"],
         ),
         intro="단기 ROI와 구현 난이도 두 축으로 8개 활용 모듈을 분류 — Quick Win 영역에서 시작 권장",
         x_axis_label="구현 난이도",
