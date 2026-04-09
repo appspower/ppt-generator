@@ -50,8 +50,8 @@ def render_card(slide: Slide, comp: CardComponent, x, y, w, h):
         top_bar_c, fill_c, text_c, header_c = CL_GREY, CL_WHITE, CL_BODY_TEXT, CL_BLACK
         border_c = CL_BORDER
 
-    pad_inch = 0.15
-    inner_w = w / 914400 - 2 * pad_inch  # 내부 텍스트 폭 (인치)
+    pad_inch = 0.08  # ④ 패딩 축소 0.15→0.08
+    inner_w = w / 914400 - 2 * pad_inch
 
     # 텍스트 실제 높이 추정
     est_h = pad_inch * 2  # 상하 패딩
@@ -69,21 +69,27 @@ def render_card(slide: Slide, comp: CardComponent, x, y, w, h):
     for bullet in comp.bullets:
         est_h += estimate_text_height(bullet, 9, inner_w - 0.15) + 0.03
 
-    # 카드 높이: 추정치와 할당 높이 중 작은 쪽 (빈 공간 최소화)
-    # 단, 최소 1.2", 최대 3.5"
-    card_h = min(h, max(Inches(1.2), Inches(est_h + 0.3)), Inches(3.5))
+    # 카드 높이: 추정치보다 작지 않게, 단 할당 h는 절대 넘지 않음
+    # (Top 정렬이라 텍스트 적으면 하단 여백 발생 → 추정 높이로 카드를 줄임)
+    est_card_h = Inches(est_h + 0.2)
+    card_h = max(Inches(1.2), min(h, est_card_h))
 
-    # 방안 4: 카드 상단 색상 바 (5px)
-    top_bar_h = Inches(0.06)
+    # ① 카드 상단 악센트 라인 (2px — 디자이너 스타일)
+    top_bar_h = Inches(0.02)
     top_bar = slide.shapes.add_shape(1, x, y, w, top_bar_h)
     top_bar.fill.solid()
     top_bar.fill.fore_color.rgb = top_bar_c
     top_bar.line.fill.background()
 
-    # 카드 본문 배경 (상단 바 아래)
+    # ③ 카드 본문 — roundRect (디자이너 스타일)
     body_y = y + top_bar_h
     body_h = card_h - top_bar_h
-    box = slide.shapes.add_shape(1, x, body_y, w, body_h)
+    from pptx.enum.shapes import MSO_SHAPE
+    box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, body_y, w, body_h)
+    try:
+        box.adjustments[0] = 0.03  # 미묘한 둥근 모서리
+    except (IndexError, TypeError):
+        pass
     box.fill.solid()
     box.fill.fore_color.rgb = fill_c
     if border_c:
@@ -92,17 +98,26 @@ def render_card(slide: Slide, comp: CardComponent, x, y, w, h):
     else:
         box.line.fill.background()
 
+    # 과제3: 드롭 쉐도우 추가
+    from .renderers.base import add_shadow
+    add_shadow(box, blur=3, dist=2, color="C0C0C0", alpha=30000)
+
     pad = Inches(pad_inch)
     tx = slide.shapes.add_textbox(x + pad, body_y + Inches(0.08), w - 2 * pad, body_h - Inches(0.16))
     tf = tx.text_frame
     tf.word_wrap = True
+    # 텍스트가 적으면 카드 중앙 정렬 (하단 빈공간 방지)
+    tf.vertical_anchor = MSO_ANCHOR.TOP
     first = True
 
-    # 방안 3: 헤더 폰트 위계 강화
+    # 과제3: 헤더 + 아이콘 앵커
     if comp.header:
+        # 아이콘 심볼 (스타일별)
+        icon_map = {"accent": "●", "dark": "◆", "default": "▸"}
+        icon = icon_map.get(style, "▸")
         p = tf.paragraphs[0]
-        p.text = comp.header
-        p.font.size = Pt(12)
+        p.text = f"{icon}  {comp.header}"
+        p.font.size = Pt(11)
         p.font.bold = True
         p.font.color.rgb = header_c
         p.font.name = FONT_BODY
@@ -153,14 +168,20 @@ def render_card(slide: Slide, comp: CardComponent, x, y, w, h):
         sep.font.color.rgb = CL_BORDER
         sep.space_after = Pt(3)
 
-    # 불릿
+    # 불릿 (빈 문자열은 간격으로 처리)
     for bullet in comp.bullets:
         p = tf.paragraphs[0] if first else tf.add_paragraph()
-        p.text = f"\u2022  {bullet}"
-        p.font.size = Pt(9)
-        p.font.color.rgb = text_c
-        p.font.name = FONT_BODY
-        p.space_after = Pt(3)
+        if bullet.strip():
+            p.text = f"\u2022  {bullet}"
+            p.font.size = Pt(9)
+            p.font.color.rgb = text_c
+            p.font.name = FONT_BODY
+            p.space_after = Pt(3)
+        else:
+            # 빈 줄은 작은 간격만 — 빈 불릿 표시 방지
+            p.text = ""
+            p.font.size = Pt(4)
+            p.space_after = Pt(2)
         first = False
 
 
@@ -272,8 +293,14 @@ def render_table(slide: Slide, comp: TableComponent, x, y, w, h):
     data = comp.data
     n_rows = len(data.rows) + 1
     n_cols = len(data.headers)
-    table_h = min(h, Inches(0.35) * n_rows)
+    # 사용 가능한 높이를 행 수로 균등 분배 (오버플로 방지)
+    row_h = int(h / n_rows)
+    table_h = row_h * n_rows
     tbl = slide.shapes.add_table(n_rows, n_cols, x, y, w, table_h).table
+
+    # 행 높이 명시적 설정 — 자동 확장 방지
+    for r in range(n_rows):
+        tbl.rows[r].height = row_h
 
     col_w = int(w / n_cols)
     for i in range(n_cols):
@@ -487,7 +514,7 @@ def render_framework_matrix(slide: Slide, comp, x, y, w, h):
             elif is_col_header:
                 col_idx = ci - (1 if has_row_h else 0)
                 text = comp.col_headers[col_idx] if col_idx < len(comp.col_headers) else ""
-                fill = CL_ACCENT
+                fill = CL_DARK  # ② 오렌지→다크 (색상 절제)
                 text_c = CL_WHITE
                 bold = True
             elif is_row_header:
@@ -813,9 +840,9 @@ def render_vertical_flow(slide: Slide, comp, x, y, w, h):
 
     for i, step in enumerate(comp.steps):
         sy = y + i * (step_h + Inches(0.08))
-        bar_c = CL_ACCENT if step.style == "accent" else CL_GREY
+        bar_c = CL_ACCENT if step.style == "accent" else CL_DARK
 
-        # 좌: 번호 + 라벨
+        # 좌: 번호 + 라벨 (대비 강화 — 회색 대신 다크)
         lbl = slide.shapes.add_shape(1, x, sy, label_w, step_h)
         lbl.fill.solid()
         lbl.fill.fore_color.rgb = bar_c

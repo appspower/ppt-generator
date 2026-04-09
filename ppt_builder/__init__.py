@@ -23,3 +23,21 @@ def render_presentation(
     """
     engine = PresentationEngine(template=template)
     return engine.render(schema, output)
+
+
+# 워크플로 강제 진입점 (Layer 1) — 검증 단계를 빠뜨리지 못하게 함
+from .workflow import (  # noqa: E402
+    ValidationResult,
+    refine_loop,
+    render_validated,
+    workflow_phases,
+)
+
+__all__ = [
+    "render_presentation",
+    "render_validated",
+    "ValidationResult",
+    "refine_loop",
+    "workflow_phases",
+    "PresentationSchema",
+]
