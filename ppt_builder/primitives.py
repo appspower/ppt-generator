@@ -422,53 +422,40 @@ class Canvas:
         y: float,
         w: float,
         h: float,
-        accent: bool = True,
+        detail: str = "",
+        stripe: bool = True,
     ):
-        """대형 KPI 숫자 + 라벨 — 굵은 박스 안에 큰 숫자."""
+        """대형 KPI 숫자 + 라벨 (+ optional detail) — 회색 톤."""
         self.box(
-            x=x,
-            y=y,
-            w=w,
-            h=h,
-            fill="white",
-            border=2,
-            border_color="black",
+            x=x, y=y, w=w, h=h,
+            fill="white", border=0.75, border_color="grey_mid",
         )
-        if accent:
-            # 좌측에 굵은 오렌지 stripe
+        if stripe:
             self.box(
-                x=x,
-                y=y,
-                w=0.12,
-                h=h,
-                fill="accent",
-                border=None,
+                x=x, y=y, w=0.08, h=h,
+                fill="grey_700", border=None,
             )
         # 큰 숫자
+        v_size = 26 if len(value) <= 3 else 20
         self.text(
             value,
-            x=x + 0.2,
-            y=y + 0.1,
-            w=w - 0.3,
-            h=h * 0.55,
-            size=int(h * 24),  # 박스 크기에 비례
-            bold=True,
-            color="accent",
-            font=FONT_TITLE,
-            anchor="middle",
+            x=x + 0.2, y=y + 0.12, w=w - 0.3, h=h * 0.5,
+            size=v_size, bold=True, color="grey_900",
+            font=FONT_TITLE, anchor="top",
         )
         # 라벨
         self.text(
             label,
-            x=x + 0.2,
-            y=y + h * 0.6,
-            w=w - 0.3,
-            h=h * 0.35,
-            size=10,
-            bold=False,
-            color="black",
-            anchor="top",
+            x=x + 0.2, y=y + h * 0.55, w=w - 0.3, h=0.25,
+            size=9, bold=True, color="grey_900", anchor="top",
         )
+        # 디테일 (선택)
+        if detail:
+            self.text(
+                detail,
+                x=x + 0.2, y=y + h * 0.55 + 0.27, w=w - 0.3, h=h * 0.3,
+                size=7, color="grey_700", anchor="top",
+            )
 
     def label_chip(
         self,
@@ -477,23 +464,18 @@ class Canvas:
         x: float,
         y: float,
         w: float = 1.2,
-        h: float = 0.3,
-        fill: str = "dark",
+        h: float = 0.28,
+        fill: str = "grey_700",
         text_color: str = "white",
+        size: float = 8,
     ):
-        """카테고리/태그 — 굵은 검정 박스 + 흰 텍스트."""
+        """카테고리/태그 — 작은 색 박스 + 흰 텍스트."""
         self.box(x=x, y=y, w=w, h=h, fill=fill, border=None)
         self.text(
             text,
-            x=x,
-            y=y,
-            w=w,
-            h=h,
-            size=8,
-            bold=True,
-            color=text_color,
-            align="center",
-            anchor="middle",
+            x=x, y=y, w=w, h=h,
+            size=size, bold=True,
+            color=text_color, align="center", anchor="middle",
         )
 
     def divider_h(
@@ -519,6 +501,335 @@ class Canvas:
     ):
         """수직 구분선 — 보통 두께."""
         self.line(x1=x, y1=y, x2=x, y2=y + h, color=color, width=width)
+
+    # --------------------------------------------------------
+    # Phase A — Rich composites
+    # --------------------------------------------------------
+
+    def badge(
+        self,
+        text: str,
+        *,
+        x: float,
+        y: float,
+        h: float = 0.24,
+        fill: str = "grey_200",
+        text_color: str = "grey_900",
+        size: float = 8,
+        rounded: bool = True,
+    ):
+        """작은 카테고리 라벨 — 자동 폭 계산.
+
+        chip보다 작고, 자동으로 폭이 텍스트에 맞춰진다.
+        """
+        # 텍스트 길이로 폭 추정 (8pt 기준)
+        char_w = 0.06 if size <= 8 else 0.07
+        # 한글 비중 가산
+        kr = sum(1 for ch in text if ord(ch) > 0x1100) / max(len(text), 1)
+        char_w *= 1 + kr * 0.6
+        w = max(0.4, len(text) * char_w + 0.18)
+        shape_kind = "rounded" if rounded else "rect"
+        self.box(
+            x=x, y=y, w=w, h=h,
+            fill=fill, border=None, shape=shape_kind,
+        )
+        self.text(
+            text,
+            x=x, y=y, w=w, h=h,
+            size=size, bold=True,
+            color=text_color, align="center", anchor="middle",
+        )
+        return w  # 자동 폭 반환 — 여러 뱃지 연달아 배치할 때 유용
+
+    def callout_box(
+        self,
+        *,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        title: str = "",
+        body: str = "",
+        bullets: list[str] | None = None,
+        bar_color: str = "grey_700",
+        bar_width: float = 0.08,
+        fill: str = "white",
+        bordered: bool = True,
+        title_size: float = 11,
+        body_size: float = 9,
+    ):
+        """좌측 컬러바 + 강조 박스. title/body/bullets 조합 가능."""
+        if bordered:
+            self.box(
+                x=x, y=y, w=w, h=h,
+                fill=fill, border=0.75, border_color="grey_mid",
+            )
+        else:
+            self.box(x=x, y=y, w=w, h=h, fill=fill, border=None)
+        # 좌측 컬러바
+        self.box(
+            x=x, y=y, w=bar_width, h=h,
+            fill=bar_color, border=None,
+        )
+        pad = 0.12
+        cx = x + bar_width + pad
+        cw = w - bar_width - pad * 2
+        cy = y + 0.1
+
+        if title:
+            self.text(
+                title,
+                x=cx, y=cy, w=cw, h=0.3,
+                size=title_size, bold=True,
+                color="grey_900", anchor="top",
+            )
+            cy += 0.32
+
+        if body:
+            # 본문 줄 수 추정
+            body_lines = body.count("\n") + 1
+            body_h = max(0.25, body_lines * 0.18)
+            self.text(
+                body,
+                x=cx, y=cy, w=cw, h=body_h,
+                size=body_size, color="grey_900", anchor="top",
+            )
+            cy += body_h + 0.05
+
+        if bullets:
+            for i, bul in enumerate(bullets):
+                self.text(
+                    f"▪  {bul}",
+                    x=cx, y=cy + i * 0.22, w=cw, h=0.2,
+                    size=body_size - 1, color="grey_700", anchor="top",
+                )
+
+    def arrow_chain(
+        self,
+        items: list[str],
+        *,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        gap: float = 0.18,
+        fill: str = "grey_200",
+        text_color: str = "grey_900",
+        text_size: float = 10,
+        with_arrows: bool = True,
+        arrow_color: str = "grey_700",
+    ):
+        """박스 N개 → 화살표 → 박스. 시퀀스/플로우 표현.
+
+        gap 안에 화살표가 들어간다 (with_arrows=True일 때).
+        """
+        n = len(items)
+        if n == 0:
+            return
+        # 박스 폭 계산: 전체 폭에서 (gap × n-1)을 뺀 후 균등 분배
+        box_w = (w - gap * (n - 1)) / n
+        for i, item in enumerate(items):
+            bx = x + i * (box_w + gap)
+            self.box(
+                x=bx, y=y, w=box_w, h=h,
+                fill=fill, border=0.75, border_color="grey_mid",
+            )
+            self.text(
+                item,
+                x=bx, y=y, w=box_w, h=h,
+                size=text_size, bold=True,
+                color=text_color, align="center", anchor="middle",
+            )
+            # 화살표 (마지막 박스 제외)
+            if with_arrows and i < n - 1:
+                ay = y + h / 2
+                ax_start = bx + box_w + 0.02
+                ax_end = bx + box_w + gap - 0.02
+                self.arrow(
+                    x1=ax_start, y1=ay, x2=ax_end, y2=ay,
+                    color=arrow_color, width=1.0,
+                )
+
+    def dot_grid(
+        self,
+        *,
+        x: float,
+        y: float,
+        filled: int,
+        total: int = 5,
+        d: float = 0.14,
+        gap: float = 0.06,
+        fill_on: str = "grey_800",
+        fill_off: str = "grey_200",
+    ):
+        """N개 점 중 filled개가 채워진 진행률 표시. Harvey Ball 대안."""
+        for i in range(total):
+            cx = x + i * (d + gap)
+            self.circle(
+                x=cx, y=y, d=d,
+                fill=fill_on if i < filled else fill_off,
+                border=None,
+                text="",
+            )
+
+    def mini_table(
+        self,
+        *,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        headers: list[str],
+        rows: list[list[str]],
+        col_ratios: list[float] | None = None,
+        header_size: float = 9,
+        body_size: float = 8,
+    ):
+        """매우 컴팩트한 표 — 강조 헤더 + 교대행. python-pptx table 대신
+        절대좌표 박스로 그려서 행 높이 자동확장 문제 회피."""
+        n_cols = len(headers)
+        n_rows = len(rows)
+        if col_ratios and len(col_ratios) == n_cols:
+            total = sum(col_ratios)
+            widths = [w * (r / total) for r in col_ratios]
+        else:
+            widths = [w / n_cols] * n_cols
+
+        header_h = 0.28
+        body_h = (h - header_h) / max(n_rows, 1)
+        # 헤더
+        cx = x
+        for i, hdr in enumerate(headers):
+            self.box(
+                x=cx, y=y, w=widths[i], h=header_h,
+                fill="grey_800", border=None,
+            )
+            self.text(
+                hdr,
+                x=cx + 0.05, y=y, w=widths[i] - 0.1, h=header_h,
+                size=header_size, bold=True, color="white", anchor="middle",
+            )
+            cx += widths[i]
+        # 바디
+        for ri, row in enumerate(rows):
+            ry = y + header_h + ri * body_h
+            row_fill = "white" if ri % 2 == 0 else "grey_100"
+            cx = x
+            for ci, cell in enumerate(row):
+                self.box(
+                    x=cx, y=ry, w=widths[ci], h=body_h,
+                    fill=row_fill, border=0.5, border_color="grey_mid",
+                )
+                self.text(
+                    str(cell),
+                    x=cx + 0.06, y=ry, w=widths[ci] - 0.12, h=body_h,
+                    size=body_size, color="grey_900", anchor="middle",
+                )
+                cx += widths[ci]
+
+    def stat_block(
+        self,
+        *,
+        value: str,
+        label: str,
+        x: float,
+        y: float,
+        w: float,
+        h: float = 0.9,
+        align: Literal["left", "center", "right"] = "left",
+        accent: bool = False,
+    ):
+        """작은 통계 블록 — KPI보다 가벼움. 라벨 + 큰 숫자만, 박스 없음.
+
+        라벨이 위에, 숫자가 아래에 위치 (시각적 위계 강조).
+        """
+        # 라벨 (작게, 위)
+        self.text(
+            label,
+            x=x, y=y, w=w, h=0.22,
+            size=8, color="grey_700", align=align, anchor="top",
+        )
+        # 큰 숫자 (아래)
+        v_color = "grey_900"
+        v_size = 22 if len(value) <= 5 else 16
+        self.text(
+            value,
+            x=x, y=y + 0.22, w=w, h=h - 0.22,
+            size=v_size, bold=True, color=v_color,
+            font=FONT_TITLE, align=align, anchor="top",
+        )
+        # 미세한 하단 라인 (선택)
+        if accent:
+            self.box(
+                x=x, y=y + h - 0.04, w=min(0.5, w * 0.3), h=0.025,
+                fill="grey_700", border=None,
+            )
+
+    def numbered_list(
+        self,
+        items: list[tuple[str, str]],
+        *,
+        x: float,
+        y: float,
+        w: float,
+        item_h: float = 0.6,
+        gap: float = 0.12,
+        circle_d: float = 0.36,
+        circle_fill: str = "grey_900",
+        circle_text_color: str = "white",
+        text_color: str = "grey_900",
+        title_size: float = 11,
+        detail_size: float = 8,
+    ):
+        """원형 번호 + 제목 + 디테일 리스트.
+
+        items: [(title, detail), (title, detail), ...]
+        """
+        for i, (title, detail) in enumerate(items):
+            iy = y + i * (item_h + gap)
+            # 원형 번호
+            self.circle(
+                x=x, y=iy + 0.04, d=circle_d,
+                fill=circle_fill, border=None,
+                text=f"{i+1:02d}", text_color=circle_text_color,
+                text_size=10,
+            )
+            # 텍스트 영역
+            tx = x + circle_d + 0.15
+            tw = w - circle_d - 0.15
+            self.text(
+                title,
+                x=tx, y=iy, w=tw, h=0.28,
+                size=title_size, bold=True, color=text_color, anchor="top",
+            )
+            if detail:
+                self.text(
+                    detail,
+                    x=tx, y=iy + 0.28, w=tw, h=item_h - 0.28,
+                    size=detail_size, color="grey_700", anchor="top",
+                )
+
+    def section_label(
+        self,
+        text: str,
+        *,
+        x: float,
+        y: float,
+        w: float,
+        size: float = 10,
+        bar_color: str = "grey_700",
+    ):
+        """섹션 헤더 — 좌측 미세 바 + 굵은 텍스트. 영역 구분용."""
+        bar_w = 0.08
+        self.box(
+            x=x, y=y + 0.04, w=bar_w, h=0.18,
+            fill=bar_color, border=None,
+        )
+        self.text(
+            text,
+            x=x + bar_w + 0.08, y=y, w=w - bar_w - 0.08, h=0.28,
+            size=size, bold=True, color="grey_900", anchor="top",
+        )
 
 
 # ============================================================
