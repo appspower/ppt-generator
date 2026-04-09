@@ -212,6 +212,363 @@ def render_2x2_matrix(
 
 
 # ============================================================
+# 템플릿: 워터폴 차트
+# ============================================================
+
+_WATERFALL_TEMPLATE = """<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Waterfall Chart</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {{ font-family: 'Pretendard', 'Malgun Gothic', sans-serif; }}
+</style>
+</head>
+<body class="bg-white p-12">
+  <h1 class="text-3xl font-bold text-black mb-2">{title}</h1>
+  <p class="text-base text-gray-600 mb-8">{subtitle}</p>
+
+  <svg viewBox="0 0 1500 720" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 720px;">
+    <!-- baseline -->
+    <line x1="80" y1="620" x2="1480" y2="620" stroke="#A1A8B3" stroke-width="2"/>
+    <!-- y axis label -->
+    <text x="40" y="320" font-size="14" font-weight="700" fill="#4b5563" text-anchor="middle" transform="rotate(-90, 40, 320)">{y_label}</text>
+    {bars_svg}
+  </svg>
+
+  <p class="text-xs text-gray-500 mt-2">{footnote}</p>
+</body>
+</html>
+"""
+
+
+def render_waterfall(
+    output_path: Path,
+    title: str,
+    bars: list[dict[str, Any]],
+    subtitle: str = "",
+    y_label: str = "값",
+    footnote: str = "",
+    width: int = 1600,
+    height: int = 1000,
+) -> Path:
+    """워터폴 차트 렌더링.
+
+    Args:
+        bars: [
+            {"label": "시작", "value": 100, "type": "total"},
+            {"label": "신규 매출", "value": 30, "type": "increase"},
+            {"label": "이탈", "value": -15, "type": "decrease"},
+            {"label": "확장", "value": 20, "type": "increase"},
+            {"label": "최종", "value": 135, "type": "total"},  # 자동 계산값과 같아야 함
+        ]
+        type: total (시작/최종), increase (+), decrease (-)
+    """
+    # 좌표 계산
+    n = len(bars)
+    x_pad = 80
+    chart_w = 1500 - 2 * x_pad
+    bar_w = chart_w / (n * 1.5)
+    gap = bar_w * 0.5
+
+    # 누적 합과 max 값
+    cumulative = 0.0
+    cumulatives: list[tuple[float, float]] = []  # (start, end) per bar
+    for b in bars:
+        if b["type"] == "total":
+            cumulatives.append((0.0, float(b["value"])))
+            cumulative = float(b["value"])
+        else:
+            new_cum = cumulative + float(b["value"])
+            cumulatives.append((cumulative, new_cum))
+            cumulative = new_cum
+
+    max_val = max(max(s, e) for s, e in cumulatives)
+    chart_h = 500
+    y_base = 620
+
+    def y_of(v: float) -> float:
+        return y_base - (v / max_val) * chart_h
+
+    # SVG bars
+    svg_parts: list[str] = []
+    color_map = {
+        "total": "#000000",
+        "increase": "#FD5108",
+        "decrease": "#A1A8B3",
+    }
+
+    for i, b in enumerate(bars):
+        start, end = cumulatives[i]
+        x = x_pad + i * (bar_w + gap)
+        top = y_of(max(start, end))
+        bottom = y_of(min(start, end))
+        h = max(bottom - top, 4)
+        color = color_map.get(b["type"], "#A1A8B3")
+
+        svg_parts.append(
+            f'<rect x="{x}" y="{top}" width="{bar_w}" height="{h}" fill="{color}"/>'
+        )
+        # value label above bar
+        sign = "+" if b["type"] == "increase" else ("-" if b["type"] == "decrease" else "")
+        val_text = f"{sign}{abs(int(b['value'])):,}"
+        svg_parts.append(
+            f'<text x="{x + bar_w/2}" y="{top - 8}" font-size="14" font-weight="700" fill="#000" text-anchor="middle">{val_text}</text>'
+        )
+        # label below baseline
+        svg_parts.append(
+            f'<text x="{x + bar_w/2}" y="{y_base + 24}" font-size="13" font-weight="600" fill="#374151" text-anchor="middle">{b["label"]}</text>'
+        )
+        # cumulative label below name
+        svg_parts.append(
+            f'<text x="{x + bar_w/2}" y="{y_base + 42}" font-size="11" fill="#9ca3af" text-anchor="middle">누적 {int(end):,}</text>'
+        )
+
+        # connector line to next bar
+        if i < n - 1:
+            next_start, _ = cumulatives[i + 1]
+            connector_y = y_of(end)
+            x_end = x_pad + (i + 1) * (bar_w + gap)
+            svg_parts.append(
+                f'<line x1="{x + bar_w}" y1="{connector_y}" x2="{x_end}" y2="{connector_y}" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3,3"/>'
+            )
+
+    html = _WATERFALL_TEMPLATE.format(
+        title=title,
+        subtitle=subtitle,
+        y_label=y_label,
+        footnote=footnote,
+        bars_svg="\n    ".join(svg_parts),
+    )
+
+    return html_to_png(html, output_path, width=width, height=height)
+
+
+# ============================================================
+# 템플릿: McKinsey Horizon 3
+# ============================================================
+
+_HORIZON3_TEMPLATE = """<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>McKinsey Horizon 3</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {{ font-family: 'Pretendard', 'Malgun Gothic', sans-serif; }}
+</style>
+</head>
+<body class="bg-white p-12">
+  <h1 class="text-3xl font-bold text-black mb-2">{title}</h1>
+  <p class="text-base text-gray-600 mb-6">{subtitle}</p>
+
+  <svg viewBox="0 0 1500 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 700px;">
+    <!-- axes -->
+    <line x1="80" y1="600" x2="1480" y2="600" stroke="#374151" stroke-width="2"/>
+    <line x1="80" y1="80" x2="80" y2="600" stroke="#374151" stroke-width="2"/>
+    <text x="780" y="650" font-size="14" font-weight="700" fill="#374151" text-anchor="middle">시간 →</text>
+    <text x="40" y="340" font-size="14" font-weight="700" fill="#374151" text-anchor="middle" transform="rotate(-90, 40, 340)">가치/임팩트 →</text>
+
+    <!-- Horizon 1: Core (수성) — opens immediately, plateaus then declines -->
+    <path d="M 80 350 Q 250 200, 500 240 Q 750 280, 1000 360 Q 1250 440, 1480 520"
+          stroke="#FD5108" stroke-width="6" fill="none" opacity="0.95"/>
+    <text x="270" y="195" font-size="20" font-weight="800" fill="#FD5108">H1 — Core</text>
+    <text x="270" y="220" font-size="13" font-weight="600" fill="#374151">{h1_label}</text>
+
+    <!-- Horizon 2: Emerging — starts later, peaks higher -->
+    <path d="M 350 580 Q 600 480, 850 320 Q 1100 200, 1350 180"
+          stroke="#FE7C39" stroke-width="6" fill="none" opacity="0.85"/>
+    <text x="700" y="305" font-size="20" font-weight="800" fill="#FE7C39">H2 — Emerging</text>
+    <text x="700" y="330" font-size="13" font-weight="600" fill="#374151">{h2_label}</text>
+
+    <!-- Horizon 3: Future — starts even later, highest potential -->
+    <path d="M 700 590 Q 950 540, 1200 380 Q 1380 250, 1480 120"
+          stroke="#A1A8B3" stroke-width="6" fill="none" stroke-dasharray="8,6" opacity="0.85"/>
+    <text x="1080" y="425" font-size="20" font-weight="800" fill="#6b7280">H3 — Future</text>
+    <text x="1080" y="450" font-size="13" font-weight="600" fill="#374151">{h3_label}</text>
+  </svg>
+
+  <div class="grid grid-cols-3 gap-4 mt-2">
+    <div class="border-l-4 p-4" style="border-color: #FD5108;">
+      <h3 class="font-bold text-lg" style="color: #FD5108;">H1 · {h1_period}</h3>
+      <p class="text-xs text-gray-500 mb-2">{h1_subtitle}</p>
+      <ul class="text-sm text-gray-800 space-y-1">{h1_items}</ul>
+    </div>
+    <div class="border-l-4 p-4" style="border-color: #FE7C39;">
+      <h3 class="font-bold text-lg" style="color: #FE7C39;">H2 · {h2_period}</h3>
+      <p class="text-xs text-gray-500 mb-2">{h2_subtitle}</p>
+      <ul class="text-sm text-gray-800 space-y-1">{h2_items}</ul>
+    </div>
+    <div class="border-l-4 p-4" style="border-color: #A1A8B3;">
+      <h3 class="font-bold text-lg text-gray-700">H3 · {h3_period}</h3>
+      <p class="text-xs text-gray-500 mb-2">{h3_subtitle}</p>
+      <ul class="text-sm text-gray-800 space-y-1">{h3_items}</ul>
+    </div>
+  </div>
+</body>
+</html>
+"""
+
+
+def render_horizon3(
+    output_path: Path,
+    title: str,
+    horizons: dict[str, dict[str, Any]],
+    subtitle: str = "",
+    width: int = 1600,
+    height: int = 1100,
+) -> Path:
+    """McKinsey Horizon 3 모델.
+
+    horizons: {
+        "h1": {"label": "축약 라벨", "period": "0-12개월", "subtitle": "...", "items": [...]},
+        "h2": {"label": "...",     "period": "12-24개월", "subtitle": "...", "items": [...]},
+        "h3": {"label": "...",     "period": "24개월+",   "subtitle": "...", "items": [...]},
+    }
+    """
+    def _items_html(items: list[str]) -> str:
+        return "".join(f"<li>• {x}</li>" for x in items)
+
+    def _h(key: str) -> dict[str, Any]:
+        h = horizons.get(key, {})
+        return {
+            "label": h.get("label", ""),
+            "period": h.get("period", ""),
+            "subtitle": h.get("subtitle", ""),
+            "items_html": _items_html(h.get("items", [])),
+        }
+
+    h1 = _h("h1")
+    h2 = _h("h2")
+    h3 = _h("h3")
+
+    html = _HORIZON3_TEMPLATE.format(
+        title=title,
+        subtitle=subtitle,
+        h1_label=h1["label"], h1_period=h1["period"], h1_subtitle=h1["subtitle"], h1_items=h1["items_html"],
+        h2_label=h2["label"], h2_period=h2["period"], h2_subtitle=h2["subtitle"], h2_items=h2["items_html"],
+        h3_label=h3["label"], h3_period=h3["period"], h3_subtitle=h3["subtitle"], h3_items=h3["items_html"],
+    )
+
+    return html_to_png(html, output_path, width=width, height=height)
+
+
+# ============================================================
+# 템플릿: Porter 가치사슬
+# ============================================================
+
+_VALUE_CHAIN_TEMPLATE = """<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Porter Value Chain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {{ font-family: 'Pretendard', 'Malgun Gothic', sans-serif; }}
+  .arrow {{
+    clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 50%, calc(100% - 30px) 100%, 0 100%);
+  }}
+</style>
+</head>
+<body class="bg-white p-12">
+  <h1 class="text-3xl font-bold text-black mb-2">{title}</h1>
+  <p class="text-base text-gray-600 mb-8">{subtitle}</p>
+
+  <div class="flex" style="height: 720px;">
+    <div class="flex-1 flex flex-col">
+      <!-- Support activities -->
+      <div class="mb-2">
+        <div class="text-sm font-bold text-gray-700 mb-2">지원 활동 (Support Activities)</div>
+        {support_rows}
+      </div>
+
+      <!-- Primary activities (arrow row) -->
+      <div class="mt-2">
+        <div class="text-sm font-bold text-gray-700 mb-2">본원적 활동 (Primary Activities)</div>
+        <div class="flex gap-1">
+          {primary_cols}
+        </div>
+      </div>
+
+      <!-- Bottom: Margin highlight -->
+      <div class="mt-6 p-4 border-2" style="background-color: #FFAA72; border-color: #FD5108;">
+        <div class="text-xs font-bold uppercase mb-1" style="color: #FD5108;">차별화 원천 → 마진</div>
+        <div class="text-base font-bold text-black">{margin_message}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+"""
+
+
+def render_value_chain(
+    output_path: Path,
+    title: str,
+    support_activities: list[dict[str, Any]],
+    primary_activities: list[dict[str, Any]],
+    margin_message: str = "",
+    subtitle: str = "",
+    width: int = 1600,
+    height: int = 1100,
+) -> Path:
+    """Porter 가치사슬.
+
+    Args:
+        support_activities: [{"name": "Firm Infrastructure", "items": ["..."], "highlight": False}, ...]
+            보통 4개 (Firm Infra / HR / Technology / Procurement)
+        primary_activities: [{"name": "Inbound Logistics", "items": ["..."], "highlight": False}, ...]
+            보통 5개 (Inbound / Operations / Outbound / M&S / Service)
+        margin_message: 마진 박스에 표시할 핵심 메시지
+    """
+    def _items_html(items: list[str]) -> str:
+        return "".join(f'<li class="text-xs text-gray-700 leading-tight">• {x}</li>' for x in items)
+
+    # Support rows (수평 박스 4개 stacked)
+    support_html = []
+    for s in support_activities:
+        bg = "#FFAA72" if s.get("highlight") else "#F3F4F6"
+        border = "#FD5108" if s.get("highlight") else "#D1D5DB"
+        support_html.append(
+            f'<div class="border-2 px-4 py-2 mb-1" style="background-color: {bg}; border-color: {border};">'
+            f'  <div class="font-bold text-sm text-black mb-1">{s["name"]}</div>'
+            f'  <ul class="grid grid-cols-3 gap-x-3">{_items_html(s.get("items", []))}</ul>'
+            f'</div>'
+        )
+
+    # Primary cols (수평 화살표 형태)
+    primary_html = []
+    n_cols = len(primary_activities)
+    for i, p in enumerate(primary_activities):
+        is_last = (i == n_cols - 1)
+        bg = "#FD5108" if p.get("highlight") else ("#FE7C39" if i % 2 == 0 else "#FFAA72")
+        text_color = "white" if p.get("highlight") else "#000"
+        arrow_class = "arrow" if is_last else ""
+        # f-string 안 백슬래시 회피: 미리 컴파일
+        items_li = "".join(
+            '<li class="text-xs leading-tight" style="color: ' + text_color + ';">• ' + str(x) + '</li>'
+            for x in p.get("items", [])
+        )
+        primary_html.append(
+            f'<div class="flex-1 p-3 {arrow_class}" style="background-color: {bg}; min-height: 220px;">'
+            f'  <div class="font-bold text-sm mb-2" style="color: {text_color};">{p["name"]}</div>'
+            f'  <ul class="space-y-1">{items_li}</ul>'
+            f'</div>'
+        )
+
+    html = _VALUE_CHAIN_TEMPLATE.format(
+        title=title,
+        subtitle=subtitle,
+        support_rows="\n        ".join(support_html),
+        primary_cols="\n          ".join(primary_html),
+        margin_message=margin_message or "본원·지원 활동 전체에 걸친 차별화 → 시장 대비 우위 마진 확보",
+    )
+
+    return html_to_png(html, output_path, width=width, height=height)
+
+
+# ============================================================
 # Image Slide PPTX 빌더 (Track A ImageComponent 미구현 우회)
 # ============================================================
 

@@ -114,6 +114,148 @@ def run_iteration(
     }
 
 
+def run_batch(
+    schemas: list[Path],
+    work_root: Path = Path("output/track_c"),
+    iter_num: int = 1,
+    template: Path | None = None,
+) -> dict[str, Any]:
+    """여러 스키마 파일을 한 번에 처리한다.
+
+    각 스키마는 자체 work_dir(work_root/<stem>)에 격리되어 실행된다.
+    PowerPoint COM은 한 번의 호출로 한 파일씩 순차 처리한다 (병렬 불가).
+
+    Args:
+        schemas: 처리할 schema JSON 경로 리스트
+        work_root: 모든 work_dir의 부모 (예: output/track_c/)
+        iter_num: 각 스키마의 회차 번호 (보통 1)
+        template: pptx 마스터 템플릿
+
+    Returns:
+        {
+            "results": [run_iteration 결과 dict, ...],
+            "summary": [{"name", "slides", "score", "pass", "issue_count"}, ...],
+            "report_path": batch 보고서 마크다운 경로,
+        }
+    """
+    work_root = Path(work_root).resolve()
+    work_root.mkdir(parents=True, exist_ok=True)
+
+    results: list[dict[str, Any]] = []
+    summary: list[dict[str, Any]] = []
+    failed: list[dict[str, Any]] = []
+
+    for schema_path in schemas:
+        schema_path = Path(schema_path).resolve()
+        name = schema_path.stem
+        try:
+            result = run_iteration(
+                schema_path=schema_path,
+                work_dir=work_root / name,
+                iter_num=iter_num,
+                template=template,
+            )
+            results.append(result)
+            report = result["eval_report"]
+            summary.append({
+                "name": name,
+                "slides": report["slide_count"],
+                "score": report["score"],
+                "pass": report["pass"],
+                "issue_count": len(report["issues"]),
+                "pptx": str(result["pptx_path"]),
+                "review_request": str(result["review_request_path"]),
+            })
+        except Exception as e:
+            failed.append({
+                "name": name,
+                "schema_path": str(schema_path),
+                "error": f"{type(e).__name__}: {e}",
+            })
+
+    # 배치 보고서 생성
+    report_path = _write_batch_report(work_root, summary, failed, iter_num)
+
+    return {
+        "results": results,
+        "summary": summary,
+        "failed": failed,
+        "report_path": report_path,
+    }
+
+
+def _write_batch_report(
+    work_root: Path,
+    summary: list[dict[str, Any]],
+    failed: list[dict[str, Any]],
+    iter_num: int,
+) -> Path:
+    from datetime import datetime
+
+    report_dir = work_root / "_batch_reports"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_path = report_dir / f"batch_iter{iter_num:03d}_{timestamp}.md"
+
+    lines = [
+        f"# Track C Batch Report — iter_{iter_num:03d}",
+        "",
+        f"**작성**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"**총 스키마**: {len(summary) + len(failed)}",
+        f"**성공**: {len(summary)}",
+        f"**실패**: {len(failed)}",
+        "",
+        "## 스키마별 결과 (evaluate.py 자동 점수)",
+        "",
+        "| 스키마 | 슬라이드 | evaluate 점수 | PASS | 이슈 수 |",
+        "|---|---|---|---|---|",
+    ]
+    for item in summary:
+        status = "PASS" if item["pass"] else "**FAIL**"
+        lines.append(
+            f"| {item['name']} | {item['slides']} | {item['score']}/100 | {status} | {item['issue_count']} |"
+        )
+
+    if summary:
+        scores = [item["score"] for item in summary]
+        avg = sum(scores) / len(scores)
+        lines.extend([
+            "",
+            f"**evaluate.py 평균**: {avg:.1f}/100",
+            "",
+        ])
+
+    if failed:
+        lines.extend([
+            "## 실패한 스키마",
+            "",
+        ])
+        for item in failed:
+            lines.append(f"- **{item['name']}** (`{item['schema_path']}`): {item['error']}")
+        lines.append("")
+
+    lines.extend([
+        "## 다음 단계 — Vision 리뷰",
+        "",
+        "각 스키마의 review_request.md를 열어 PNG를 확인하고 review_response.json을 작성하세요:",
+        "",
+    ])
+    for item in summary:
+        lines.append(f"- {item['name']}: `{item['review_request']}`")
+
+    lines.append("")
+    lines.append("Vision 리뷰 후 patches를 작성했다면 자동 재실행:")
+    lines.append("```bash")
+    for item in summary:
+        work_dir = work_root / item["name"]
+        lines.append(f"python -m ppt_builder.track_c.pipeline refine {work_dir} {iter_num}")
+    lines.append("```")
+    lines.append("")
+
+    report_path.write_text("\n".join(lines), encoding="utf-8")
+    return report_path
+
+
 def apply_and_rerun(
     work_dir: Path,
     source_iter: int,
@@ -203,9 +345,13 @@ def main() -> None:
         # 기존 review_response.json의 patches로 자동 재실행
         python -m ppt_builder.track_c.pipeline refine <work_dir> <source_iter> [template.pptx]
 
+        # 여러 스키마 batch 처리 (glob 패턴)
+        python -m ppt_builder.track_c.pipeline batch <glob_pattern> [work_root] [iter_num]
+
         # 호환 모드 (run 생략 가능)
         python -m ppt_builder.track_c.pipeline <schema.json>
     """
+    import glob
     import sys
 
     if len(sys.argv) < 2:
@@ -225,6 +371,45 @@ def main() -> None:
         result = apply_and_rerun(work_dir=work_dir, source_iter=source_iter, template=template)
         _print_summary(result)
         print(f"Refine stats:   {result['refine_stats']}")
+        return
+
+    if cmd == "batch":
+        if len(sys.argv) < 3:
+            print("Usage: python -m ppt_builder.track_c.pipeline batch <glob_pattern> [work_root] [iter_num]")
+            sys.exit(1)
+        pattern = sys.argv[2]
+        work_root = Path(sys.argv[3]) if len(sys.argv) > 3 else Path("output/track_c")
+        iter_num = int(sys.argv[4]) if len(sys.argv) > 4 else 1
+
+        schemas = sorted(Path(p) for p in glob.glob(pattern))
+        if not schemas:
+            print(f"패턴에 매칭되는 파일 없음: {pattern}")
+            sys.exit(1)
+
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+        print(f"Batch: {len(schemas)}개 스키마 처리 시작")
+        for s in schemas:
+            print(f"  - {s}")
+        print()
+
+        result = run_batch(
+            schemas=schemas,
+            work_root=work_root,
+            iter_num=iter_num,
+        )
+
+        print()
+        print("=" * 60)
+        print(f"Batch 완료: 성공 {len(result['summary'])} / 실패 {len(result['failed'])}")
+        print("=" * 60)
+        for item in result["summary"]:
+            status = "PASS" if item["pass"] else "FAIL"
+            print(f"  [{status}] {item['name']:<20} {item['score']:>3}/100  ({item['slides']} slides, {item['issue_count']} issues)")
+        for item in result["failed"]:
+            print(f"  [ERR ] {item['name']:<20} {item['error']}")
+        print()
+        print(f"보고서: {result['report_path']}")
         return
 
     # run 모드 (기본)
