@@ -497,9 +497,9 @@ def comparison_matrix(slide: Slide, spec: ComparisonSpec):
 
     GRID_Y = 1.7
     HEADER_H = 0.6
-    # 행 높이: 균등 분배하되 최대 0.6"로 cap (셀이 너무 커지지 않도록)
+    # 행 높이: 균등 분배하되 최대 0.45"로 cap (셀이 콤팩트하게)
     raw_row_h = (4.4 - HEADER_H) / max(n_crit, 1)
-    ROW_H = min(raw_row_h, 0.6)
+    ROW_H = min(raw_row_h, 0.45)
 
     # ----- 헤더: 옵션명 -----
     for i, opt in enumerate(spec.options):
