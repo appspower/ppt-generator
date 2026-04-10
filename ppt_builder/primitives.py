@@ -81,6 +81,12 @@ COLORS = {
     "grey_400": RGBColor(0x9A, 0xA0, 0xA8),  # 미디엄 그레이
     "grey_200": RGBColor(0xE2, 0xE5, 0xE8),  # 라이트 그레이 (배경)
     "grey_100": RGBColor(0xF1, 0xF3, 0xF5),  # 매우 라이트 그레이
+    # Zone 배경 (의미론적)
+    "zone_alert": RGBColor(0xFF, 0xF3, 0xE0),   # 연한 주황 (경고 zone)
+    "zone_positive": RGBColor(0xE8, 0xF5, 0xE9), # 연한 녹색 (긍정 zone)
+    "zone_negative": RGBColor(0xFF, 0xEB, 0xEE), # 연한 빨강 (위험 zone)
+    # Warning (앰버)
+    "warning": RGBColor(0xF5, 0xA6, 0x23),       # 주의/경고
 }
 
 # 굵은 라인 두께 — 1pt = 12700 EMU

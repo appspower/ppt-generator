@@ -91,6 +91,118 @@ CHART_COLORS = [
     CL_BLACK,          # Black
 ]
 
+
+# ============================================================
+# Design Token System — 의미론적 색상 + 타이포 + 간격
+# ============================================================
+#
+# 60-30-10 규칙:
+#   60% = 배경/여백 (WHITE, SUBTLE_BG)
+#   30% = 구조/텍스트 (PRIMARY, SECONDARY)
+#   10% = 강조 (ACCENT — 핵심 메시지만)
+#
+# 색상은 "정보 전달 채널" — 장식이 아님.
+# 같은 역할(예: 긍정)에는 슬라이드 전체에서 같은 색을 유지.
+# ============================================================
+
+
+class DesignToken:
+    """의미론적 디자인 토큰. 색상을 역할로 참조한다.
+
+    사용 예:
+        from ppt_builder.assembler.styles import token
+        c.box(fill=token.ACCENT)      # "주목하라"
+        c.box(fill=token.POSITIVE)    # "좋다"
+        c.box(fill=token.ZONE_DARK)   # 어두운 zone 배경
+    """
+
+    # --- 의미론적 색상 (역할 기반) ---
+    ACCENT = "accent"           # 핵심 강조 (PwC 오렌지) — 10% 이하
+    ACCENT_LIGHT = "accent_light"  # 부드러운 강조
+    POSITIVE = "positive"       # 긍정/상승/달성 (녹색)
+    NEGATIVE = "negative"       # 부정/하락/위험 (빨간)
+    WARNING = "#F5A623"         # 주의/경고 (앰버)
+    NEUTRAL = "grey_400"        # 보통/기준선
+    MUTED = "grey_200"          # 배경/비활성
+
+    # --- 텍스트 색상 ---
+    TEXT_PRIMARY = "grey_900"   # 주요 텍스트 (거의 검정)
+    TEXT_SECONDARY = "grey_700" # 보조 텍스트
+    TEXT_TERTIARY = "grey_400"  # 약한 텍스트
+    TEXT_ON_DARK = "white"      # 어두운 배경 위 텍스트
+    TEXT_ACCENT = "accent"      # 강조 텍스트
+
+    # --- Zone 배경 (4분면 등에서 zone 구분용) ---
+    ZONE_DARK = "grey_800"      # 어두운 zone
+    ZONE_MID = "grey_200"       # 중간 zone
+    ZONE_LIGHT = "white"        # 밝은 zone
+    ZONE_SUBTLE = "grey_100"    # 매우 연한 zone
+    ZONE_ALERT = "#FFF3E0"      # 경고 zone (연한 주황 배경)
+
+    # --- 구조 색상 ---
+    BORDER = "grey_mid"         # 테두리
+    BORDER_STRONG = "grey_700"  # 강한 테두리 (강조 요소)
+    DIVIDER = "grey_mid"        # 구분선
+    STRIPE = "grey_700"         # 좌측 stripe 기본
+
+    # --- 데이터 시각화 (바 차트 등) ---
+    DATA_HIGHLIGHT = "grey_900"    # 강조 데이터 포인트
+    DATA_PRIMARY = "accent"        # 주요 데이터 시리즈
+    DATA_SECONDARY = "grey_400"    # 보조 데이터
+    DATA_BACKGROUND = "grey_200"   # 배경 데이터
+
+    # --- 폰트 크기 (4레벨 위계) ---
+    FONT_L1 = 16    # 액션 타이틀
+    FONT_L2 = 11    # 섹션 헤더
+    FONT_L3 = 9     # 본문
+    FONT_L4 = 7     # 각주/출처
+
+    # --- 간격 (2단계) ---
+    GAP_INNER = 0.08   # 같은 그룹 내부 (인치)
+    GAP_OUTER = 0.20   # 그룹 간 (인치)
+
+    # --- KPI/데이터 카드 자동 색상 ---
+    @staticmethod
+    def auto_trend_color(value: float, target: float = 0,
+                         higher_is_better: bool = True) -> str:
+        """값과 목표를 비교해 자동으로 색상 결정."""
+        if higher_is_better:
+            if value >= target:
+                return "positive"
+            elif value >= target * 0.8:
+                return "#F5A623"  # 주의
+            else:
+                return "negative"
+        else:  # lower is better (비용, 시간 등)
+            if value <= target:
+                return "positive"
+            elif value <= target * 1.2:
+                return "#F5A623"
+            else:
+                return "negative"
+
+    @staticmethod
+    def auto_trend_symbol(current: float, previous: float) -> str:
+        """현재 vs 이전 비교해 트렌드 심볼 반환."""
+        if current > previous:
+            return "▲"
+        elif current < previous:
+            return "▼"
+        return "●"
+
+    @staticmethod
+    def auto_delta(current: float, previous: float, unit: str = "") -> str:
+        """변화량 자동 포맷."""
+        delta = current - previous
+        sign = "+" if delta > 0 else ""
+        if delta == int(delta):
+            return f"{sign}{int(delta)}{unit}"
+        return f"{sign}{delta:.1f}{unit}"
+
+
+# 싱글턴 인스턴스
+token = DesignToken()
+
 # ============================================================
 # Fonts (spec.md + components.md 기반)
 # ============================================================

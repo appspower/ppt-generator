@@ -195,3 +195,121 @@ class SlideComposer:
             pattern_func(self.slide, spec)
         finally:
             self.canvas.pop_region()
+
+
+# ============================================================
+# Composition Rules — 조합 지능
+# ============================================================
+
+
+# Zone 톤: zone별 배경색/강조 수준 프리셋
+ZONE_TONES = {
+    "dark": {"bg": "grey_800", "text": "white", "stripe": "grey_900"},
+    "mid": {"bg": "grey_200", "text": "grey_900", "stripe": "grey_700"},
+    "light": {"bg": "white", "text": "grey_900", "stripe": "grey_700"},
+    "subtle": {"bg": "grey_100", "text": "grey_900", "stripe": "grey_400"},
+    "accent": {"bg": "zone_alert", "text": "grey_900", "stripe": "accent"},
+    "positive": {"bg": "zone_positive", "text": "grey_900", "stripe": "positive"},
+    "negative": {"bg": "zone_negative", "text": "grey_900", "stripe": "negative"},
+}
+
+
+def apply_zone_tone(
+    canvas: Canvas,
+    region: Region,
+    tone: str = "light",
+    *,
+    border: bool = True,
+):
+    """Zone에 배경 톤을 적용한다. 콘텐츠 렌더 전에 호출."""
+    t = ZONE_TONES.get(tone, ZONE_TONES["light"])
+    canvas.box(
+        x=0, y=0, w=region.w, h=region.h,
+        fill=t["bg"],
+        border=0.5 if border else None,
+        border_color="grey_mid",
+        region=region,
+    )
+
+
+# 추천 조합 레시피 — Claude가 콘텐츠 유형을 보고 선택
+COMPOSITION_RECIPES = {
+    "kpi_summary_detail": {
+        "description": "상단 KPI 요약 + 하단 상세 차트/해설",
+        "layout": "top_bottom",
+        "layout_params": {"split": 0.28},
+        "zones": {
+            "top": {"component": "kpi_row OR data_card_row", "tone": "light"},
+            "bottom": {"component": "bar_chart OR callout_list OR bullet_list", "tone": "light"},
+        },
+        "when": "KPI 성과 보고 + 세부 분석이 동시에 필요할 때",
+    },
+    "analysis_insight": {
+        "description": "좌 분석 데이터 + 우 인사이트 해설",
+        "layout": "two_column",
+        "layout_params": {"split": 0.5},
+        "zones": {
+            "left": {"component": "bar_chart OR bullet_list OR heat_map", "tone": "light"},
+            "right": {"component": "callout_list OR icon_list", "tone": "light"},
+        },
+        "when": "데이터 분석 결과와 So What을 한 장에 담을 때",
+    },
+    "stats_narrative": {
+        "description": "좌 핵심 지표 + 우 상세 해설",
+        "layout": "sidebar_left",
+        "layout_params": {"sidebar_w": 2.8},
+        "zones": {
+            "sidebar": {"component": "stat_column OR gauge_column", "tone": "subtle"},
+            "main": {"component": "callout_list OR bullet_list", "tone": "light"},
+        },
+        "when": "정량 지표와 정성 해설을 좌우로 대비할 때",
+    },
+    "option_comparison": {
+        "description": "N개 옵션 병렬 비교 (중앙 권장 강조)",
+        "layout": "three_column",
+        "layout_params": {},
+        "zones": {
+            "col_0": {"component": "option_card", "tone": "light"},
+            "col_1": {"component": "option_card", "tone": "dark"},  # 권장
+            "col_2": {"component": "option_card", "tone": "light"},
+        },
+        "when": "전략적 옵션 A/B/C 비교 시",
+    },
+    "status_dashboard": {
+        "description": "4분면 PMO 대시보드",
+        "layout": "grid_2x2",
+        "layout_params": {},
+        "zones": {
+            "tl": {"component": "kpi_row OR gauge", "tone": "light"},
+            "tr": {"component": "icon_list OR bullet_list", "tone": "subtle"},
+            "bl": {"component": "bar_chart OR progress_bars", "tone": "light"},
+            "br": {"component": "timeline_mini OR bullet_list", "tone": "subtle"},
+        },
+        "when": "프로젝트 현황을 한눈에 보여줄 때 (KPI, 리스크, 진척, 일정)",
+    },
+    "deep_analysis": {
+        "description": "전체 폭 데이터 분석 (차트 + 해설 세로 배치)",
+        "layout": "full",
+        "layout_params": {},
+        "zones": {
+            "main": {"component": "chart + narrative", "tone": "light"},
+        },
+        "when": "단일 데이터 포인트를 깊이 분석할 때",
+    },
+}
+
+
+def suggest_recipe(content_type: str) -> dict | None:
+    """콘텐츠 유형에 맞는 조합 레시피를 추천한다."""
+    mapping = {
+        "kpi_report": "kpi_summary_detail",
+        "data_analysis": "analysis_insight",
+        "performance": "stats_narrative",
+        "option_comparison": "option_comparison",
+        "status_report": "status_dashboard",
+        "deep_dive": "deep_analysis",
+    }
+    recipe_key = mapping.get(content_type)
+    if recipe_key:
+        return COMPOSITION_RECIPES[recipe_key]
+    return None
