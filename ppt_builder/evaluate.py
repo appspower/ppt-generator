@@ -84,11 +84,13 @@ def _evaluate_slide(slide, slide_idx: int) -> list[str]:
                     sz = round(p.font.size / 12700, 0)
                     font_sizes[sz] = font_sizes.get(sz, 0) + chars
 
-    # 3. 텍스트 밀도 체크
+    # 3. 과제5: 텍스트 밀도 강제 (최소 800자)
     if total_chars < 100:
         issues.append(f"HIGH: Slide {slide_idx+1}: 텍스트 부족 ({total_chars}자)")
-    elif total_chars > 2000:
-        issues.append(f"MEDIUM: Slide {slide_idx+1}: 텍스트 과다 ({total_chars}자)")
+    elif total_chars < 800:
+        issues.append(f"MEDIUM: Slide {slide_idx+1}: 텍스트 밀도 낮음 ({total_chars}자, 목표 800+)")
+    elif total_chars > 2500:
+        issues.append(f"LOW: Slide {slide_idx+1}: 텍스트 과다 ({total_chars}자)")
 
     # 4. 폰트 위계 체크
     if font_sizes:
@@ -121,6 +123,60 @@ def _evaluate_slide(slide, slide_idx: int) -> list[str]:
             break
     if title_text and len(title_text) < 10:
         issues.append(f"LOW: Slide {slide_idx+1}: 제목이 너무 짧음 (라벨형?)")
+
+    # 8. Overflow 추정 — 텍스트 프레임 밀도 (Track C 베이스라인에서 발견한 사각지대 #1)
+    # 텍스트가 컨테이너를 넘치는지 python-pptx로 정확히 알 수 없지만,
+    # "작은 박스에 긴 텍스트"를 근사적으로 감지한다.
+    for s in shapes:
+        if s.has_text_frame and s.width and s.height:
+            frame_text = s.text_frame.text.strip()
+            if not frame_text:
+                continue
+            # 컨테이너 면적 (제곱인치)
+            area_sq_in = (s.width / 914400) * (s.height / 914400)
+            if area_sq_in < 0.5:
+                continue  # 너무 작은 shape는 라벨이므로 무시
+            # 글자수 / 면적 비율 (chars per sq inch)
+            density = len(frame_text) / area_sq_in
+            if density > 200:
+                issues.append(
+                    f"HIGH: Slide {slide_idx+1}: overflow 의심 — "
+                    f"텍스트 밀도 {density:.0f}자/in² (shape '{frame_text[:20]}...')"
+                )
+            elif density > 140:
+                issues.append(
+                    f"MEDIUM: Slide {slide_idx+1}: overflow 위험 — "
+                    f"텍스트 밀도 {density:.0f}자/in² (shape '{frame_text[:20]}...')"
+                )
+
+    # 9. 시각 다양성 — 컴포넌트 타입 다양성 (사각지대 #2: 평면성)
+    # 단순 표만 있는 슬라이드(style_b_r8 유형)를 감지한다.
+    shape_categories = set()
+    for s in shapes:
+        if s.has_table:
+            shape_categories.add("table")
+        elif s.has_chart:
+            shape_categories.add("chart")
+        elif hasattr(s, "image"):
+            shape_categories.add("image")
+        elif s.has_text_frame:
+            text = s.text_frame.text.strip()
+            if not text:
+                continue
+            # 큰 텍스트 (헤더/타이틀) vs 작은 텍스트 (본문)
+            if s.height and s.height / 914400 > 0.6:
+                shape_categories.add("text_large")
+            else:
+                shape_categories.add("text_small")
+        else:
+            shape_categories.add("shape")
+
+    # 의미 있는 카테고리가 2종 미만이면 평면적
+    if n_shapes >= 5 and len(shape_categories) < 2:
+        issues.append(
+            f"MEDIUM: Slide {slide_idx+1}: 시각 다양성 부족 — "
+            f"카테고리 {len(shape_categories)}종 ({', '.join(shape_categories)}), 컨설팅 PPT는 3종+ 권장"
+        )
 
     return issues
 
