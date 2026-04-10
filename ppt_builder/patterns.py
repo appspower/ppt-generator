@@ -732,7 +732,9 @@ class QuadrantSpec:
     y_high: str
     quadrants: list[dict]
     # 4개 항목, 순서: TL, TR, BL, BR
-    # quadrant = {"title": "...", "items": [...], "highlight": False}
+    # quadrant = {"title": "...", "items": [...], "highlight": False,
+    #             -- aux (선택) --
+    #             "description": "...", "action": "...", "metrics": "..."}
     insight: str  # 하단 인사이트 박스
     footer: SlideFooter
 
@@ -831,11 +833,43 @@ def quadrant_story(slide: Slide, spec: QuadrantSpec):
             fill="grey_mid", border=None,
         )
         # items
+        n_items = len(q.get("items", []))
         for ii, item in enumerate(q.get("items", [])):
             c.text(
                 f"▪  {item}",
                 x=cx + 0.2, y=cy + 0.6 + ii * 0.26, w=cell_w - 0.3, h=0.25,
                 size=9, color="grey_900", anchor="top",
+            )
+
+        # --- aux 콘텐츠 (빈 사분면 공간 채움) ---
+        aux_start_y = cy + 0.6 + n_items * 0.26 + 0.15
+        cell_bottom = cy + cell_h - 0.1
+        available = cell_bottom - aux_start_y
+        aux_item_h = 0.36
+        aux_items = []
+        if q.get("description"):
+            aux_items.append(("설명", q["description"]))
+        if q.get("action"):
+            aux_items.append(("실행 과제", q["action"]))
+        if q.get("metrics"):
+            aux_items.append(("정량 효과", q["metrics"]))
+        max_aux = max(0, int(available / aux_item_h))
+        aux_items = aux_items[:max_aux]
+        for ai, (albl, aval) in enumerate(aux_items):
+            ay = aux_start_y + ai * aux_item_h
+            c.box(
+                x=cx + 0.2, y=ay, w=cell_w - 0.4, h=0.01,
+                fill="grey_mid", border=None,
+            )
+            c.text(
+                albl,
+                x=cx + 0.2, y=ay + 0.03, w=cell_w - 0.4, h=0.14,
+                size=7, bold=True, color="grey_700", anchor="top",
+            )
+            c.text(
+                aval,
+                x=cx + 0.2, y=ay + 0.16, w=cell_w - 0.4, h=0.18,
+                size=8, color="grey_900", anchor="top",
             )
 
     # 하단 인사이트 박스 (insight + footer 사이)
