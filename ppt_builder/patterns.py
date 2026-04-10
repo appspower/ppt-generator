@@ -1,4 +1,4 @@
-"""Phase C — 패턴 라이브러리 (22개).
+"""Phase C — 패턴 라이브러리 (25개).
 
 각 패턴은 spec(dict)을 받아 한 슬라이드를 그린다. **출발점일 뿐** —
 같은 패턴 안에서도 콘텐츠와 디테일은 매번 다를 수 있다.
@@ -2369,6 +2369,224 @@ def harvey_ball_matrix(slide: Slide, spec: HarveyBallSpec):
                      border=1.0 if is_hl else 0.75,
                      border_color="grey_900" if is_hl else "grey_700",
                      text="", text_size=1)
+
+    _draw_takeaway(c, spec.takeaway)
+    _draw_footer(c, spec.footer)
+
+
+# ============================================================
+# Pattern 23 — Grid Process (3×2 번호 그리드)
+# ============================================================
+
+
+@dataclass
+class GridProcessSpec:
+    header: SlideHeader
+    intro: str
+    items: list[dict]
+    # item = {"number": "01", "title": "...", "detail": "..."}
+    # 최대 6개 (3×2), 짝수 권장
+    takeaway: str
+    footer: SlideFooter
+
+
+def grid_process(slide: Slide, spec: GridProcessSpec):
+    """3×2 번호 그리드 — 6단계 프로세스를 그리드로 표현."""
+    c = Canvas(slide)
+    _draw_header(c, spec.header)
+    if spec.intro:
+        c.text(spec.intro, x=0.3, y=1.20, w=9.4, h=0.30,
+               size=10, color="grey_900", anchor="top")
+
+    n = len(spec.items)
+    cols = min(3, n)
+    rows = (n + cols - 1) // cols
+    gap = 0.1
+    GRID_X, GRID_Y = 0.3, 1.7
+    GRID_W, GRID_H = 9.4, 4.7
+    cell_w = (GRID_W - gap * (cols - 1)) / cols
+    cell_h = (GRID_H - gap * (rows - 1)) / rows
+
+    # 색상 그라데이션 (연→진)
+    fills = ["grey_200", "grey_400", "grey_700", "accent", "grey_800", "grey_900"]
+    txt_cls = ["grey_900", "grey_900", "white", "white", "white", "white"]
+
+    for i, item in enumerate(spec.items):
+        col = i % cols
+        row = i // cols
+        cx = GRID_X + col * (cell_w + gap)
+        cy = GRID_Y + row * (cell_h + gap)
+        fill = fills[i % len(fills)]
+        tc = txt_cls[i % len(txt_cls)]
+
+        c.box(x=cx, y=cy, w=cell_w, h=cell_h, fill=fill, border=None)
+
+        # 큰 번호
+        c.text(item.get("number", f"{i:02d}"),
+               x=cx + 0.15, y=cy + 0.1, w=cell_w - 0.3, h=0.45,
+               size=28, bold=True, color=tc, anchor="top")
+
+        # 제목
+        c.text(item["title"],
+               x=cx + 0.15, y=cy + cell_h * 0.45, w=cell_w - 0.3, h=0.3,
+               size=11, bold=True, color=tc, anchor="top")
+
+        # 디테일
+        if item.get("detail"):
+            c.text(item["detail"],
+                   x=cx + 0.15, y=cy + cell_h * 0.45 + 0.32, w=cell_w - 0.3,
+                   h=cell_h * 0.4,
+                   size=8, color=tc, anchor="top")
+
+    _draw_takeaway(c, spec.takeaway)
+    _draw_footer(c, spec.footer)
+
+
+# ============================================================
+# Pattern 24 — Diamond Four (다이아몬드 4분면)
+# ============================================================
+
+
+@dataclass
+class DiamondFourSpec:
+    header: SlideHeader
+    intro: str
+    center: dict    # {"title": "...", "subtitle": "..."}
+    sections: list[dict]  # 4개: top, right, bottom, left
+    # section = {"title": "...", "detail": "..."}
+    takeaway: str
+    footer: SlideFooter
+
+
+def diamond_four(slide: Slide, spec: DiamondFourSpec):
+    """다이아몬드 4분면 — 중앙 + 상하좌우 4개 섹션."""
+    c = Canvas(slide)
+    _draw_header(c, spec.header)
+    if spec.intro:
+        c.text(spec.intro, x=0.3, y=1.20, w=9.4, h=0.30,
+               size=10, color="grey_900", anchor="top")
+
+    CX, CY = 5.0, 3.8
+    CENTER_W, CENTER_H = 2.0, 1.2
+
+    # 중앙 박스 (45도 회전은 python-pptx에서 어렵기 때문에 일반 박스+색상 강조)
+    c.box(x=CX - CENTER_W / 2, y=CY - CENTER_H / 2,
+          w=CENTER_W, h=CENTER_H,
+          fill="accent", border=None)
+    c.text(spec.center["title"],
+           x=CX - CENTER_W / 2, y=CY - CENTER_H / 2,
+           w=CENTER_W, h=CENTER_H * 0.6,
+           size=12, bold=True, color="white", align="center", anchor="middle")
+    if spec.center.get("subtitle"):
+        c.text(spec.center["subtitle"],
+               x=CX - CENTER_W / 2, y=CY + CENTER_H * 0.1,
+               w=CENTER_W, h=CENTER_H * 0.4,
+               size=8, color="white", align="center", anchor="middle")
+
+    # 4 방향 텍스트 블록
+    positions = [
+        # (text_x, text_y, text_w, text_h, align)
+        (CX - 1.5, CY - CENTER_H / 2 - 1.5, 3.0, 1.2, "center"),  # top
+        (CX + CENTER_W / 2 + 0.3, CY - 0.6, 3.2, 1.2, "left"),    # right
+        (CX - 1.5, CY + CENTER_H / 2 + 0.3, 3.0, 1.2, "center"),  # bottom
+        (0.5, CY - 0.6, 3.2, 1.2, "right"),                         # left
+    ]
+
+    for i, sec in enumerate(spec.sections[:4]):
+        tx, ty, tw, th, align = positions[i]
+
+        # 연결선
+        if i == 0:  # top
+            c.line(x1=CX, y1=CY - CENTER_H / 2, x2=CX, y2=ty + th,
+                   color="grey_400", width=1.0)
+        elif i == 1:  # right
+            c.line(x1=CX + CENTER_W / 2, y1=CY, x2=tx, y2=CY,
+                   color="grey_400", width=1.0)
+        elif i == 2:  # bottom
+            c.line(x1=CX, y1=CY + CENTER_H / 2, x2=CX, y2=ty,
+                   color="grey_400", width=1.0)
+        elif i == 3:  # left
+            c.line(x1=CX - CENTER_W / 2, y1=CY, x2=tx + tw, y2=CY,
+                   color="grey_400", width=1.0)
+
+        c.text(sec["title"],
+               x=tx, y=ty, w=tw, h=0.28,
+               size=11, bold=True, color="grey_900", align=align, anchor="top")
+        if sec.get("detail"):
+            c.text(sec["detail"],
+                   x=tx, y=ty + 0.32, w=tw, h=th - 0.35,
+                   size=8, color="grey_700", align=align, anchor="top")
+
+    _draw_takeaway(c, spec.takeaway)
+    _draw_footer(c, spec.footer)
+
+
+# ============================================================
+# Pattern 25 — Chevron Timeline (그라데이션 쉐브론 타임라인)
+# ============================================================
+
+
+@dataclass
+class ChevronTimelineSpec:
+    header: SlideHeader
+    intro: str
+    phases: list[dict]
+    # phase = {"year": "2024", "title": "...", "detail": "...", "position": "top"/"bottom"}
+    takeaway: str
+    footer: SlideFooter
+
+
+def chevron_timeline(slide: Slide, spec: ChevronTimelineSpec):
+    """그라데이션 쉐브론 타임라인 — 연도별 위아래 교대 해설."""
+    c = Canvas(slide)
+    _draw_header(c, spec.header)
+    if spec.intro:
+        c.text(spec.intro, x=0.3, y=1.20, w=9.4, h=0.30,
+               size=10, color="grey_900", anchor="top")
+
+    n = len(spec.phases)
+    CHEV_Y = 3.6
+    CHEV_H = 0.5
+    chev_overlap = 0.08
+    chev_w = (9.4 + chev_overlap * (n - 1)) / n
+
+    # 그라데이션 색상 (연한→진한)
+    fills = ["grey_200", "grey_400", "grey_700", "accent", "grey_900"]
+    txt_cls = ["grey_900", "grey_900", "white", "white", "white"]
+
+    for i, phase in enumerate(spec.phases):
+        cx = 0.3 + i * (chev_w - chev_overlap)
+        fill = fills[i % len(fills)]
+        tc = txt_cls[i % len(txt_cls)]
+
+        c.chevron(x=cx, y=CHEV_Y, w=chev_w, h=CHEV_H,
+                  fill=fill, text=phase.get("year", ""),
+                  text_color=tc, text_size=11)
+
+        # 위 또는 아래 해설 블록
+        pos = phase.get("position", "top" if i % 2 == 0 else "bottom")
+        text_w = chev_w - 0.2
+        text_x = cx + 0.1
+
+        if pos == "top":
+            ty = CHEV_Y - 1.8
+            # 연결선
+            c.line(x1=cx + chev_w / 2, y1=CHEV_Y,
+                   x2=cx + chev_w / 2, y2=ty + 1.65,
+                   color="grey_400", width=0.75)
+        else:
+            ty = CHEV_Y + CHEV_H + 0.15
+            c.line(x1=cx + chev_w / 2, y1=CHEV_Y + CHEV_H,
+                   x2=cx + chev_w / 2, y2=ty,
+                   color="grey_400", width=0.75)
+
+        c.text(phase["title"],
+               x=text_x, y=ty, w=text_w, h=0.28,
+               size=10, bold=True, color="grey_900", anchor="top")
+        if phase.get("detail"):
+            c.text(phase["detail"],
+                   x=text_x, y=ty + 0.3, w=text_w, h=1.2,
+                   size=8, color="grey_700", anchor="top")
 
     _draw_takeaway(c, spec.takeaway)
     _draw_footer(c, spec.footer)

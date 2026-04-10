@@ -721,3 +721,218 @@ def comp_data_card(
                size=7, color=token.TEXT_SECONDARY, anchor="top", region=r)
 
     return r.h
+
+
+# ============================================================
+# Track B: 아이콘 시스템
+# ============================================================
+
+# PwC 스타일 아이콘 (유니코드 기반 — 별도 이미지 불필요)
+ICONS = {
+    # 비즈니스 개념
+    "database": "🗄",  "cloud": "☁",  "globe": "🌐",  "lock": "🔒",
+    "chart": "📊",  "target": "🎯",  "rocket": "🚀",  "gear": "⚙",
+    "people": "👥",  "money": "💰",  "clock": "⏱",  "check_circle": "✅",
+    "warning": "⚠",  "lightning": "⚡",  "star": "★",  "flag": "🚩",
+    # 화살표/방향
+    "arrow_right": "→",  "arrow_up": "↑",  "arrow_down": "↓",
+    "chevron_right": "›",  "bullet": "▪",  "circle": "●",
+    # 상태
+    "check": "✓",  "cross": "✗",  "dash": "—",
+    "triangle_up": "▲",  "triangle_down": "▼",
+}
+
+
+def comp_icon_card(
+    c: Canvas,
+    *,
+    icon: str,
+    title: str,
+    body: str = "",
+    style: str = "light",  # "light"/"dark"/"accent"/"outline"
+    region: Region,
+) -> float:
+    """아이콘 + 제목 + 본문 카드. 스타일 5종 지원."""
+    r = region
+    styles = {
+        "light":   {"bg": "white", "border": 0.75, "bc": "grey_mid",
+                    "tc": token.TEXT_PRIMARY, "ic": token.TEXT_PRIMARY},
+        "dark":    {"bg": "grey_800", "border": None, "bc": None,
+                    "tc": "white", "ic": "white"},
+        "accent":  {"bg": "accent", "border": None, "bc": None,
+                    "tc": "white", "ic": "white"},
+        "subtle":  {"bg": "grey_100", "border": 0.5, "bc": "grey_mid",
+                    "tc": token.TEXT_PRIMARY, "ic": token.TEXT_SECONDARY},
+        "outline": {"bg": "white", "border": 1.5, "bc": "grey_800",
+                    "tc": token.TEXT_PRIMARY, "ic": "accent"},
+    }
+    s = styles.get(style, styles["light"])
+
+    c.box(x=0, y=0, w=r.w, h=r.h,
+          fill=s["bg"], border=s["border"], border_color=s["bc"] or "grey_mid", region=r)
+
+    # 아이콘
+    icon_char = ICONS.get(icon, icon)
+    c.text(icon_char, x=0.15, y=0.12, w=0.5, h=0.4,
+           size=20, color=s["ic"], anchor="top", region=r)
+
+    # 제목
+    c.text(title, x=0.15, y=0.55, w=r.w - 0.3, h=0.3,
+           size=10, bold=True, color=s["tc"], anchor="top", region=r)
+
+    # 본문
+    if body:
+        c.text(body, x=0.15, y=0.85, w=r.w - 0.3, h=r.h - 0.95,
+               size=8, color=s["tc"], anchor="top", region=r)
+
+    return r.h
+
+
+def comp_icon_row(
+    c: Canvas,
+    *,
+    items: list[dict],  # [{"icon": "...", "title": "...", "body": "...", "style": "..."}]
+    region: Region,
+    gap: float = 0.12,
+) -> float:
+    """아이콘 카드 N개 가로 배열."""
+    r = region
+    n = len(items)
+    if n == 0:
+        return 0
+    card_w = (r.w - gap * (n - 1)) / n
+    for i, item in enumerate(items):
+        cr = r.sub(i * (card_w + gap), 0, card_w, r.h)
+        comp_icon_card(c, icon=item.get("icon", "circle"),
+                       title=item["title"], body=item.get("body", ""),
+                       style=item.get("style", "light"), region=cr)
+    return r.h
+
+
+# ============================================================
+# Track C: 스타일 카드 변형 (5종)
+# ============================================================
+
+def comp_styled_card(
+    c: Canvas,
+    *,
+    title: str,
+    body: str = "",
+    bullets: list[str] | None = None,
+    number: str = "",       # "01", "02" 등 큰 번호
+    kpi_value: str = "",    # 큰 숫자
+    style: str = "light",   # light/dark/accent/subtle/numbered
+    region: Region,
+) -> float:
+    """다양한 스타일의 콘텐츠 카드.
+
+    light: 흰 배경 + 테두리
+    dark: 진회색 배경 + 흰 글씨
+    accent: 오렌지 배경 + 흰 글씨
+    subtle: 연회색 배경 + 회색 글씨
+    numbered: 좌상단 큰 번호 + 내용
+    """
+    r = region
+    card_styles = {
+        "light":    {"bg": "white", "border": 0.75, "bc": "grey_mid",
+                     "tc": token.TEXT_PRIMARY, "sc": token.TEXT_SECONDARY},
+        "dark":     {"bg": "grey_800", "border": None, "bc": None,
+                     "tc": "white", "sc": "grey_200"},
+        "accent":   {"bg": "accent", "border": None, "bc": None,
+                     "tc": "white", "sc": "white"},
+        "subtle":   {"bg": "grey_100", "border": 0.5, "bc": "grey_mid",
+                     "tc": token.TEXT_PRIMARY, "sc": token.TEXT_SECONDARY},
+        "numbered": {"bg": "white", "border": 0.75, "bc": "grey_mid",
+                     "tc": token.TEXT_PRIMARY, "sc": token.TEXT_SECONDARY},
+    }
+    s = card_styles.get(style, card_styles["light"])
+
+    c.box(x=0, y=0, w=r.w, h=r.h,
+          fill=s["bg"], border=s["border"], border_color=s["bc"] or "grey_mid", region=r)
+
+    cy = 0.12
+
+    # 큰 번호 (numbered 스타일)
+    if number and style == "numbered":
+        c.text(number, x=0.12, y=cy, w=0.6, h=0.5,
+               size=28, bold=True, color="accent", anchor="top", region=r)
+        cy += 0.5
+
+    # KPI 큰 숫자
+    if kpi_value:
+        c.text(kpi_value, x=0.15, y=cy, w=r.w - 0.3, h=0.45,
+               size=24, bold=True, color=s["tc"], font="Georgia", anchor="top", region=r)
+        cy += 0.5
+
+    # 제목
+    c.text(title, x=0.15, y=cy, w=r.w - 0.3, h=0.28,
+           size=10, bold=True, color=s["tc"], anchor="top", region=r)
+    cy += 0.32
+
+    # 본문
+    if body:
+        c.text(body, x=0.15, y=cy, w=r.w - 0.3, h=r.h - cy - 0.1,
+               size=8, color=s["sc"], anchor="top", region=r)
+
+    # 불릿
+    if bullets:
+        for bul in bullets:
+            c.text(f"▪  {bul}", x=0.15, y=cy, w=r.w - 0.3, h=0.2,
+                   size=8, color=s["sc"], anchor="top", region=r)
+            cy += 0.22
+
+    return r.h
+
+
+def comp_styled_card_row(
+    c: Canvas,
+    *,
+    cards: list[dict],
+    region: Region,
+    gap: float = 0.12,
+) -> float:
+    """스타일 카드 N개 가로 배열."""
+    r = region
+    n = len(cards)
+    if n == 0:
+        return 0
+    card_w = (r.w - gap * (n - 1)) / n
+    for i, card in enumerate(cards):
+        cr = r.sub(i * (card_w + gap), 0, card_w, r.h)
+        comp_styled_card(c, region=cr, **card)
+    return r.h
+
+
+# ============================================================
+# Track A 연동: 네이티브 차트 컴포넌트 래퍼
+# ============================================================
+
+def comp_native_chart(
+    c: Canvas,
+    *,
+    chart_type: str,  # "vertical_bar"/"line"/"donut"/"stacked_bar"/"scatter"
+    chart_kwargs: dict,
+    region: Region,
+) -> float:
+    """네이티브 PPT 차트를 Region 안에 배치.
+
+    chart_kwargs는 charts.native의 각 함수에 전달되는 인자.
+    slide는 canvas에서 가져옴.
+    """
+    from ppt_builder.charts.native import (
+        chart_vertical_bar, chart_line, chart_donut,
+        chart_stacked_bar, chart_scatter,
+    )
+    funcs = {
+        "vertical_bar": chart_vertical_bar,
+        "line": chart_line,
+        "donut": chart_donut,
+        "stacked_bar": chart_stacked_bar,
+        "scatter": chart_scatter,
+    }
+    func = funcs.get(chart_type)
+    if func is None:
+        raise ValueError(f"Unknown chart type: {chart_type}")
+
+    func(c.slide, region=region, **chart_kwargs)
+    return region.h
