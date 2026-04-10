@@ -310,7 +310,9 @@ class TimelineSpec:
     intro: str
     phases: list[dict]
     # phase = {"tag": "L1", "name": "...", "duration": "...",
-    #          "objective": "...", "deliverables": [...], "metrics": "..."}
+    #          "objective": "...", "deliverables": [...], "metrics": "...",
+    #          -- aux (선택, 빈 공간 채움용) --
+    #          "prerequisites": "...", "gate": "...", "team": "...", "risks": "..."}
     takeaway: str
     footer: SlideFooter
 
@@ -393,6 +395,7 @@ def timeline_phases(slide: Slide, spec: TimelineSpec):
             x=cx + 0.15, y=DELIV_Y, w=card_w - 0.3, h=0.2,
             size=7, bold=True, color="grey_700", anchor="top",
         )
+        n_deliverables = len(p.get("deliverables", []))
         for di, item in enumerate(p.get("deliverables", [])):
             c.text(
                 f"▪ {item}",
@@ -400,6 +403,43 @@ def timeline_phases(slide: Slide, spec: TimelineSpec):
                 w=card_w - 0.33, h=0.2,
                 size=8, color="grey_900", anchor="top",
             )
+
+        # --- aux 콘텐츠 (빈 공간 채움 — 남은 공간 자동 계산) ---
+        aux_y = DELIV_Y + 0.22 + n_deliverables * 0.22 + 0.12
+        metrics_top = CARD_Y + CARD_H - 0.50  # metrics 바 시작 y
+        available_for_aux = metrics_top - aux_y - 0.05
+        aux_item_h = 0.36
+
+        aux_items = []
+        if p.get("prerequisites"):
+            aux_items.append(("선행 조건", p["prerequisites"]))
+        if p.get("gate"):
+            aux_items.append(("Gate 기준", p["gate"]))
+        if p.get("team"):
+            aux_items.append(("투입 인력", p["team"]))
+        if p.get("risks"):
+            aux_items.append(("리스크", p["risks"]))
+
+        max_aux = max(0, int(available_for_aux / aux_item_h))
+        aux_items = aux_items[:max_aux]
+
+        for ai, (aux_label, aux_value) in enumerate(aux_items):
+            ay = aux_y + ai * aux_item_h
+            c.box(
+                x=cx + 0.15, y=ay, w=card_w - 0.3, h=0.01,
+                fill="grey_mid", border=None,
+            )
+            c.text(
+                aux_label,
+                x=cx + 0.15, y=ay + 0.03, w=card_w - 0.3, h=0.14,
+                size=7, bold=True, color="grey_700", anchor="top",
+            )
+            c.text(
+                aux_value,
+                x=cx + 0.15, y=ay + 0.16, w=card_w - 0.3, h=0.18,
+                size=8, color="grey_900", anchor="top",
+            )
+
         # metrics (하단)
         if p.get("metrics"):
             c.box(
@@ -457,7 +497,9 @@ def comparison_matrix(slide: Slide, spec: ComparisonSpec):
 
     GRID_Y = 1.7
     HEADER_H = 0.6
-    ROW_H = (4.4 - HEADER_H) / n_crit
+    # 행 높이: 균등 분배하되 최대 0.6"로 cap (셀이 너무 커지지 않도록)
+    raw_row_h = (4.4 - HEADER_H) / max(n_crit, 1)
+    ROW_H = min(raw_row_h, 0.6)
 
     # ----- 헤더: 옵션명 -----
     for i, opt in enumerate(spec.options):
@@ -528,7 +570,9 @@ class ProcessSpec:
     intro: str
     steps: list[dict]
     # step = {"name": "...", "actor": "...", "tools": "...",
-    #         "output": "...", "duration": "..."}
+    #         "output": "...", "duration": "...",
+    #         -- aux (선택, 빈 공간 채움용) --
+    #         "prerequisites": "...", "risks": "...", "metrics": "...", "example": "..."}
     takeaway: str
     footer: SlideFooter
 
@@ -613,9 +657,47 @@ def process_flow(slide: Slide, spec: ProcessSpec):
             )
             c.text(
                 step["output"],
-                x=bx + 0.15, y=cy + 0.18, w=box_w - 0.3, h=0.5,
+                x=bx + 0.15, y=cy + 0.18, w=box_w - 0.3, h=0.35,
                 size=8, color="grey_900", anchor="top",
             )
+            cy += 0.55
+
+        # --- aux 콘텐츠 (빈 공간 채움 — 남은 공간 자동 계산) ---
+        duration_top = detail_y + detail_h - 0.35  # duration 바 시작 y
+        available_for_aux = duration_top - cy - 0.1  # 여유 공간
+        aux_item_h = 0.38  # aux 항목 하나당 높이
+
+        aux_items = []
+        if step.get("prerequisites"):
+            aux_items.append(("전제 조건", step["prerequisites"]))
+        if step.get("risks"):
+            aux_items.append(("리스크", step["risks"]))
+        if step.get("metrics"):
+            aux_items.append(("기대 효과", step["metrics"]))
+        if step.get("example"):
+            aux_items.append(("실증 사례", step["example"]))
+
+        # 남은 공간에 맞게 aux 개수 자동 제한
+        max_aux = max(0, int(available_for_aux / aux_item_h))
+        aux_items = aux_items[:max_aux]
+
+        for ai, (aux_label, aux_value) in enumerate(aux_items):
+            ay = cy + ai * aux_item_h
+            c.box(
+                x=bx + 0.15, y=ay, w=box_w - 0.3, h=0.01,
+                fill="grey_mid", border=None,
+            )
+            c.text(
+                aux_label,
+                x=bx + 0.15, y=ay + 0.03, w=box_w - 0.3, h=0.14,
+                size=7, bold=True, color="grey_700", anchor="top",
+            )
+            c.text(
+                aux_value,
+                x=bx + 0.15, y=ay + 0.16, w=box_w - 0.3, h=0.2,
+                size=8, color="grey_900", anchor="top",
+            )
+
         # duration (하단)
         if step.get("duration"):
             c.box(
