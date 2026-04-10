@@ -559,6 +559,81 @@ class Canvas:
                 size=7, color="grey_700", anchor="top",
             )
 
+    def diamond(
+        self,
+        *,
+        cx: float,
+        cy: float,
+        size: float,
+        fill: str | RGBColor = "accent",
+        border: float | None = None,
+        text: str = "",
+        text_color: str | RGBColor = "white",
+        text_size: float = 12,
+        region: Region | None = None,
+    ):
+        """45도 회전 사각형 (다이아몬드). 중심 좌표 기준."""
+        cx, cy = self._resolve(cx, cy, region)
+        half = size / 2
+        shape = self.slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE,
+            Inches(cx - half), Inches(cy - half),
+            Inches(size), Inches(size),
+        )
+        shape.rotation = 45.0
+        if fill is None:
+            shape.fill.background()
+        else:
+            shape.fill.solid()
+            shape.fill.fore_color.rgb = color(fill)
+        if border is None:
+            shape.line.fill.background()
+        else:
+            shape.line.color.rgb = color("grey_mid")
+            shape.line.width = Pt(border)
+
+        if text:
+            tf = shape.text_frame
+            tf.word_wrap = True
+            tf.margin_left = Inches(0.1)
+            tf.margin_right = Inches(0.1)
+            tf.margin_top = Inches(0.05)
+            tf.margin_bottom = Inches(0.05)
+            from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+            tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+            p = tf.paragraphs[0]
+            p.text = text
+            p.font.size = Pt(text_size)
+            p.font.bold = True
+            p.font.color.rgb = _color(text_color)
+            p.font.name = FONT_BODY
+            p.alignment = PP_ALIGN.CENTER
+
+        self._drawn.append(("diamond", cx, cy, size))
+        return shape
+
+    def icon(
+        self,
+        name: str,
+        *,
+        x: float,
+        y: float,
+        size: float = 20,
+        color: str | RGBColor = "accent",
+        region: Region | None = None,
+    ):
+        """Segoe MDL2 Assets 벡터 아이콘."""
+        from ppt_builder.icons import ICON_MAP, ICON_FONT
+        glyph = ICON_MAP.get(name, "\uE946")
+        box_s = size * 0.019
+        self.text(
+            glyph,
+            x=x, y=y, w=box_s, h=box_s,
+            size=size, color=color, font=ICON_FONT,
+            align="center", anchor="middle",
+            region=region,
+        )
+
     def label_chip(
         self,
         text: str,
