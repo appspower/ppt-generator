@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Literal, Optional
 
 from pptx.dml.color import RGBColor
@@ -107,6 +108,40 @@ def color(name_or_rgb) -> RGBColor:
 
 
 # ============================================================
+# Region — 좌표 오프셋 + 클리핑 영역
+# ============================================================
+
+
+@dataclass
+class Region:
+    """슬라이드 내 사각 영역. 컴포넌트/패턴의 로컬 좌표계 원점.
+
+    Canvas 메서드에 region을 전달하면, (x, y)는 region 기준 상대좌표로 해석.
+    region=None이면 기존 절대좌표 동작 (하위 호환).
+
+    사용 예:
+        left = Region(0.3, 1.7, 4.35, 4.8)
+        c.box(x=0, y=0, w=4.35, h=1.0, region=left)
+        # → 실제 좌표: (0.3, 1.7, 4.35, 1.0)
+    """
+    x: float
+    y: float
+    w: float
+    h: float
+
+    def abs_x(self, local_x: float) -> float:
+        return self.x + local_x
+
+    def abs_y(self, local_y: float) -> float:
+        return self.y + local_y
+
+    def sub(self, x: float, y: float, w: float, h: float) -> "Region":
+        """이 Region 안에 하위 Region을 생성."""
+        return Region(self.x + x, self.y + y, w, h)
+
+
+
+# ============================================================
 # Canvas — 백지 위에 도형/텍스트를 절대좌표로 그리는 펜
 # ============================================================
 
@@ -116,11 +151,35 @@ class Canvas:
 
     좌표는 인치 단위 (10x7.5 슬라이드 기준 0~10, 0~7.5).
     원점은 좌상단.
+
+    Region을 전달하면 좌표가 region 기준 상대좌표로 해석됨.
     """
 
     def __init__(self, slide: Slide):
         self.slide = slide
         self._drawn: list[tuple] = []  # 디버깅/검증용 추적
+        self._region_stack: list[Region] = []  # context region 스택
+
+    def push_region(self, region: Region):
+        """context region 설정. 이후 모든 좌표가 이 region 기준 상대좌표."""
+        self._region_stack.append(region)
+
+    def pop_region(self):
+        """context region 해제."""
+        if self._region_stack:
+            self._region_stack.pop()
+
+    @property
+    def _ctx_region(self) -> Optional[Region]:
+        return self._region_stack[-1] if self._region_stack else None
+
+    def _resolve(self, x: float, y: float,
+                 region: Optional["Region"] = None) -> tuple[float, float]:
+        """region이 있으면 상대→절대 변환. 없으면 context region 사용."""
+        r = region or self._ctx_region
+        if r is None:
+            return x, y
+        return r.abs_x(x), r.abs_y(y)
 
     # --------------------------------------------------------
     # Atomic shapes
@@ -140,6 +199,7 @@ class Canvas:
         corner_label: str = "",
         corner_label_color: str | RGBColor = "grey_700",
         corner_label_size: float = 8,
+        region: Region | None = None,
     ):
         """굵고 각진 사각형. 둥근 모서리는 명시적으로 요청해야 적용됨.
 
@@ -153,6 +213,7 @@ class Canvas:
             corner_label_color: 마커 색
             corner_label_size: 마커 폰트 pt
         """
+        x, y = self._resolve(x, y, region)
         mso_shape = (
             MSO_SHAPE.ROUNDED_RECTANGLE if shape == "rounded" else MSO_SHAPE.RECTANGLE
         )
@@ -211,8 +272,10 @@ class Canvas:
         text_color: str | RGBColor = "black",
         text_size: float = 11,
         text_bold: bool = True,
+        region: Region | None = None,
     ):
         """원형 도형 (지름 d). 번호 뱃지/카테고리 마커 등에 사용."""
+        x, y = self._resolve(x, y, region)
         oval = self.slide.shapes.add_shape(
             MSO_SHAPE.OVAL, Inches(x), Inches(y), Inches(d), Inches(d)
         )
@@ -258,8 +321,10 @@ class Canvas:
         text_color: str | RGBColor = "white",
         text_size: float = 10,
         text_bold: bool = True,
+        region: Region | None = None,
     ):
         """5각형 화살표 (chevron). 단계/순서 표시에 사용."""
+        x, y = self._resolve(x, y, region)
         chev = self.slide.shapes.add_shape(
             MSO_SHAPE.CHEVRON, Inches(x), Inches(y), Inches(w), Inches(h)
         )
@@ -299,8 +364,11 @@ class Canvas:
         y2: float,
         color: str | RGBColor = "black",
         width: float = 1.5,
+        region: Region | None = None,
     ):
         """직선 (수평/수직/대각)."""
+        x1, y1 = self._resolve(x1, y1, region)
+        x2, y2 = self._resolve(x2, y2, region)
         ln = self.slide.shapes.add_connector(
             1,  # straight line
             Inches(x1),
@@ -322,8 +390,11 @@ class Canvas:
         y2: float,
         color: str | RGBColor = "dark",
         width: float = 1.0,
+        region: Region | None = None,
     ):
         """화살표 — 보통 두께, 다크 기본."""
+        x1, y1 = self._resolve(x1, y1, region)
+        x2, y2 = self._resolve(x2, y2, region)
         ln = self.slide.shapes.add_connector(
             1,
             Inches(x1),
@@ -363,8 +434,10 @@ class Canvas:
         font: str = FONT_BODY,
         align: Literal["left", "center", "right"] = "left",
         anchor: Literal["top", "middle", "bottom"] = "top",
+        region: Region | None = None,
     ):
         """텍스트 박스 — 절대좌표 + 명시적 폰트 제어."""
+        x, y = self._resolve(x, y, region)
         tx = self.slide.shapes.add_textbox(
             Inches(x), Inches(y), Inches(w), Inches(h)
         )
