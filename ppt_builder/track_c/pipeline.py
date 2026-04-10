@@ -1,13 +1,12 @@
 """Track C 오케스트레이션 파이프라인.
 
-한 번의 iteration:
-    1. Track A 렌더러로 schema_path → pptx
-    2. PNG 익스포트 (PowerPoint COM)
-    3. evaluate.py 자동 점수
-    4. 리뷰 요청 마크다운 생성
-    5. (Claude Code가 PNG를 직접 보고 review_response.json 작성)
+모드 3종:
+    1. run — 1회 iteration (렌더→PNG→evaluate→review_request 생성)
+    2. refine — review_response.json의 patches로 자동 재실행
+    3. auto — 무인 루프: render→PNG→Claude Vision API→patches→re-render (max 3회)
+    4. batch — 여러 스키마 일괄 처리
 
-여러 iteration을 돌리려면 schema를 수정해서 다시 호출하면 된다.
+auto 모드가 P0의 핵심. ANTHROPIC_API_KEY 없으면 mock 모드로 동작.
 """
 
 from __future__ import annotations
@@ -20,8 +19,9 @@ from ppt_builder import render_presentation
 from ppt_builder.evaluate import evaluate_pptx
 from ppt_builder.models.schema import PresentationSchema
 
+from .auto_vision import review_all_slides
 from .png_export import pptx_to_pngs
-from .refine import refine_schema_file
+from .refine import apply_patches, refine_schema_file
 from .vision_review import generate_review_request
 
 
@@ -111,6 +111,188 @@ def run_iteration(
         "eval_report": eval_report,
         "review_request_path": review_request_path,
         "iter_dir": iter_dir,
+    }
+
+
+def run_auto_loop(
+    schema_path: Path,
+    work_dir: Path,
+    max_iterations: int = 3,
+    pass_threshold: int = 7,
+    template: Path | None = None,
+    model: str = "claude-sonnet-4-20250514",
+    mock: bool = False,
+) -> dict[str, Any]:
+    """무인 Vision 피드백 루프.
+
+    render → PNG → Claude Vision API → patches → re-render를 자동 반복한다.
+    ANTHROPIC_API_KEY가 없으면 mock=True로 자동 전환.
+
+    종료 조건:
+        1. 모든 체크리스트 항목 ≥ pass_threshold → PASS, 루프 종료
+        2. max_iterations 도달 → 강제 종료 + 현재 상태 반환
+        3. 점수 회귀 감지 → 이전 iteration으로 롤백 + 종료
+
+    Args:
+        schema_path: 입력 슬라이드 스키마 JSON
+        work_dir: 작업 디렉토리
+        max_iterations: 최대 반복 횟수 (기본 3)
+        pass_threshold: 체크리스트 각 항목 최소 점수 (기본 7)
+        template: pptx 마스터 템플릿
+        model: Claude 모델 ID
+        mock: True이면 API 호출 없이 mock 결과 사용
+
+    Returns:
+        {
+            "final_iter": int,
+            "final_score": int,
+            "passed": bool,
+            "stop_reason": str,  # "all_pass" | "max_iterations" | "score_regression" | "no_patches"
+            "iterations": [각 iter의 run_iteration 결과 + vision_result],
+        }
+    """
+    import os
+
+    schema_path = Path(schema_path).resolve()
+    work_dir = Path(work_dir).resolve()
+
+    # API 키 확인 → 없으면 자동 mock 전환
+    if not mock and not os.environ.get("ANTHROPIC_API_KEY"):
+        print("[auto_loop] ANTHROPIC_API_KEY 미설정 → mock 모드로 전환")
+        mock = True
+
+    iterations: list[dict[str, Any]] = []
+    current_schema_path = schema_path
+    prev_score = 0
+
+    for iter_num in range(1, max_iterations + 1):
+        print(f"\n{'='*50}")
+        print(f"Auto Loop — Iteration {iter_num}/{max_iterations}")
+        print(f"{'='*50}")
+
+        # 1. render + png + evaluate
+        result = run_iteration(
+            schema_path=current_schema_path,
+            work_dir=work_dir,
+            iter_num=iter_num,
+            template=template,
+        )
+
+        # 2. Claude Vision 자동 평가
+        print(f"  Vision 평가 중... ({'mock' if mock else model})")
+        vision_result = review_all_slides(
+            png_paths=result["png_paths"],
+            schema_path=current_schema_path,
+            model=model,
+            mock=mock,
+        )
+        vision_result["iter_num"] = iter_num
+        current_score = vision_result.get("overall_score", 0)
+
+        # vision_result를 review_response.json으로 저장
+        response_path = result["iter_dir"] / "review_response.json"
+        response_path.write_text(
+            json.dumps(vision_result, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+
+        result["vision_result"] = vision_result
+        iterations.append(result)
+
+        print(f"  evaluate.py: {result['eval_report']['score']}/100")
+        print(f"  Vision:      {current_score}/100")
+        print(f"  must_fix:    {vision_result.get('slides', [{}])[0].get('must_fix', False) if vision_result.get('slides') else 'N/A'}")
+
+        # 3. 종료 조건 체크
+
+        # 3a. 모든 체크리스트 항목 ≥ threshold?
+        all_pass = True
+        for slide in vision_result.get("slides", []):
+            checklist = slide.get("checklist", {})
+            for key, val in checklist.items():
+                if val < pass_threshold:
+                    all_pass = False
+                    break
+            if not all_pass:
+                break
+
+        if all_pass:
+            print(f"  → ALL PASS (모든 항목 ≥ {pass_threshold}점). 루프 종료.")
+            return {
+                "final_iter": iter_num,
+                "final_score": current_score,
+                "passed": True,
+                "stop_reason": "all_pass",
+                "iterations": iterations,
+            }
+
+        # 3b. 점수 회귀?
+        if iter_num > 1 and current_score < prev_score:
+            print(f"  → 점수 회귀 감지 ({prev_score} → {current_score}). 이전 버전 유지, 루프 종료.")
+            return {
+                "final_iter": iter_num - 1,
+                "final_score": prev_score,
+                "passed": False,
+                "stop_reason": "score_regression",
+                "iterations": iterations,
+            }
+
+        # 3c. patches가 없으면?
+        patches = vision_result.get("patches", [])
+        if not patches:
+            print(f"  → patches 없음. 수정 불가. 루프 종료.")
+            return {
+                "final_iter": iter_num,
+                "final_score": current_score,
+                "passed": False,
+                "stop_reason": "no_patches",
+                "iterations": iterations,
+            }
+
+        # 3d. 마지막 iteration이면?
+        if iter_num >= max_iterations:
+            print(f"  → max_iterations={max_iterations} 도달. 강제 종료.")
+            return {
+                "final_iter": iter_num,
+                "final_score": current_score,
+                "passed": False,
+                "stop_reason": "max_iterations",
+                "iterations": iterations,
+            }
+
+        # 4. patches 적용 → 다음 iteration용 스키마 생성
+        print(f"  → {len(patches)}개 patches 적용 중...")
+        prev_score = current_score
+        saved_schema = result["iter_dir"] / f"{schema_path.stem}.json"
+        current_data = json.loads(saved_schema.read_text(encoding="utf-8"))
+
+        try:
+            refined = apply_patches(current_data, patches)
+            next_schema_path = work_dir / f"iter_{iter_num+1:03d}" / f"{schema_path.stem}.json"
+            next_schema_path.parent.mkdir(parents=True, exist_ok=True)
+            next_schema_path.write_text(
+                json.dumps(refined, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            current_schema_path = next_schema_path
+            print(f"  → 다음 스키마: {next_schema_path}")
+        except Exception as e:
+            print(f"  → patches 적용 실패: {e}. 루프 종료.")
+            return {
+                "final_iter": iter_num,
+                "final_score": current_score,
+                "passed": False,
+                "stop_reason": f"patch_error: {e}",
+                "iterations": iterations,
+            }
+
+    # 여기에 올 일은 없지만 안전망
+    return {
+        "final_iter": max_iterations,
+        "final_score": prev_score,
+        "passed": False,
+        "stop_reason": "unknown",
+        "iterations": iterations,
     }
 
 
@@ -371,6 +553,61 @@ def main() -> None:
         result = apply_and_rerun(work_dir=work_dir, source_iter=source_iter, template=template)
         _print_summary(result)
         print(f"Refine stats:   {result['refine_stats']}")
+        return
+
+    if cmd == "review":
+        # pptx 직접 평가 (schema 없이 — Phase D 등 Canvas 빌드 파일용)
+        if len(sys.argv) < 3:
+            print("Usage: python -m ppt_builder.track_c.pipeline review <file.pptx> [--mock]")
+            sys.exit(1)
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+        pptx_path = Path(sys.argv[2])
+        mock = "--mock" in sys.argv
+        work_dir = Path("output/track_c/_review") / pptx_path.stem
+        work_dir.mkdir(parents=True, exist_ok=True)
+        pngs = pptx_to_pngs(pptx_path, work_dir / "pngs")
+        eval_report = evaluate_pptx(pptx_path)
+        vision = review_all_slides(pngs, mock=mock)
+        (work_dir / "review_response.json").write_text(
+            json.dumps(vision, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(f"evaluate.py:  {eval_report['score']}/100")
+        print(f"Vision:       {vision['overall_score']}/100")
+        print(f"must_fix:     {any(s.get('must_fix') for s in vision.get('slides', []))}")
+        for s in vision.get("slides", []):
+            cl = s.get("checklist", {})
+            items = " | ".join(f"{k}:{v}" for k, v in cl.items())
+            print(f"  Slide {s.get('slide_index',0)}: [{items}]")
+        print(f"결과 저장: {work_dir / 'review_response.json'}")
+        return
+
+    if cmd == "auto":
+        if len(sys.argv) < 3:
+            print("Usage: python -m ppt_builder.track_c.pipeline auto <schema.json> [work_dir] [max_iter] [--mock]")
+            sys.exit(1)
+        args = sys.argv[2:]
+        schema_path = Path(args[0])
+        work_dir = Path(args[1]) if len(args) > 1 and not args[1].startswith("-") else Path("output/track_c") / schema_path.stem
+        max_iter_idx = 2 if len(args) > 2 and not args[2].startswith("-") else None
+        max_iter = int(args[max_iter_idx]) if max_iter_idx and len(args) > max_iter_idx else 3
+        mock = "--mock" in args
+
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+        result = run_auto_loop(
+            schema_path=schema_path,
+            work_dir=work_dir,
+            max_iterations=max_iter,
+            mock=mock,
+        )
+        print()
+        print("=" * 60)
+        print(f"Auto Loop 완료: {result['stop_reason']}")
+        print(f"최종 iteration: {result['final_iter']}")
+        print(f"최종 Vision 점수: {result['final_score']}/100")
+        print(f"PASSED: {result['passed']}")
+        print("=" * 60)
         return
 
     if cmd == "batch":

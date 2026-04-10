@@ -15,16 +15,16 @@ import win32com.client
 def pptx_to_pngs(
     pptx_path: Path,
     output_dir: Path,
-    width: int = 1920,
-    height: int = 1440,
+    width: int = 1568,
+    height: int = 1176,
 ) -> list[Path]:
     """pptx 파일을 슬라이드별 PNG로 변환.
 
     Args:
         pptx_path: 입력 .pptx 파일
         output_dir: PNG 출력 디렉토리 (자동 생성)
-        width: PNG 가로 픽셀 (4:3 기준 1920×1440 권장)
-        height: PNG 세로 픽셀
+        width: PNG 가로 픽셀 (Claude Vision 내부 최대 1568px, 추가 축소 없음)
+        height: PNG 세로 픽셀 (4:3 = 1568×1176)
 
     Returns:
         생성된 PNG 파일 경로 리스트 (슬라이드 순)

@@ -12,8 +12,9 @@ Workflow:
 
 Public API:
     run_iteration(schema_path, work_dir, iter_num) -> dict
+    run_auto_loop(schema_path, work_dir, ...) -> dict  # 무인 Vision 루프
 """
 
-from .pipeline import run_iteration
+from .pipeline import run_auto_loop, run_iteration
 
-__all__ = ["run_iteration"]
+__all__ = ["run_iteration", "run_auto_loop"]
