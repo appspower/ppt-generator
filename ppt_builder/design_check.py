@@ -605,15 +605,214 @@ def inspect_design(
 # ============================================================
 
 
+def inspect_box_fill_ratios(pptx_path: str) -> list[dict]:
+    """큰 박스(>= 2"×2") 안의 콘텐츠 채움 비율을 측정한다.
+
+    각 박스에 대해:
+    - 박스 좌표/크기
+    - 박스 안에 위치한 텍스트 shape들의 총 면적
+    - fill_ratio = 텍스트 면적 / 박스 면적 (0.0~1.0)
+    - fill_ratio < 0.4이면 비어 보이는 박스
+
+    Returns:
+        list of {"slide": int, "box_idx": int, "box_rect": (l,t,w,h),
+                 "fill_ratio": float, "sparse": bool}
+    """
+    prs = Presentation(pptx_path)
+    results = []
+
+    for si, slide in enumerate(prs.slides):
+        # 1) 모든 shape의 좌표 수집
+        shapes_data = []
+        for idx, s in enumerate(slide.shapes):
+            if s.left is None or s.top is None:
+                continue
+            l = s.left / 914400
+            t = s.top / 914400
+            w = (s.width or 0) / 914400
+            h = (s.height or 0) / 914400
+            if w <= 0 or h <= 0:
+                continue
+
+            has_fill = False
+            try:
+                if s.fill.type is not None:
+                    has_fill = True
+            except Exception:
+                pass
+
+            has_text = s.has_text_frame and bool(s.text_frame.text.strip())
+            shapes_data.append({
+                "idx": idx, "l": l, "t": t, "w": w, "h": h,
+                "area": w * h, "has_fill": has_fill, "has_text": has_text,
+            })
+
+        # 2) 큰 박스 식별 (fill 있고, 2"×2" 이상)
+        big_boxes = [
+            s for s in shapes_data
+            if s["has_fill"] and s["w"] >= 1.5 and s["h"] >= 1.5 and s["area"] >= 3.0
+        ]
+
+        for box in big_boxes:
+            bl, bt, bw, bh = box["l"], box["t"], box["w"], box["h"]
+            box_area = bw * bh
+
+            # 3) 박스 안에 있는 텍스트 shape들의 면적 합산
+            text_area = 0.0
+            for s in shapes_data:
+                if not s["has_text"]:
+                    continue
+                # shape 중심이 박스 안에 있는가?
+                cx = s["l"] + s["w"] / 2
+                cy = s["t"] + s["h"] / 2
+                if bl <= cx <= bl + bw and bt <= cy <= bt + bh:
+                    text_area += s["area"]
+
+            fill_ratio = text_area / box_area if box_area > 0 else 0
+            results.append({
+                "slide": si + 1,
+                "box_idx": box["idx"],
+                "box_rect": (round(bl, 2), round(bt, 2), round(bw, 2), round(bh, 2)),
+                "fill_ratio": round(fill_ratio, 2),
+                "sparse": fill_ratio < 0.4,
+            })
+
+    return results
+
+
+def decide_aux_content(
+    *,
+    pattern_kind: Literal[
+        "executive", "timeline", "comparison", "process", "quadrant", "data"
+    ],
+    box_context: str = "",
+    fill_ratio: float = 0.0,
+) -> DesignDecision:
+    """빈 박스에 어떤 보조 콘텐츠를 채울지 자동 결정한다.
+
+    Claude가 이걸 호출하는 게 아니라, 패턴 함수가 빈 공간을 감지했을 때
+    자동으로 적절한 aux 슬롯을 결정하는 데 사용한다.
+
+    Args:
+        pattern_kind: 패턴 종류
+        box_context: 박스가 어떤 단계/영역에 해당하는지 (예: "L1 가시화", "Blueprint 수집")
+        fill_ratio: 현재 채움 비율 (0.0~1.0)
+
+    Returns:
+        DesignDecision with recommended aux content types
+    """
+    # 패턴별 aux 콘텐츠 후보 — 우선순위 순서
+    aux_pool = {
+        "process": [
+            {"type": "prerequisites", "label": "전제 조건",
+             "rationale": "이 단계를 시작하기 위한 선행 조건 — 단계 간 의존성을 보여줌"},
+            {"type": "risks", "label": "리스크 / 주의사항",
+             "rationale": "이 단계에서 발생 가능한 위험 — 실무자가 즉시 참고"},
+            {"type": "metrics", "label": "정량 효과",
+             "rationale": "이 단계 완료 시 기대 효과 — 투자 근거 강화"},
+            {"type": "example", "label": "실증 사례",
+             "rationale": "유사 프로젝트에서의 적용 결과 — 신뢰성 확보"},
+        ],
+        "timeline": [
+            {"type": "prerequisites", "label": "선행 조건",
+             "rationale": "이전 단계 완료 기준 — 의존성 체인 시각화"},
+            {"type": "gate_criteria", "label": "Gate 기준",
+             "rationale": "다음 단계 착수 조건 — PMO 의사결정 근거"},
+            {"type": "team", "label": "투입 인력",
+             "rationale": "이 단계에 필요한 역할 — 리소스 계획 지원"},
+            {"type": "risks", "label": "리스크",
+             "rationale": "일정 지연 가능 요인 — 선제 대응 가능"},
+        ],
+        "executive": [
+            {"type": "metrics", "label": "핵심 KPI",
+             "rationale": "정량적 성과 수치 — 경영진 즉시 판단 가능"},
+            {"type": "next_steps", "label": "후속 조치",
+             "rationale": "의사결정 후 즉시 실행 사항 — action item"},
+        ],
+        "comparison": [
+            {"type": "notes", "label": "비고",
+             "rationale": "셀만으로 설명이 부족한 경우 보조 정보"},
+            {"type": "recommendation", "label": "권장 사항",
+             "rationale": "비교 결과 기반 권고 — 의사결정 지원"},
+        ],
+        "quadrant": [
+            {"type": "action_items", "label": "실행 과제",
+             "rationale": "각 사분면에 대한 구체적 후속 조치"},
+            {"type": "criteria", "label": "분류 기준",
+             "rationale": "축의 의미를 더 구체적으로 설명"},
+        ],
+        "data": [
+            {"type": "insight", "label": "인사이트",
+             "rationale": "데이터에서 도출한 의미 — 숫자만으로는 부족"},
+            {"type": "methodology", "label": "분석 방법",
+             "rationale": "어떻게 이 결론에 도달했는가 — 신뢰성"},
+        ],
+    }
+
+    pool = aux_pool.get(pattern_kind, aux_pool["executive"])
+
+    # fill_ratio에 따라 추천 개수 결정
+    # 매우 빈약 (< 0.25) → 2개 추천, 약간 빈약 (0.25~0.4) → 1개 추천
+    if fill_ratio < 0.25:
+        n_recommend = min(2, len(pool))
+    elif fill_ratio < 0.4:
+        n_recommend = 1
+    else:
+        n_recommend = 0
+
+    recommended = pool[:n_recommend]
+    alternatives = pool[n_recommend:n_recommend + 2]
+
+    return DesignDecision(
+        rationale=(
+            f"{pattern_kind} 패턴, fill_ratio={fill_ratio:.0%} — "
+            f"{n_recommend}개 aux 콘텐츠 추천"
+            + (f" ({', '.join(r['label'] for r in recommended)})" if recommended else "")
+        ),
+        recommendation={
+            "n_aux": n_recommend,
+            "aux_types": recommended,
+            "box_context": box_context,
+        },
+        alternatives=[{"type": a["type"], "reason": a["rationale"]} for a in alternatives],
+    )
+
+
 def design_check_pipeline(
     pptx_path: str,
     *,
     expect_dense: bool = True,
     forbidden_colors: Optional[list[str]] = None,
+    pattern_kind: Optional[str] = None,
 ) -> DesignReport:
-    """convenience: render_validated 후 호출하여 디자인 점검까지 한 번에."""
-    return inspect_design(
+    """convenience: render_validated 후 호출하여 디자인 점검까지 한 번에.
+
+    디자인 점검 + 박스별 fill ratio 측정을 모두 수행.
+    """
+    report = inspect_design(
         pptx_path,
         expect_dense=expect_dense,
         forbidden_colors=forbidden_colors,
+        pattern_kind=pattern_kind,
     )
+    # 박스별 fill ratio 측정 결과를 metrics에 추가
+    box_ratios = inspect_box_fill_ratios(pptx_path)
+    sparse_boxes = [b for b in box_ratios if b["sparse"]]
+    report.metrics["box_fill_ratios"] = box_ratios
+    report.metrics["sparse_box_count"] = len(sparse_boxes)
+
+    # sparse 박스가 있으면 MEDIUM issue 추가
+    for b in sparse_boxes:
+        report.issues.append(
+            DesignIssue(
+                severity="medium",
+                category="density",
+                message=(
+                    f"Slide {b['slide']}: 박스 {b['box_rect']} fill_ratio={b['fill_ratio']:.0%} — "
+                    "콘텐츠 부족으로 빈 공간 과다"
+                ),
+                suggestion="aux 콘텐츠(전제조건/리스크/KPI/사례) 추가 또는 shrink-to-fit 적용",
+            )
+        )
+
+    return report

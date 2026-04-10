@@ -27,24 +27,27 @@ class ContentSlideRenderer(BaseRenderer):
     def render(self, prs: Presentation, slide_def: ContentSlide) -> Slide:
         slide = self.add_blank_slide(prs)
 
+        # 과제2: 헤더 스타일 전달
+        hs = slide_def.header_style if hasattr(slide_def, 'header_style') else "standard"
+
         # 프레임 분기
         if slide_def.layout == LayoutType.FULLSCREEN:
             self._render_fullscreen(slide, slide_def)
         elif slide_def.layout == LayoutType.SIDEBAR:
-            self.add_header_bar(slide)
-            self.add_title(slide, slide_def.title)
-            self.add_breadcrumb(slide, slide_def.breadcrumb)
+            self.add_header_bar(slide, hs)
+            self.add_title(slide, slide_def.title, hs)
+            self.add_breadcrumb(slide, slide_def.breadcrumb, hs)
             self._render_sidebar(slide, slide_def)
         elif slide_def.layout == LayoutType.STACKED and slide_def.sections:
-            self.add_header_bar(slide)
-            self.add_title(slide, slide_def.title)
-            self.add_breadcrumb(slide, slide_def.breadcrumb)
+            self.add_header_bar(slide, hs)
+            self.add_title(slide, slide_def.title, hs)
+            self.add_breadcrumb(slide, slide_def.breadcrumb, hs)
             self.add_header_message(slide, slide_def.header_message)
             self._render_stacked(slide, slide_def)
         else:
-            self.add_header_bar(slide)
-            self.add_title(slide, slide_def.title)
-            self.add_breadcrumb(slide, slide_def.breadcrumb)
+            self.add_header_bar(slide, hs)
+            self.add_title(slide, slide_def.title, hs)
+            self.add_breadcrumb(slide, slide_def.breadcrumb, hs)
             self.add_header_message(slide, slide_def.header_message)
             self._render_single(slide, slide_def)
 
@@ -66,6 +69,8 @@ class ContentSlideRenderer(BaseRenderer):
         normal_h = CONTENT_H - fw_total  # 축소하지 않음 — 전체를 채움
 
         if normal:
+            # 과제1: col_ratios 전달
+            cr = slide_def.col_ratios if hasattr(slide_def, 'col_ratios') else None
             positions = calculate_positions_custom(
                 layout=slide_def.layout,
                 n_elements=len(normal),
@@ -73,6 +78,7 @@ class ContentSlideRenderer(BaseRenderer):
                 elements=normal,
                 content_x=CONTENT_X, content_y=CONTENT_Y,
                 content_w=CONTENT_W, content_h=normal_h,
+                col_ratios=cr if cr else None,
             )
             for comp, (x, y, w, h) in zip(normal, positions):
                 render_component(slide, comp, x, y, w, h)

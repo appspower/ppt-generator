@@ -157,6 +157,42 @@ def estimate_text_height(
     return total_lines * line_height
 
 
+def estimate_block_height(
+    items: list[dict],
+    box_width_inches: float,
+) -> float:
+    """콘텐츠 블록의 총 높이를 인치로 추정한다.
+
+    items: 각 항목은 dict로, 아래 키를 가질 수 있다:
+        - "text": 텍스트 문자열
+        - "size": 폰트 pt (기본 9)
+        - "bold": 굵게 여부 (기본 False)
+        - "h": 고정 높이 오버라이드 (있으면 텍스트 추정 무시)
+        - "gap": 이 항목 뒤 추가 여백 (기본 0)
+
+    사용 예:
+        h = estimate_block_height([
+            {"text": "수행 주체", "size": 7, "bold": True, "gap": 0},
+            {"text": "PMO + Palantir", "size": 9, "gap": 0.1},
+            {"text": "도구 / 기술", "size": 7, "bold": True},
+            {"text": "Jira REST\\nFoundry", "size": 8, "gap": 0.1},
+        ], box_width_inches=1.5)
+    """
+    total = 0.0
+    for item in items:
+        if "h" in item:
+            total += item["h"]
+        elif "text" in item and item["text"]:
+            total += estimate_text_height(
+                item["text"],
+                font_pt=item.get("size", 9),
+                box_width_inches=box_width_inches,
+                bold=item.get("bold", False),
+            )
+        total += item.get("gap", 0)
+    return total
+
+
 # ============================================================
 # Layout Helpers
 # ============================================================

@@ -267,7 +267,7 @@ class SlideSection(BaseModel):
     """stacked 레이아웃의 개별 섹션."""
     height_ratio: float = Field(default=0.5, ge=0.1, le=0.9, description="전체 콘텐츠 영역 대비 비율")
     layout: LayoutType = LayoutType.FULL
-    n_cols: int = Field(default=1, ge=1, le=4)
+    n_cols: int = Field(default=1, ge=1, le=6)
     elements: list[ComponentSchema] = Field(min_length=1)
 
 
@@ -286,7 +286,9 @@ class ContentSlide(BaseModel):
     sidebar_items: list[str] = Field(default_factory=list, description="sidebar 레이아웃: 좌측 네비 항목들")
     sidebar_active: int = Field(default=0, description="sidebar: 활성화된 항목 인덱스")
     layout: LayoutType = LayoutType.COLUMNS
-    n_cols: int = Field(default=1, ge=1, le=4)
+    n_cols: int = Field(default=1, ge=1, le=6)
+    col_ratios: list[float] = Field(default_factory=list, description="비대칭 컬럼 비율 (예: [0.6, 0.4])")
+    header_style: str = Field(default="standard", description="standard/minimal/accent")
     elements: list[ComponentSchema] = Field(default_factory=list)
     sections: list[SlideSection] = Field(default_factory=list, description="stacked 레이아웃용 섹션 분할")
     footnote: str = ""

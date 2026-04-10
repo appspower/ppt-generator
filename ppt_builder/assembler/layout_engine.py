@@ -43,11 +43,25 @@ def _layout_full(cx, cy, cw, ch, n):
     return [(cx, cy + i * (h + gap), cw, h) for i in range(n)]
 
 
-def _layout_columns(cx, cy, cw, ch, n, n_cols, elements=None):
+def _layout_columns(cx, cy, cw, ch, n, n_cols, elements=None, col_ratios=None):
     if n_cols <= 1:
         n_cols = min(n, 4)
 
-    cols = calc_columns(n_cols, gap=0.15, start_x=0.3, total_w=9.4)
+    # 과제1: 비대칭 컬럼 지원
+    if col_ratios and len(col_ratios) == n_cols:
+        gap = 0.15
+        total_w = 9.4
+        start_x = 0.3
+        total_ratio = sum(col_ratios)
+        avail_w = total_w - gap * (n_cols - 1)
+        cols = []
+        cur_x = start_x
+        for r in col_ratios:
+            w = avail_w * (r / total_ratio)
+            cols.append((cur_x, w))
+            cur_x += w + gap
+    else:
+        cols = calc_columns(n_cols, gap=0.15, start_x=0.3, total_w=9.4)
 
     # 분배
     col_elems: dict[int, list[int]] = {i: [] for i in range(n_cols)}
@@ -114,6 +128,7 @@ def calculate_positions_custom(
     content_y=None,
     content_w=None,
     content_h=None,
+    col_ratios: list[float] | None = None,
 ) -> list[tuple[int, int, int, int]]:
     """커스텀 콘텐츠 영역으로 좌표를 계산한다."""
     cx = content_x if content_x is not None else CONTENT_X
@@ -124,7 +139,7 @@ def calculate_positions_custom(
     if layout == LayoutType.FULL:
         return _layout_full(cx, cy, cw, ch, n_elements)
     elif layout == LayoutType.COLUMNS:
-        return _layout_columns(cx, cy, cw, ch, n_elements, n_cols, elements)
+        return _layout_columns(cx, cy, cw, ch, n_elements, n_cols, elements, col_ratios)
     elif layout == LayoutType.PROCESS:
         return _layout_process(cx, cy, cw, ch, n_elements)
     elif layout == LayoutType.TABLE:
