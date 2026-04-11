@@ -1404,7 +1404,7 @@ def comp_comparison_grid(
 
         # 라벨
         c.box(x=0, y=ry, w=label_w, h=rh,
-              fill="grey_200", border=0.5, border_color="grey_mid", region=r)
+              fill="grey_200", border=1.0, border_color="grey_mid", region=r)
         c.text(label, x=0.06, y=ry, w=label_w - 0.12, h=rh,
                size=font_size, bold=True, color="grey_900", anchor="middle", region=r)
 
@@ -1416,11 +1416,17 @@ def comp_comparison_grid(
             crits = col.get("criteria", [])
             val = str(crits[ri]) if ri < len(crits) else ""
             c.box(x=ox, y=ry, w=col_w, h=rh,
-                  fill=cell_fill, border=0.5, border_color="grey_mid", region=r)
+                  fill=cell_fill, border=1.0, border_color="grey_mid", region=r)
             txt_color = "white" if is_hl and alt == 0 else "grey_900"
-            c.text(val,
-                   x=ox + 0.08, y=ry + 0.06, w=cell_text_w, h=rh - 0.12,
-                   size=font_size, color=txt_color, anchor="top", region=r)
+            # **볼드** 마크업 지원
+            if "**" in val:
+                c.rich_text(val,
+                            x=ox + 0.08, y=ry + 0.06, w=cell_text_w, h=rh - 0.12,
+                            size=font_size, color=txt_color, anchor="top", region=r)
+            else:
+                c.text(val,
+                       x=ox + 0.08, y=ry + 0.06, w=cell_text_w, h=rh - 0.12,
+                       size=font_size, color=txt_color, anchor="top", region=r)
 
         ry += rh
 
