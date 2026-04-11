@@ -1068,3 +1068,360 @@ def comp_icon_header_card(
            size=8, color="grey_700", anchor="top", region=r)
 
     return r.h
+
+
+# ============================================================
+# Compound Component 1: Chevron Flow
+# ============================================================
+
+def comp_chevron_flow(
+    c: Canvas,
+    *,
+    phases: list[dict],       # [{"label": "분석", "tag": "01"}, ...]
+    style: str = "gradient",  # "gradient" | "uniform" | "accent_last"
+    show_details: bool = False,
+    region: Region,
+) -> float:
+    """수평 쉐브론 화살표 체인 (3~6단계).
+
+    timeline_phases, executive_summary, value_chain, chevron_timeline에서 추출.
+    4개 패턴에서 중복 사용된 최고 빈도 시각 요소.
+
+    사용 맥락: 프로세스 로드맵, 프로젝트 페이즈, 의사결정 흐름
+    """
+    r = region
+    n = len(phases)
+    if n == 0:
+        return 0.0
+
+    # 쉐브론 영역 (show_details면 상단 40%, 아니면 전체)
+    chev_h = min(r.h * 0.40, 0.55) if show_details else min(r.h, 0.55)
+    overlap = 0.08
+    chev_w = (r.w + overlap * (n - 1)) / n
+
+    # 색상 팔레트
+    if style == "gradient":
+        fills = ["grey_800", "grey_700", "grey_400", "grey_200", "grey_100", "white"]
+        txt_c = ["white", "white", "white", "grey_900", "grey_900", "grey_900"]
+    elif style == "accent_last":
+        fills = ["grey_200"] * (n - 1) + ["accent"]
+        txt_c = ["grey_900"] * (n - 1) + ["white"]
+    else:  # uniform
+        fills = ["grey_700"] * n
+        txt_c = ["white"] * n
+
+    for i, p in enumerate(phases):
+        cx = i * (chev_w - overlap)
+        fi = fills[min(i, len(fills) - 1)]
+        tc = txt_c[min(i, len(txt_c) - 1)]
+        tag = p.get("tag", f"{i + 1:02d}")
+        label = p.get("label", "")
+        text = f"{tag}  {label}" if tag else label
+        c.chevron(x=cx, y=0, w=chev_w, h=chev_h,
+                  fill=fi, text=text, text_color=tc, text_size=9,
+                  region=r)
+
+    # 상세 카드 (선택)
+    if show_details and n > 0:
+        detail_y = chev_h + 0.10
+        detail_h = r.h - detail_y
+        card_gap = 0.10
+        card_w = (r.w - card_gap * (n - 1)) / n
+        for i, p in enumerate(phases):
+            dx = i * (card_w + card_gap)
+            c.box(x=dx, y=detail_y, w=card_w, h=detail_h,
+                  fill="grey_100", border=0.5, border_color="grey_mid",
+                  region=r)
+            details = p.get("details", [])
+            for di, item in enumerate(details):
+                c.text(f"▪ {item}",
+                       x=dx + 0.07, y=detail_y + 0.06 + di * 0.22,
+                       w=card_w - 0.14, h=0.20,
+                       size=7, color="grey_900", anchor="top", region=r)
+
+    return chev_h if not show_details else r.h
+
+
+# ============================================================
+# Compound Component 2: Hero Block
+# ============================================================
+
+def comp_hero_block(
+    c: Canvas,
+    *,
+    headline: str,
+    sub_points: list[str] = None,
+    label: str = "",
+    bg_color: str = "grey_800",
+    text_color: str = "white",
+    region: Region,
+) -> float:
+    """대형 색상 박스 — 핵심 메시지 강조.
+
+    executive_summary의 좌측 Hero 영역에서 추출.
+
+    사용 맥락: 전략 방향 선언, 핵심 발견 강조, 섹션 도입부
+    """
+    r = region
+    sub_points = sub_points or []
+
+    # 배경
+    c.box(x=0, y=0, w=r.w, h=r.h,
+          fill=bg_color, border=None, region=r)
+
+    cy = 0.20
+    pad = 0.25
+
+    # 레이블 칩 (선택) — label_chip은 region 미지원이므로 절대좌표 계산
+    if label:
+        c.label_chip(label, x=r.x + pad, y=r.y + cy,
+                     w=min(1.5, r.w * 0.4), h=0.26,
+                     fill="grey_400", text_color="white")
+        cy += 0.40
+
+    # 헤드라인
+    hl_h = min(r.h * 0.35, 1.2)
+    c.text(headline, x=pad, y=cy, w=r.w - pad * 2, h=hl_h,
+           size=18, bold=True, color=text_color, anchor="top",
+           region=r)
+    cy += hl_h + 0.08
+
+    # 구분선
+    c.box(x=pad, y=cy, w=r.w - pad * 2, h=0.012,
+          fill="grey_400", border=None, region=r)
+    cy += 0.15
+
+    # 하위 포인트
+    for i, pt in enumerate(sub_points):
+        if cy + 0.22 > r.h - 0.1:
+            break
+        c.text(f"▪  {pt}", x=pad, y=cy, w=r.w - pad * 2, h=0.22,
+               size=9, color=text_color, anchor="top", region=r)
+        cy += 0.24
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 3: Hub-Spoke Diagram
+# ============================================================
+
+def comp_hub_spoke_diagram(
+    c: Canvas,
+    *,
+    center: str,
+    center_sub: str = "",
+    spokes: list[dict],       # [{"title": "...", "detail": "...", "badge": ""}, ...]
+    center_color: str = "grey_800",
+    spoke_color: str = "white",
+    region: Region,
+) -> float:
+    """허브-스포크 방사형 다이어그램.
+
+    hub_spoke 패턴에서 추출. 삼각함수 기반 자동 배치.
+
+    사용 맥락: 시스템 통합 구조, 핵심 역량 + 영향 영역, 이해관계자 맵
+    """
+    import math
+    r = region
+    n = len(spokes)
+    if n == 0:
+        return r.h
+
+    # 중심 원
+    hub_cx = r.w / 2
+    hub_cy = r.h / 2
+    hub_d = min(r.w, r.h) * 0.25
+    c.circle(x=hub_cx - hub_d / 2, y=hub_cy - hub_d / 2, d=hub_d,
+             fill=center_color, border=None,
+             text=center, text_color="white", text_size=12, text_bold=True,
+             region=r)
+    if center_sub:
+        c.text(center_sub,
+               x=hub_cx - hub_d / 2, y=hub_cy + hub_d * 0.15,
+               w=hub_d, h=0.25,
+               size=7, color="grey_200", align="center", anchor="top",
+               region=r)
+
+    # 스포크 크기 자동 조정
+    spoke_r = min(r.w, r.h) * 0.38
+    if n <= 4:
+        sp_w, sp_h = min(r.w * 0.28, 2.0), min(r.h * 0.28, 1.0)
+    elif n <= 6:
+        sp_w, sp_h = min(r.w * 0.24, 1.7), min(r.h * 0.24, 0.85)
+    else:
+        sp_w, sp_h = min(r.w * 0.20, 1.5), min(r.h * 0.20, 0.75)
+
+    angle_offset = -math.pi / 2
+
+    for i, sp in enumerate(spokes):
+        angle = angle_offset + (2 * math.pi * i / n)
+        sx = hub_cx + spoke_r * math.cos(angle) - sp_w / 2
+        sy = hub_cy + spoke_r * math.sin(angle) - sp_h / 2
+
+        # 연결선
+        lx1 = hub_cx + (hub_d / 2 + 0.03) * math.cos(angle)
+        ly1 = hub_cy + (hub_d / 2 + 0.03) * math.sin(angle)
+        lx2 = hub_cx + (spoke_r - sp_w / 2 - 0.03) * math.cos(angle)
+        ly2 = hub_cy + (spoke_r - sp_h / 2 - 0.03) * math.sin(angle)
+        c.line(x1=lx1, y1=ly1, x2=lx2, y2=ly2,
+               color="grey_400", width=1.0, region=r)
+
+        # 스포크 박스
+        c.box(x=sx, y=sy, w=sp_w, h=sp_h,
+              fill=spoke_color, border=0.75, border_color="grey_mid",
+              region=r)
+        c.box(x=sx, y=sy, w=sp_w, h=0.04,
+              fill="grey_700", border=None, region=r)
+
+        # 텍스트
+        c.text(sp["title"],
+               x=sx + 0.08, y=sy + 0.12, w=sp_w - 0.16, h=0.25,
+               size=9, bold=True, color="grey_900", anchor="top",
+               region=r)
+        if sp.get("detail"):
+            c.text(sp["detail"],
+                   x=sx + 0.08, y=sy + 0.36, w=sp_w - 0.16, h=sp_h - 0.44,
+                   size=7, color="grey_700", anchor="top",
+                   region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 4: Comparison Grid
+# ============================================================
+
+def comp_comparison_grid(
+    c: Canvas,
+    *,
+    columns: list[dict],      # [{"name": "Option A", "summary": "", "highlight": False, "criteria": [...]}, ...]
+    row_labels: list[str],
+    region: Region,
+) -> float:
+    """N열 비교 표 — 컬럼별 헤더(색상 구분) + 행별 비교 데이터.
+
+    comparison_matrix에서 추출. highlight=True인 컬럼은 강조 배경.
+
+    사용 맥락: 옵션 A/B/C 비교, 솔루션 벤더 비교, AS-IS vs TO-BE
+    """
+    r = region
+    n_cols = len(columns)
+    n_rows = len(row_labels)
+    if n_cols == 0 or n_rows == 0:
+        return 0.0
+
+    label_w = min(r.w * 0.22, 1.8)
+    grid_x = label_w + 0.08
+    grid_w = r.w - grid_x
+    col_w = (grid_w - 0.08 * (n_cols - 1)) / n_cols
+
+    header_h = 0.50
+    row_h = (r.h - header_h - 0.05) / n_rows
+
+    # 헤더
+    for i, col in enumerate(columns):
+        ox = grid_x + i * (col_w + 0.08)
+        is_hl = col.get("highlight", False)
+        fill = "grey_900" if is_hl else "grey_700"
+        c.box(x=ox, y=0, w=col_w, h=header_h,
+              fill=fill, border=None, region=r)
+        c.text(col["name"],
+               x=ox + 0.06, y=0.06, w=col_w - 0.12, h=0.22,
+               size=10, bold=True, color="white", align="center", anchor="top",
+               region=r)
+        if col.get("summary"):
+            c.text(col["summary"],
+                   x=ox + 0.06, y=0.28, w=col_w - 0.12, h=0.18,
+                   size=7, color="grey_200", align="center", anchor="top",
+                   region=r)
+
+    # 행 라벨 + 셀
+    for ri, label in enumerate(row_labels):
+        ry = header_h + ri * row_h
+        # 라벨
+        c.box(x=0, y=ry, w=label_w, h=row_h,
+              fill="grey_100", border=0.5, border_color="grey_mid", region=r)
+        c.text(label, x=0.06, y=ry, w=label_w - 0.12, h=row_h,
+               size=8, bold=True, color="grey_900", anchor="middle", region=r)
+
+        # 셀
+        for ci, col in enumerate(columns):
+            ox = grid_x + ci * (col_w + 0.08)
+            is_hl = col.get("highlight", False)
+            cell_fill = "grey_200" if is_hl else "white"
+            crits = col.get("criteria", [])
+            val = crits[ri] if ri < len(crits) else ""
+            c.box(x=ox, y=ry, w=col_w, h=row_h,
+                  fill=cell_fill, border=0.5, border_color="grey_mid", region=r)
+            c.text(str(val),
+                   x=ox + 0.06, y=ry, w=col_w - 0.12, h=row_h,
+                   size=8, color="grey_900", anchor="middle", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 5: Architecture Stack
+# ============================================================
+
+def comp_architecture_stack(
+    c: Canvas,
+    *,
+    layers: list[dict],       # [{"title": "Presentation", "items": ["React", "Next.js"]}, ...] (top→bottom)
+    style: str = "gradient",  # "gradient" | "alternating" | "uniform"
+    region: Region,
+) -> float:
+    """수직 레이어 스택 (기술 아키텍처).
+
+    architecture_stack에서 추출. 가장 단순한 compound component.
+
+    사용 맥락: 기술 스택, 시스템 레이어, 조직 계층
+    """
+    r = region
+    n = len(layers)
+    if n == 0:
+        return 0.0
+
+    gap = 0.05
+    layer_h = (r.h - gap * (n - 1)) / n
+
+    if style == "gradient":
+        fills = ["grey_900", "grey_800", "grey_700", "grey_400", "grey_200", "grey_100"]
+        txts = ["white", "white", "white", "white", "grey_900", "grey_900"]
+    elif style == "alternating":
+        fills = ["grey_800", "grey_200"] * (n // 2 + 1)
+        txts = ["white", "grey_900"] * (n // 2 + 1)
+    else:
+        fills = ["grey_700"] * n
+        txts = ["white"] * n
+
+    title_w = min(r.w * 0.28, 2.2)
+
+    for i, layer in enumerate(layers):
+        ly = i * (layer_h + gap)
+        fi = fills[min(i, len(fills) - 1)]
+        tc = txts[min(i, len(txts) - 1)]
+
+        c.box(x=0, y=ly, w=r.w, h=layer_h,
+              fill=fi, border=None, region=r)
+
+        # 레이어 타이틀 (좌측)
+        c.text(layer["title"],
+               x=0.12, y=ly, w=title_w, h=layer_h,
+               size=10, bold=True, color=tc, anchor="middle",
+               region=r)
+
+        # 아이템 (우측 균등 배치)
+        items = layer.get("items", [])
+        if items:
+            item_area_w = r.w - title_w - 0.15
+            item_w = item_area_w / max(len(items), 1)
+            for ji, item in enumerate(items):
+                c.text(item,
+                       x=title_w + 0.10 + ji * item_w, y=ly,
+                       w=item_w, h=layer_h,
+                       size=8, color=tc, align="center", anchor="middle",
+                       region=r)
+
+    return r.h
