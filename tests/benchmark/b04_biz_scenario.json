@@ -1,0 +1,74 @@
+{
+  "metadata": {"title": "B04", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 분석 Biz Scenario 정의 — 단계별 표준 방법론과 Template 적용 체계",
+    "breadcrumb": "4. AI 전략 > 4.2 Biz Scenario 정의",
+    "header_message": "Palantir 프로젝트 수행 결과와 축적된 PwC의 각 단계별 표준 방법론과 Template을 활용하여 체계적으로 과제를 도출하고 설계함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Palantir 분석 과제 상세 정의"},
+            {"label": "Palantir 기반 의사결정 구현 과제 정의"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.6,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["Task", "산출물\nImage\n(Illustrative)", "주요\nActivity"],
+           "col_headers": ["Biz Scenario\n정의 Template", "데이터\n현황 분석", "RCA 정의/분석", "Alternative\n분석/정의", "Cost Driver 및\nFunction 정의", "가설검증/\n분석방법론", "결과 리포트\n정의"],
+           "cells": [
+             [{"text": "시나리오\n구조 설계"},
+              {"text": "데이터\n프로파일링"},
+              {"text": "근본원인\n분석"},
+              {"text": "대안\n도출/비교"},
+              {"text": "원가동인\n매핑"},
+              {"text": "통계적\n검증"},
+              {"text": "경영진\n보고"}],
+             [{"text": "[Template\nForm]", "highlight": true},
+              {"text": "[Data\nProfile]", "highlight": true},
+              {"text": "[RCA\nMatrix]", "highlight": true},
+              {"text": "[Alt.\nScoring]", "highlight": true},
+              {"text": "[Driver\nTree]", "highlight": true},
+              {"text": "[Stat.\nResult]", "highlight": true},
+              {"text": "[Exec.\nReport]", "highlight": true}],
+             [{"text": "업무 프로세스\n정의 및 시나리오\n범위 확정"},
+              {"text": "소스 데이터\n품질 검증 및\n정합성 확인"},
+              {"text": "Fishbone/5Why\n근본원인 분류\n및 우선순위화"},
+              {"text": "시뮬레이션\n기반 대안별\n효과 산정"},
+              {"text": "원가 동인\n트리 작성 및\nKPI 연계"},
+              {"text": "가설 수립\nA/B 검증\n유의성 테스트"},
+              {"text": "인사이트 요약\n실행 로드맵\n경영진 보고"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.17,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "Phase 1: 과제 정의", "style": "default",
+           "bullets": ["Biz Scenario 구조 설계", "데이터 소스 식별", "RCA 프레임워크 적용"], "col": 0},
+          {"type": "card", "header": "Phase 2: 분석/검증", "style": "accent",
+           "bullets": ["대안 도출 및 시뮬레이션", "Cost Driver 매핑", "통계적 가설 검증"], "col": 1},
+          {"type": "card", "header": "Phase 3: 구현/보고", "style": "default",
+           "bullets": ["Palantir 대시보드 구축", "실행 로드맵 수립", "경영진 의사결정 지원"], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "7단계 표준 방법론 + Palantir Template으로 Biz Scenario 정의부터 경영진 보고까지 End-to-End 체계화", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: PwC Palantir CoE Practice, Biz Scenario 방법론 가이드 (2025)"
+  }]
+}

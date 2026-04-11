@@ -1,0 +1,56 @@
+{
+  "metadata": {"title": "B06", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "PI 결과물의 실현(Realization) 방안 — '일하는 체계의 혁신'을 업그레이드",
+    "breadcrumb": "1. 사업에 대한 이해 > 1.1 PI 비전",
+    "header_message": "이미 HD현대는 PwC와 함께 전사 통합 PI를 수행한 바, 최근 사업 환경의 변화와 경쟁 기준 재설정에 대응하여 '일하는 체계의 혁신'을 업그레이드 하는 시점에 도달함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.2,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "통합 프로세스 혁신 PI 수행", "subtitle": "HD + PwC 공동 추진 경험", "style": "default",
+           "bullets": ["3-3-0 혁신 전략을 통해 Fit to Standard 기반", "핵심: ERP, 물류, 기타 업무 영역의 전사 통합", "PI Data 기반 Master Data 전사 표준화"], "col": 0},
+          {"type": "card", "header": "사업 운영 복잡성·난이도 상승", "subtitle": "산업 경쟁구도의 변화", "style": "accent",
+           "bullets": ["Multi-Yard, Global 운영 복잡성", "신사업(해양/방산) 진출로 프로세스 다양화", "Fxl-driven 디지털 전환 요구", "Down Cycle 도래 → 원가 경쟁력 필수"], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.55,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["PI Vision", "PI Goal", "PI Mission"],
+           "col_headers": ["Manage\nEngineering", "Manage Sales &\nProject Comm.", "Manage Project &\nYard Ops", "Manage\nPurchasing", "Manage\nEquip. & Safety"],
+           "cells": [
+             [{"text": "3D Model 기반\n통합 설계 체계"},
+              {"text": "Risk 기반\n수주 의사결정"},
+              {"text": "Smart Yard\n실시간 운영", "style": "accent"},
+              {"text": "Supplier 360\n공급망 최적화"},
+              {"text": "IoT 예지정비\n안전 디지털화"}],
+             [{"text": "설계 Leadtime\n30% 단축", "highlight": true},
+              {"text": "수주 정확도\n95%+ 달성", "highlight": true},
+              {"text": "공정 효율성\n20% 향상", "highlight": true},
+              {"text": "재고 정확도\n95%+ 달성", "highlight": true},
+              {"text": "설비 가동률\n99% 달성", "highlight": true}],
+             [{"text": "CAD/PLM 연계\nBOM 자동 생성\nMaster Data 통합"},
+              {"text": "CO-PA 수익성\nCost Component\n실시간 추적"},
+              {"text": "MES-ERP 연동\nYard Twin 구축\n공정 자동 스케줄"},
+              {"text": "전략 구매 최적화\n납기 예측 AI\nSupplier Portal"},
+              {"text": "설비 이력 통합\nIoT 센서 연동\n안전 관리 표준"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "'일하는 체계의 혁신' 조직·제도의 혁 방안을 도출 — 5대 영역 PI Vision → Goal → Mission 체계로 전사 통합 전환", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 PI 결과물 실현 방안, PwC 전략컨설팅팀"
+  }]
+}

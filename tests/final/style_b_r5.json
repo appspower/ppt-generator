@@ -1,0 +1,36 @@
+{
+  "metadata": {"title": "Style B R5 — Technical Architecture (Final)", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "PALCONN SP32 + SLT CDC로 8대 SAP 테이블 실시간 동기화 — Foundry Ontology→AIP Logic→Workshop 풀스택 아키텍처",
+    "breadcrumb": "① Palantir 활용안 — 기술 아키텍처",
+    "header_style": "accent",
+    "layout": "sidebar",
+    "sidebar_items": ["① SAP Source", "② Foundry Pipeline", "③ AIP Engine", "④ Workshop Apps", "⑤ vs Celonis/Tricentis"],
+    "sidebar_active": 0,
+    "n_cols": 1,
+    "elements": [
+      {"type": "text_block", "text": "SAP Add-On PALCONN v2.3(SP32, 2024.10 GA) — NetWeaver ABAP 7.50 SP15+에 설치, Kernel 7.89+ 필수. 커넥터 6종(RFC/SLT-CDC/BEx/OData v2·v4/HANA View/CDS View) 중 SLT Trigger-Based CDC가 핵심: CDHDR/CDPOS/BKPF/BSEG/VBAK/VBAP/EKKO/MKPF 8대 테이블을 P95 < 5초로 Foundry에 동기화. ECC 6.0 EHP7+ ↔ S/4HANA 2020 FPS01+ 듀얼 연결로 전환기 병행운영 완전 지원", "size": "small"},
+      {"type": "table", "data": {
+        "headers": ["계층", "구성요소 (T-Code/API)", "데이터 흐름 — 테이블.필드 → Foundry 객체", "연동 방식 / SLA"],
+        "rows": [
+          ["SAP", "변경문서 (SE16N/RSSCD100)", "CDHDR.OBJECTCLAS·OBJECTID·TCODE·UDATE·CHANGENR → CDPOS.FNAME·VALUE_NEW·VALUE_OLD → EventLog 객체", "SLT CDC / P95<5s"],
+          ["SAP", "FI 전표 (FB01/FB03/FBL3N)", "BKPF.BUKRS·BELNR·GJAHR·BLART·BUDAT·USNAM → BSEG.BUZEI·KOART·HKONT·DMBTR·WRBTR → FinDocument 객체", "RFC+SLT / P95<5s"],
+          ["SAP", "SD 오더 (VA01/VA03/VL01N)", "VBAK.VBELN·AUART·ERDAT·KUNNR → VBAP.POSNR·MATNR·KWMENG·NETWR → SalesOrder 객체", "RFC+SLT / P95<5s"],
+          ["SAP", "MM 입출고 (MIGO/MM01/MB51)", "MKPF.MBLNR·VGART·BUDAT → MSEG.ZEILE·BWART·MATNR·WERKS·MENGE·DMBTR → MaterialDoc 객체", "RFC+SLT / P95<5s"],
+          ["SAP", "구매오더 (ME21N/ME23N/ME2M)", "EKKO.EBELN·BSART·LIFNR·EKORG → EKPO.EBELP·MATNR·MENGE·NETPR·BANFN → PurchaseOrder 객체", "RFC+SLT / P95<5s"],
+          ["SAP", "Transport (SE09/SE10/STMS)", "E070.TRKORR·TRSTATUS·AS4USER·AS4DATE → E071.PGMID·OBJECT·OBJ_NAME → TransportReq 객체", "BEx Extract / 15분"],
+          ["SAP", "Config (SPRO/SM30)", "E071K.TRKORR·TABKEY + T001/T001B/T169/T156 등 커스터마이징 테이블 → ConfigDecision 객체", "BEx+SLT / 15분"],
+          ["Foundry", "Ontology 7 객체 모델", "EventLog·FinDocument·SalesOrder·MaterialDoc·PurchaseOrder·TransportReq·ConfigDecision", "Pipeline / 스케줄"],
+          ["Foundry", "이벤트로그 변환", "CDHDR+CDPOS → CaseID(OBJECTID)·Activity(TCODE+FNAME)·Timestamp(UDATE+UTIME), Z-Tcode 필터", "PySpark Transform"],
+          ["AIP", "Blueprint→Rule Registry", "PDF OCR(Tesseract)→LLM 구조화→비즈니스 규칙 추출(Precision≥95%)→Rule Registry 자동등록", "Logic Chain / 건당 45s"],
+          ["AIP", "LLM-Judge 연속검증", "Rubric 0~10점, 임계값 9, Few-shot 4샘플 Calibration, Cohen's κ≥0.85 평가자간 신뢰도", "Logic 함수 / 건당 12s"],
+          ["AIP", "RAID Agent (RAG)", "질의응답 + Inline Sourcing + 출처 신뢰도 점수, Top-K=5 청크, SLA P95<8s", "Agent Studio"],
+          ["App", "4종 Workshop 대시보드", "Cutover(Critical Path 간트) / Test(커버리지 히트맵·Pass%) / RAG(Readiness 추이) / Transport(상태 Kanban)", "Workshop+Contour"]
+        ]
+      }},
+      {"type": "takeaway_bar", "message": "Celonis = Signal(탐지) | Tricentis = Testim(실행) | Palantir = Ontology(구조화)+AIP(해석)+Workshop(시각화) E2E 오케스트레이션 — HD현대 전환기에 3사 허브로 Palantir 포지셔닝이 최적", "style": "dark"}
+    ],
+    "footnote": "PALCONN v2.3 SP32(2024.10 GA) | 커넥터: RFC·SLT·BEx·OData v2/v4·HANA View·CDS View | 지원: ECC 6.0 EHP7+ / S/4 2020+ / BW/4 2.0+ | ABAP 7.50 SP15+, Kernel 7.89+"
+  }]
+}

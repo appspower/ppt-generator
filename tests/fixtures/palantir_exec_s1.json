@@ -1,0 +1,36 @@
+{
+  "metadata": {"title": "Palantir 수행계획 S1", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir Foundry/AIP 활용을 통한 SAP 전환 프로젝트 생산성 향상 방안",
+    "breadcrumb": "① Palantir 활용안",
+    "header_style": "minimal",
+    "layout": "fullscreen",
+    "n_cols": 1,
+    "elements": [
+      {"type": "text_block", "text": "Palantir Foundry/AIP 활용을 통해 SAP 전환 프로젝트의 주요 병목 구간에서 생산성을 높일 수 있는 방안을 검토 중이며, 아래는 적용 가능 영역 예시임", "size": "body"},
+      {"type": "framework_matrix",
+       "row_headers": ["테스트 관리\n자동화", "Cutover\n리허설 관리", "프로세스\n마이닝", "프로젝트\n거버넌스", "Quality Gate\n자동화"],
+       "col_headers": ["Pain Point (현 방식의 한계)", "Palantir Solution (구체적 방법론)", "Business Benefit (정량 효과)"],
+       "cells": [
+         [{"text": "• 테스트케이스 수작업 작성 → 누락/중복\n• 단위/통합/UAT 결함 현황 분산 관리\n• 결함 근본원인 파악 지연 → 동일 유형 반복"},
+          {"text": "• AIP: Blueprint 문서 기반 테스트케이스 자동 생성\n  (비즈니스 규칙 추출 → 입력/기대출력 쌍 매핑)\n• Foundry: 테스트 진척/결함 추이 통합 시각화\n  및 미커버 영역 자동 식별"},
+          {"text": "• 테스트케이스 작성 공수 60~70% 절감\n• 결함 해결 소요시간 단축\n• 테스트 커버리지 정량적 가시화로\n  Go-Live 품질 확보", "style": "accent"}],
+         [{"text": "• Cutover 리허설 결과 Excel 기반 수기 관리\n• Task 간 의존성 파악 부족 → 리허설 초과\n• 리허설 간 비교 분석 어려움"},
+          {"text": "• Ontology: CutoverTask 객체 모델링\n  (시퀀스/담당/의존성/계획·실적 시간)\n• Workshop: 실시간 Critical Path 표시\n• 리허설별 계획 vs 실적 자동 비교 분석"},
+          {"text": "• Cutover 초과율 30~40% → 10% 이하\n• 리허설 간 개선 추이 정량화\n• Go-Live 다운타임 50% 단축 목표", "style": "accent"}],
+         [{"text": "• ECC 현행 프로세스 문서화 불완전\n• 미인가 우회 프로세스(Z-Program) 미식별\n• Blueprint 확정 후 범위 변경 빈발"},
+          {"text": "• Foundry: ECC 이벤트 로그 수집 → As-Is 프로세스\n  변형 자동 탐지 (Signavio 대비 탐지→시뮬→실행)\n• To-Be Blueprint 대비 Gap 자동 도출\n• 실제 사용 Z-Program ~20%만 식별 → 범위 최적화"},
+          {"text": "• 미문서화 프로세스 변형 30~50% 사전 발견\n• Blueprint 이후 범위 변경 리스크 최소화\n• 불필요 커스텀 코드 제거 → 개발 범위 축소"}],
+         [{"text": "• 프로젝트 현황 주간 취합 2~3일 소요\n• RAID 로그/이슈/마일스톤 분산 관리\n• 리스크 조기 인지 체계 부재"},
+          {"text": "• Foundry Ontology: 마일스톤/이슈/리소스 통합 모델\n• AIP Agent: \"Top 3 Risk는?\" → 근거 기반 답변\n  (RAID 로그 + 일정 데이터 인용)\n• 워크스트림별 참여도 추적 → 이탈 조기 감지"},
+          {"text": "• PMO 보고 2~3일 → 실시간 자동화\n• 전체 프로그램 일정 14% 단축 가능\n  (18개월 기준 1.5~2.5개월)\n• 리스크 선제 대응 체계 확보"}],
+         [{"text": "• Go/No-Go 판단이 주관적·정치적\n• Gate 전 데이터 수집 1~2주 소요\n• 숨겨진 Critical 결함 간과 리스크"},
+          {"text": "• Foundry: 데이터 준비도/결함 수/테스트률/교육\n  완료율/Mock 결과/인프라 상태 통합 집계\n• AIP: Go/No-Go 권고 + 근거 자동 생성\n• 시나리오 시뮬레이션 (\"Wave 2로 이연 시?\")"},
+          {"text": "• 4시간 운영위 → 15분 데이터 기반 리뷰\n• Gate 전 수집 스프린트 제거\n• 숨겨진 결함 상태 진행 리스크 제거", "style": "accent"}]
+       ]},
+      {"type": "takeaway_bar", "message": "5대 적용 영역 모두 Palantir의 Ontology(구조화) + AIP(지능화) + Workshop(시각화) 3축으로 구현 — 프로젝트 라이프사이클 전 구간에 걸쳐 생산성 향상 실현", "style": "dark"}
+    ],
+    "footnote": "출처: Palantir AIP ERP Migration Suite, Unit8 ERP Migration Case Study, SAP-Palantir Partnership (SAPPHIRE 2025)"
+  }]
+}

@@ -1,0 +1,78 @@
+{
+  "metadata": {"title": "B03", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "수익성 선제 관리 및 Simulation을 통한 경영진 의사결정 지원 체계",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.4 의사결정 지원",
+    "header_message": "대내외 경영환경 변화에 따른 수익성 선제 관리 및 Simulation을 통한 경영진 의사결정 지원",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.12,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "불량/단가 기반 목표 손익 관리"},
+            {"label": "Risk 조기 인지 대응 체계"},
+            {"label": "조선소 현황 실시간 분석"},
+            {"label": "경영진 의사결정 지원"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.55,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "Key Consideration — 원가 변동 분석", "subtitle": "건적→Delivery 원가 추적 체계", "style": "default",
+           "bullets": [
+             "① 경영적 차이분석을 통한 원가 기본 분석 판단",
+             "   · 건적원가→실행원가→실적원가 3단계 추적",
+             "   · P×Q 분해: 가격차이 vs 수량차이 분리",
+             "② Target Cost 설계 및 현장원가 기준 활용",
+             "   · 공정별 Target Cost → 실적 비교 자동화",
+             "③ 차이분석을 통한 원가 변동 추적 및 시뮬레이션",
+             "   · What-if 시나리오: 환율/자재가/인건비",
+             "④ C/O 효과 구분 관리",
+             "   · 설계변경 원가 영향 vs 외부 요인 분리"
+           ], "col": 0},
+          {"type": "card", "header": "Risk 조기 인지 + 실시간 분석", "subtitle": "About Case Tracking + Palantir", "style": "accent",
+           "bullets": [
+             "Risk 조기 인지 대응 체계:",
+             "  · Cost Tracking: 원가 초과 자동 알림",
+             "  · Schedule Tracking: 공정 지연 감지",
+             "  · Quality Tracking: 품질 이슈 집계",
+             "  · Milestone Plan vs Actual 비교",
+             "조선소 현황 실시간 분석:",
+             "  · 조선소 현황을 실시간으로 분석 → Palantir",
+             "  · PLM 분석 연계 신뢰성 강화",
+             "Digital Thread:",
+             "  · 조선소 Twin (Yard Twin) 실시간 연동"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.18,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["체계"],
+           "col_headers": ["원가 변동 추적", "Risk 조기 인지", "실시간 분석", "의사결정 지원"],
+           "cells": [
+             [{"text": "P×Q 분해\nVariance 자동", "style": "accent"},
+              {"text": "Cost/Schedule\nQuality 3축 추적"},
+              {"text": "Palantir 대시보드\nYard Twin 연동", "highlight": true},
+              {"text": "What-if 시뮬레이션\n시나리오 비교"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "원가 변동 추적(P×Q) + Risk 3축 조기 인지 + Palantir 실시간 분석으로 경영진 선제적 의사결정 체계 구축", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 Future Blueprint — Sales & Project Commercials, PwC Palantir CoE"
+  }]
+}

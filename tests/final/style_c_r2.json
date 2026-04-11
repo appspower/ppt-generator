@@ -1,0 +1,50 @@
+{
+  "metadata": {"title": "Style C R2 — Business Case / ROI", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Level 1 투자 2~3주 대비 PMO 주 3~4시간 절감 — 8개 모듈 점진적 ROI 확보 전략",
+    "breadcrumb": "① Palantir 활용안 — 투자 대비 효과",
+    "header_style": "standard",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.28,
+        "layout": "columns", "n_cols": 4,
+        "elements": [
+          {"type": "card", "header": "14%", "subtitle": "전체 일정 단축", "style": "accent",
+           "bullets": ["18개월 → 15.5개월", "약 2.5개월 절감 효과", "PMO 보고 실시간화", "데이터 기반 의사결정 전환"], "col": 0},
+          {"type": "card", "header": "60~70%", "subtitle": "테스트 공수 절감", "style": "default",
+           "bullets": ["수작업 3~6개월→수 일", "검증 정확도 99.8%", "결함 해결시간 40%↓", "AI 비용 건당 $4K 미만"], "col": 1},
+          {"type": "card", "header": "50%", "subtitle": "Cutover 다운타임↓", "style": "default",
+           "bullets": ["초과율 30~40%→10%↓", "Dual Maint 60~70%↓", "리허설 추이 자동 정량화", "실시간 Go/No-Go 신호"], "col": 2},
+          {"type": "card", "header": "2~3주", "subtitle": "Quick Win 가치 입증", "style": "dark",
+           "bullets": ["최소 투자로 즉시 ROI", "Health 대시보드 구현", "주간 보고 자동화", "경영진 신뢰 기반 확보"], "col": 3}
+        ]
+      },
+      {
+        "height_ratio": 0.47,
+        "layout": "full",
+        "elements": [
+          {"type": "rag_table", "items": [
+            {"name": "Health 대시보드 (L1)", "status": "green", "trend": "up", "note": "투자 2~3주·1명 | 절감 PMO 주 3~4h, 보고 3일→실시간 — 즉시 ROI 확보"},
+            {"name": "Config Register (L1)", "status": "green", "trend": "up", "note": "투자 2~3주·추가불요 | 미문서화 Config 결함 10~15%↓ — 후반부 재작업 방지"},
+            {"name": "주간 보고 자동화 (L1)", "status": "green", "trend": "up", "note": "투자 1~2주·AIP 설정 | PMO 주 1~2h 절감, 보고 품질 일관성 — L1 합산 3~5주"},
+            {"name": "테스트 자동화 (L2)", "status": "amber", "trend": "flat", "note": "투자 4~6주·2명 | 작성 60~70%↓, 정확도 99.8% — Blueprint 품질 의존"},
+            {"name": "FDD 자동 초안 (L2)", "status": "amber", "trend": "up", "note": "투자 2~3주·AIP | 건당 5분(수작업 2~3h) — FDD 코퍼스 사전 확보 필요"},
+            {"name": "Cutover 관리 (L3)", "status": "amber", "trend": "flat", "note": "투자 8~12주·2명 | 초과율 10%↓, DT 50%↓ — 리허설 3회 이상 권장"},
+            {"name": "프로세스 마이닝 (L3)", "status": "amber", "trend": "up", "note": "투자 6~10주·SLT | 미문서화 변형 30~50% 사전발견 — 범위변경 리스크↓"},
+            {"name": "AI Go/No-Go (L4)", "status": "red", "trend": "flat", "note": "투자 L1~3 후·1명 | Counterfactual 시뮬 최종 판단 — 전 WS 데이터 필수"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Green(L1) 합산 3~5주 투자 → 즉시 ROI | Amber(L2~3) 프로젝트 진행 맞춰 투자 | Red(L4) 전 단계 축적 후 최종 지능화", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "투자 기간은 Palantir 전문 인력 기준 | 실증: 에너지社 20K+ 레코드/2주/$4K, 리테일社 250+ 데이터셋/100% 정확도"
+  }]
+}

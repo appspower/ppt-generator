@@ -1,0 +1,36 @@
+{
+  "metadata": {"title": "Style B R3 — Technical Architecture", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "SAP Add-On(SP32) 기반 CDHDR/BKPF/VBAK/EKKO 실시간 CDC — Foundry Ontology→AIP Logic→Workshop 3계층 아키텍처",
+    "breadcrumb": "① Palantir 활용안 — 기술 아키텍처",
+    "header_style": "accent",
+    "layout": "sidebar",
+    "sidebar_items": ["① SAP Source", "② Foundry Pipeline", "③ AIP Engine", "④ Workshop Apps", "⑤ vs Celonis/Tricentis"],
+    "sidebar_active": 1,
+    "n_cols": 1,
+    "elements": [
+      {"type": "text_block", "text": "SAP Add-On(PALANTIR/PALCONN, SP32 — 2024.10 GA)이 NetWeaver ABAP Stack에 직접 설치 → RFC/SLT(CDC)/BEx/OData/HANA View/CDS View 6종 커넥터로 ECC 6.0 EHP8 ↔ S/4HANA 2023 FPS02 동시 연결. SLT(Trigger-Based CDC)는 CDHDR/CDPOS/BKPF/BSEG/VBAK/VBAP/EKKO/EKPO 8대 핵심 테이블을 < 5초 지연으로 Foundry에 동기화", "size": "small"},
+      {"type": "table", "data": {
+        "headers": ["계층", "구성요소", "기술 상세 (테이블/필드)", "연동 방식"],
+        "rows": [
+          ["SAP", "변경문서 헤더", "CDHDR.OBJECTCLAS/OBJECTID/TCODE/UDATE/UTIME + CHANGENR", "SLT CDC (<5s)"],
+          ["SAP", "변경문서 항목", "CDPOS.TABNAME/FNAME/VALUE_NEW/VALUE_OLD — 필드별 Before/After", "SLT CDC (<5s)"],
+          ["SAP", "FI 전표 헤더", "BKPF.BUKRS/BELNR/GJAHR/BLART/BUDAT/USNAM (회계문서)", "RFC + SLT"],
+          ["SAP", "FI 전표 항목", "BSEG.BUZEI/KOART/HKONT/DMBTR/WRBTR (개별 라인아이템)", "RFC + SLT"],
+          ["SAP", "SD 오더", "VBAK.VBELN/AUART/ERDAT/KUNNR + VBAP.POSNR/MATNR/KWMENG", "RFC + SLT"],
+          ["SAP", "MM 자재문서", "MKPF.MBLNR/VGART/BUDAT + MSEG.ZEILE/BWART/MATNR/WERKS", "RFC + SLT"],
+          ["SAP", "구매오더", "EKKO.EBELN/BSART/LIFNR/EKORG + EKPO.EBELP/MATNR/MENGE", "RFC + SLT"],
+          ["SAP", "Transport", "E070.TRKORR/TRSTATUS/AS4USER + E071.PGMID/OBJECT/OBJ_NAME", "BEx Extract"],
+          ["Foundry", "Ontology 객체", "CutoverTask / TestCase / Defect / ConfigDecision / TransportRequest", "Pipeline Build"],
+          ["Foundry", "이벤트로그", "CDHDR+CDPOS→EventLog 변환, OBJECTCLAS 기반 프로세스 분류, Z-Tcode 필터", "Transform + PySpark"],
+          ["AIP", "Blueprint 해석", "PDF→OCR→LLM 구조화→비즈니스 규칙 추출→Rule Registry 등록", "Logic Chain"],
+          ["AIP", "LLM-Judge", "Rubric 0~10 연속검증, 임계값 9, Few-shot Calibration 포함", "Logic 함수"],
+          ["App", "Cutover Tracker", "Critical Path 라이브, T-30/T-7/T-0 리허설 계획vs실적 Gap", "Workshop"]
+        ]
+      }},
+      {"type": "takeaway_bar", "message": "Palantir = 구조화(Ontology) + 지능화(AIP) + 시각화(Workshop) 3계층 통합 | Celonis는 프로세스 마이닝 탐지 전문, Tricentis는 테스트 자동화 전문 → Palantir만이 E2E 오케스트레이션 가능", "style": "dark"}
+    ],
+    "footnote": "SAP Connector 2.0: Add-On SP30+(2024.02~), SP32(2024.10 GA) | ECC 6.0 EHP7+ ↔ S/4HANA 2020+ 듀얼 연결 | SLT CDC < 5초 지연"
+  }]
+}

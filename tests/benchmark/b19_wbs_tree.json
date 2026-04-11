@@ -1,0 +1,48 @@
+{
+  "metadata": {"title": "B19", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "공장 세분화 구조(WBS) 재설계 — 업무 구분별 WBS 구조 통일 및 Activity 실적연계",
+    "breadcrumb": "3. 프로세스 설계 > 3.7 WBS 구조 재설계",
+    "header_message": "업무 구분별 표준 WBS 구조를 운용하여 동일 분류체계 및 Activity 실적연계를 통해 WBS 구조체계를 활용한 데이터 분석 체계를 구성하겠음",
+    "layout": "fullscreen",
+    "n_cols": 1,
+    "elements": [
+      {"type": "framework_matrix",
+       "row_headers": ["WBS L1\n조선/구조물", "WBS L2\n부문 구분", "WBS L3\n단계/공정", "WBS L4\n설계/공종"],
+       "col_headers": ["건조", "설계", "구매", "생산 (Hull)", "생산 (Outfitting)", "생산 (기타)", "품질/안전"],
+       "cells": [
+         [{"text": "선박 건조\nProject", "style": "accent"},
+          {"text": ""},
+          {"text": ""},
+          {"text": ""},
+          {"text": ""},
+          {"text": ""},
+          {"text": ""}],
+         [{"text": "호선별\n구분"},
+          {"text": "E 설계", "style": "accent"},
+          {"text": "H 선체공정"},
+          {"text": "O 의장공정"},
+          {"text": "OB 블록"},
+          {"text": "OU 유닛"},
+          {"text": "OW 용접"}],
+         [{"text": "단계 구분"},
+          {"text": "기본설계\n상세설계"},
+          {"text": "구매요청\n발주\n입고"},
+          {"text": "절단→소조립\n→대조립\n→탑재"},
+          {"text": "선행의장\n선내의장\n안벽의장"},
+          {"text": "시운전\n인도", "highlight": true},
+          {"text": "PO\n검사"}],
+         [{"text": "Activity\n연계"},
+          {"text": "HH HP"},
+          {"text": "OB OU OW OM OC OW"},
+          {"text": "생산시험", "highlight": true},
+          {"text": "JO"},
+          {"text": ""},
+          {"text": ""}]
+       ]},
+      {"type": "takeaway_bar", "message": "WBS 4-Level 표준 구조로 Activity 실적 연계 체계 구축 — 동일 분류체계 기반 프로젝트별/공정별 원가 분석 가능", "style": "dark"}
+    ],
+    "footnote": "출처: HD현대 WBS 세분화 구조 설계서 (Illustrative)"
+  }]
+}

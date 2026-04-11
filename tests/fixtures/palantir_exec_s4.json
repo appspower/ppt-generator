@@ -1,0 +1,45 @@
+{
+  "metadata": {"title": "Palantir 수행계획 S4", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 투입 효과 정량화 — 5대 영역별 생산성 향상 목표와 구현 난이도",
+    "breadcrumb": "① Palantir 활용안 (효과 관점)",
+    "header_style": "standard",
+    "layout": "columns",
+    "n_cols": 2,
+    "col_ratios": [0.6, 0.4],
+    "elements": [
+      {"type": "card", "header": "영역별 정량 효과 종합", "subtitle": "리서치 기반 보수적 추정", "style": "default",
+       "content": [],
+       "bullets": [
+         "① 테스트 관리: 작성 공수 60~70%↓, 검증 정확도 99.8%",
+         "   → 3~6개월 수작업 → AIP 수 일로 압축",
+         "② Cutover 관리: 초과율 30~40% → 10% 이하",
+         "   → 다운타임 50% 단축, 리허설 자동 비교 분석",
+         "③ 프로세스 마이닝: 미문서화 변형 30~50% 사전 발견",
+         "   → Blueprint 이후 범위 변경 리스크 최소화",
+         "④ 프로젝트 거버넌스: 보고 실시간화, 일정 14%↓",
+         "   → 18개월 기준 1.5~2.5개월 단축",
+         "⑤ Quality Gate: 4시간 운영위 → 15분 리뷰",
+         "   → 데이터 기반 Go/No-Go 의사결정"
+       ], "col": 0},
+      {"type": "card", "header": "구현 난이도 및 일정", "subtitle": "단계별 도입 권장", "style": "dark",
+       "bullets": [
+         "━━ Quick Win (착수 즉시) ━━",
+         "• 프로젝트 대시보드: 2~3주",
+         "• Config Register: 2~3주",
+         "• 상태 보고 자동화: 1~2주",
+         "",
+         "━━ Build 단계 적용 ━━",
+         "• 테스트 자동화: 4~6주",
+         "• 결함 Triage: 3~4주",
+         "",
+         "━━ Test/Go-Live 적용 ━━",
+         "• Cutover 오케스트레이션: 8~12주",
+         "• Go-Live Readiness: 4~6주"
+       ], "col": 1},
+      {"type": "takeaway_bar", "message": "Quick Win(대시보드/Register/보고)을 착수 즉시 구현하여 Palantir 가치를 조기 입증한 후, Build/Test 단계로 확대 적용하는 점진적 도입 전략 권장", "style": "dark"}
+    ],
+    "footnote": "출처: Palantir Foundry Docs, IJIRSS AI-driven SAP Efficiency Research, PwC SAP Practice 벤치마크"
+  }]
+}

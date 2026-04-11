@@ -1,0 +1,59 @@
+{
+  "metadata": {"title": "Style B v1", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 3축(Ontology·AIP·Workshop) × 4대 적용 영역 교차 맵",
+    "breadcrumb": "① Palantir 활용안 (아키텍처 관점)",
+    "header_style": "accent",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.22,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "Ontology (구조화)", "subtitle": "비즈니스 객체 관계 모델링", "style": "accent",
+           "bullets": ["CutoverTask DAG 의존성 모델", "Config Decision → Test 추적", "Readiness 가중 점수 모델", "Cross-system 객체 매핑 (ECC↔S/4)"], "col": 0},
+          {"type": "card", "header": "AIP (지능화)", "subtitle": "LLM + ML 기반 자동화", "style": "default",
+           "bullets": ["Interpretation AI: 규칙 자동 추출", "LLM-as-Judge: 테스트 연속 검증", "Agent: Top 3 Risk 근거 답변", "Go/No-Go AI 권고 + 시뮬레이션"], "col": 1},
+          {"type": "card", "header": "Workshop (시각화)", "subtitle": "실시간 대시보드 + 협업", "style": "default",
+           "bullets": ["Cutover Critical Path 라이브 뷰", "테스트 커버리지 히트맵", "RAG 프로젝트 Health 대시보드", "Readiness 점수 추이 그래프"], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.53,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["테스트 관리", "Cutover", "프로세스 마이닝", "프로젝트 거버넌스"],
+           "col_headers": ["Ontology 역할", "AIP 역할", "Workshop 역할", "기대 효과"],
+           "cells": [
+             [{"text": "TestCase→Defect\n→Wave 객체 연결\nJira 커넥터 양방향"},
+              {"text": "Blueprint→규칙추출\nLLM 테스트 생성\nJudge 연속검증", "style": "accent"},
+              {"text": "커버리지 히트맵\n결함 추이 대시보드\n미커버 영역 표시"},
+              {"text": "작성 60~70%↓\n정확도 99.8%\n해결시간 40%↓"}],
+             [{"text": "Task DAG 모델\nMRP/잔액/동결 등\n제약 조건 인코딩"},
+              {"text": "지연 시 대안 시퀀스\n자동 제안 (HITL)\nCounterfactual 시뮬"},
+              {"text": "Critical Path 라이브\n완료율 실시간\nBlocker 피드", "style": "accent"},
+              {"text": "초과율 10%↓\n다운타임 50%↓\nDual Maint 70%↓"}],
+             [{"text": "CDHDR→이벤트객체\nZ-Tcode 자동 분류\n변형→Gap 매핑"},
+              {"text": "탐지→시뮬→실행\n(Celonis+α)\n최적 경로 도출"},
+              {"text": "As-Is vs To-Be\nGap 시각화\n변형 빈도 분석"},
+              {"text": "미문서화 30~50%↑\n범위변경 리스크↓\nZ-code 80%↓"}],
+             [{"text": "마일스톤/이슈/리소스\n통합 모델\n역할별 접근제어"},
+              {"text": "Agent 상태종합\nRisk 조기경보\nInline Sourcing", "style": "accent"},
+              {"text": "RAG 대시보드\n참여도 추적\n이탈 조기감지"},
+              {"text": "보고 실시간화\n일정 14%↓\n15분 Gate 리뷰"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Ontology(구조) × AIP(지능) × Workshop(시각) 3축이 4대 영역에 교차 적용 — 단일 플랫폼에서 프로젝트 전 구간 통합 관리, 중복 투자 없이 시너지 극대화", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry Architecture, SAP Connector 2.0, AIP ERP Migration Suite, SAPPHIRE 2025"
+  }]
+}

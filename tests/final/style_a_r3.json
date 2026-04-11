@@ -1,0 +1,49 @@
+{
+  "metadata": {"title": "Style A R3 — PMO Timeline", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "3단계 Quick Win 전략으로 2~3주 내 가치 입증 후 프로젝트 진행에 맞춰 점진 확대",
+    "breadcrumb": "① Palantir 활용안 — 도입 로드맵",
+    "header_style": "standard",
+    "header_message": "각 단계 산출물이 다음 단계의 입력 — Level 1 미완료 시 Level 2 이후 착수 불가 (의존성 체인)",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Level 1: 가시화", "description": "2~3주 | Quick Win"},
+            {"label": "Level 2: 자동화", "description": "4~6주 | Build"},
+            {"label": "Level 3: 최적화", "description": "8~12주 | Test"},
+            {"label": "Level 4: 지능화", "description": "9개월+ | Go-Live"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.68,
+        "layout": "full",
+        "elements": [
+          {"type": "vertical_flow", "steps": [
+            {"label": "Level 1: 가시화 (착수 즉시, 2~3주)", "style": "accent",
+             "detail": "산출물: ① Health RAG 대시보드 (Jira REST→Ontology→Workshop)  ② Config Decision Register (Fit/Gap 이력+감사추적)  ③ 주간 보고서 자동 생성 (AIP Logic→Teams)\n선행조건: Jira/ADO API 접근권한 + 프로젝트 관리자 계정 발급\n인력: Palantir 엔지니어 1명 + PwC PMO 1명\n리스크: API 접근 지연(IT보안 승인 2주+), Jira 데이터 품질 미달(필드 미입력률 30%↑)\nGate: ① 대시보드 실시간 갱신 주기 ≤5분  ② 경영진 데모 완료+서면 승인  ③ RAG 정확도 90%↑"},
+            {"label": "Level 2: 자동화 (Build 단계, 4~6주)", "style": "default",
+             "detail": "산출물: ① AIP 테스트케이스 자동 생성 앱  ② FDD 자동 초안 (5분/건)  ③ 결함 Triage 클러스터링  ④ Rule Registry\n선행조건: L1 Ontology 완료 + Blueprint 문서 확보 + 테스트 시나리오 100건↑\n인력: Palantir 2명 + PwC 테스트 리드 1명\n리스크: Blueprint 문서 미확보(공급사 지연), 테스트 데이터 마스킹 이슈(개인정보)\nGate: ① 테스트 커버리지 ≥80%  ② 자동 생성 정확도 ≥95%  ③ FDD 초안 리뷰 통과율 ≥70%"},
+            {"label": "Level 3: 최적화 (Test 단계, 8~12주)", "style": "default",
+             "detail": "산출물: ① Cutover 오케스트레이션 앱 (DAG+Critical Path)  ② 프로세스 마이닝 Gap 리포트  ③ Readiness Scorecard\n선행조건: L2 테스트 앱 운영 안정화 + Cutover 스프레드시트 확보\n인력: Palantir 2명 + PwC Basis 1명\n리스크: Cutover 시나리오 복잡도 과소평가, 레거시 인터페이스 매핑 누락\nGate: ① Mock Cutover 3회 완료  ② 계획 대비 초과율 ≤15%  ③ Readiness Score ≥85점"},
+            {"label": "Level 4: 지능화 (Go-Live 이후, 9개월+)", "style": "default",
+             "detail": "산출물: ① AI Go/No-Go 권고 (Counterfactual 시뮬레이션)  ② Hypercare 이상탐지 (SM21/EDIDS/TBTCO)  ③ 운영 안정화 대시보드\n선행조건: L1~3 전 데이터 축적 완료 + 전 워크스트림 Ontology 연결\n인력: Palantir 1명 + HD현대 IT 운영팀 2명\n리스크: Go-Live 후 데이터 유실(백업 미비), 운영팀 역량 부족(교육 미완료)\nGate: ① Hypercare KPI 7일 연속 SLA 충족  ② Critical 장애 0건  ③ BAU 전환 승인서 서명"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Level 1이 Quick Win이자 전체 기반 — 2~3주 내 가치 입증 실패 시 전략 재검토, 성공 시 자연스러운 확대 동력 확보", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "산출물/선행조건/Gate 기준은 킥오프 시 PMO 합의 후 확정 | 인력 규모는 Palantir 리소스 가용성에 따라 조정"
+  }]
+}

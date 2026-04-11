@@ -1,0 +1,50 @@
+{
+  "metadata": {"title": "Style C v5", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 단계별 도입 로드맵 — Quick Win에서 AI 지능화까지 점진적 확대",
+    "breadcrumb": "① Palantir 활용안 (로드맵 관점)",
+    "header_style": "standard",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.3,
+        "layout": "columns", "n_cols": 4,
+        "elements": [
+          {"type": "card", "header": "Level 1: 가시화", "subtitle": "착수 즉시 (2~3주)", "style": "accent",
+           "bullets": ["프로젝트 Health 대시보드\n(Jira/ADO REST → Ontology)", "Config Decision Register\n(Fit/Gap 이력+감사추적)", "주간 보고 자동 생성\n(AIP Logic → SP/Teams)", "결함 Triage 클러스터링\n(Embedding + DBSCAN)", "Quick Win: 2~3주 내\nPalantir 가치 입증"], "col": 0},
+          {"type": "card", "header": "Level 2: 자동화", "subtitle": "Build 단계 (4~6주)", "style": "default",
+           "bullets": ["AIP 테스트 자동 생성\n(Blueprint → 규칙 → TC)", "FDD 초안 5분/건\n(AIP Logic + FDD 코퍼스)", "LLM-as-Judge 연속검증\n(Rubric 0~10, 임계 9)", "IDoc/API 모니터링\n(Pass Rate + 에러 분류)", "산출물: 테스트 앱 +\nRule Registry + FDD"], "col": 1},
+          {"type": "card", "header": "Level 3: 최적화", "subtitle": "Test 단계 (8~12주)", "style": "default",
+           "bullets": ["Cutover 오케스트레이션\n(DAG + Critical Path)", "프로세스 마이닝 검증\n(CDHDR SLT → Gap)", "Readiness Scorecard\n(가중점수 + AI 권고)", "Z-Tcode 사용률 분석\n(~20% 실사용 식별)", "산출물: Cutover 앱\n+ Gap 리포트 + 스코어"], "col": 2},
+          {"type": "card", "header": "Level 4: 지능화", "subtitle": "Go-Live+ (9개월~)", "style": "dark",
+           "bullets": ["AI Go/No-Go 권고\n(Counterfactual 시뮬)", "Hypercare 이상 탐지\n(SM21/EDIDS/TBTCO)", "지속 프로세스 최적화\n(운영 Ontology 확장)", "AIP Agent 자연어 질의\n(근거+출처 추적 답변)", "산출물: 운영 대시보드\n+ AI 경보 + Agent"], "col": 3}
+        ]
+      },
+      {
+        "height_ratio": 0.4,
+        "layout": "full",
+        "elements": [
+          {"type": "rag_table", "items": [
+            {"name": "프로젝트 Health 대시보드 (L1)", "status": "green", "trend": "up", "note": "Workshop 2~3주, Jira REST — PMO 보고 3일→실시간, 주 3~4h 절감, Quick Win 확보"},
+            {"name": "Config Decision Register (L1)", "status": "green", "trend": "up", "note": "Ontology 2~3주, Workshop 직접입력 — 미문서화 Config 결함 10~15%↓, 감사추적 확보"},
+            {"name": "주간 보고 자동화 (L1)", "status": "green", "trend": "up", "note": "AIP Logic 1~2주, 금 트리거 Teams — PMO 주 1~2h 절감, 보고 품질 일관성 확보"},
+            {"name": "AIP 테스트 자동화 (L2)", "status": "amber", "trend": "flat", "note": "AIP+Add-On 4~6주, BP 품질 의존 — 작성 60~70%↓, 정확도 99.8%, Tricentis 보완"},
+            {"name": "FDD 자동 초안 (L2)", "status": "amber", "trend": "up", "note": "AIP Logic 2~3주, FDD 코퍼스 필요 — 5분(수작업 2~3h), Cycle 40~50%↓"},
+            {"name": "Cutover 오케스트레이션 (L3)", "status": "amber", "trend": "flat", "note": "Ontology+WS 8~12주 — 초과율 10%↓, 다운타임 50%↓, Dual Maint 60~70%↓"},
+            {"name": "프로세스 마이닝 (L3)", "status": "amber", "trend": "up", "note": "CDHDR SLT 6~10주, Z-Tcode 캡처 — 미문서화 30~50%↑, Z-code 80% 제거"},
+            {"name": "AI Go/No-Go 권고 (L4)", "status": "red", "trend": "flat", "note": "L1~3 축적 후 가능, 전 WS 연결 — Counterfactual 시뮬, 데이터기반 최종 판단"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Level 1 Quick Win(2~3주) → Level 2~3 프로젝트 진행 맞춰 확대 → Level 4 Go-Live 후 AI 지능화 — 전체 14%+ 일정 단축, 점진적 ROI 입증 전략", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry, AIP Agent Studio, SAP Connector 2.0 (SP30+), PwC SAP Practice"
+  }]
+}

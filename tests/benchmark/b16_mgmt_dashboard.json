@@ -1,0 +1,83 @@
+{
+  "metadata": {"title": "B16", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "경영관리 시스템 (상세) — Business Question 기반 경영정보 Chain 설계",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.4 경영관리 상세",
+    "header_message": "현장의 변화가 재무적 성과로 즉시 반영되는 경영관리 시스템 (상세)",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.3,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "Key Questions — 의사결정 핵심 질문", "subtitle": "경영진 의사결정을 위한 정보 및 분석 수준", "style": "default",
+           "bullets": [
+             "납품 측면 원적 제한 분석 수준",
+             "수주별 수익성 즉시 반영?",
+             "외부 환경 리스크 선제 대응?",
+             "전사 최적의 판단 기준 수준",
+             "원가 경쟁력 분석 실시간?"
+           ], "col": 0},
+          {"type": "card", "header": "경영진 제공 정보 (예시)", "subtitle": "Illustrative — 실시간 대시보드", "style": "accent",
+           "bullets": [
+             "경영보고: 전사 경영 현황 일일 보고",
+             "수익성 분석: 호선별/사업부별 수익성",
+             "주요 KPI: 공정진도·원가·납기·품질",
+             "Early Warning: 임계치 초과 자동 알림",
+             "시나리오: What-if 시뮬레이션 결과"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.4,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["정보 유형", "데이터 소스", "분석 방법", "의사결정 지원"],
+           "col_headers": ["경영 보고", "수익성 분석", "주요 KPI", "Early Warning", "시나리오"],
+           "cells": [
+             [{"text": "일일/주간\n경영 현황"},
+              {"text": "호선별\n사업부별"},
+              {"text": "공정/원가\n납기/품질"},
+              {"text": "임계치 기반\n자동 알림", "highlight": true},
+              {"text": "What-if\n시뮬레이션"}],
+             [{"text": "ERP 실적\n생산 실적"},
+              {"text": "CO-PA\n원가 데이터"},
+              {"text": "MES 실적\n품질 데이터"},
+              {"text": "실시간\n이벤트 로그"},
+              {"text": "가정 변수\n시장 데이터"}],
+             [{"text": "BI 리포트\n자동 생성"},
+              {"text": "Variance\n분석 (P×Q)"},
+              {"text": "트렌드 분석\n대시보드", "style": "accent"},
+              {"text": "이상치 탐지\nML 기반"},
+              {"text": "Monte Carlo\n민감도 분석"}],
+             [{"text": "현황 파악\n빠른 의사결정"},
+              {"text": "수익성 개선\n포인트 도출"},
+              {"text": "실시간 추적\n조기 대응"},
+              {"text": "리스크 선제\n관리 체계", "style": "accent"},
+              {"text": "전략적\n판단 근거"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "numbered_circle", "style": "accent",
+           "items": [
+             "Business Question 기반 경영정보 Chain: 핵심 의사결정을 위한 필요 정보(DATA)를 도출하여 지표→분석체계→대시보드 Process 설계"
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Business Question → DATA 도출 → 지표 설계 → 분석 체계 → 대시보드 구현의 End-to-End 경영정보 Chain 완성", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 Future Blueprint — Manage Sales & Project Commercials (상세)"
+  }]
+}

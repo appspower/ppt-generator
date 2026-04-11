@@ -1,0 +1,58 @@
+{
+  "metadata": {"title": "Palantir 수행계획 S5", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 3축 아키텍처와 SAP 전환 프로젝트 적용 맵",
+    "breadcrumb": "① Palantir 활용안 (아키텍처 관점)",
+    "header_style": "minimal",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.25,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "Ontology (구조화)", "subtitle": "비즈니스 객체 모델링", "style": "accent",
+           "bullets": ["CutoverTask 의존성 모델", "Config Decision 이력 추적", "Cross-system 객체 매핑", "ReadinessCriterion 가중 점수"], "col": 0},
+          {"type": "card", "header": "AIP (지능화)", "subtitle": "LLM + ML 자동화", "style": "default",
+           "bullets": ["테스트케이스 자동 생성", "FDD 초안 5분 내 작성", "결함 근본원인 클러스터링", "Go/No-Go AI 권고"], "col": 1},
+          {"type": "card", "header": "Workshop (시각화)", "subtitle": "실시간 대시보드", "style": "default",
+           "bullets": ["프로젝트 Health 대시보드", "Cutover Critical Path 표시", "테스트 커버리지 히트맵", "Readiness 종합 점수 추이"], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.5,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["테스트 관리", "Cutover 관리", "프로세스 마이닝", "거버넌스", "Quality Gate"],
+           "col_headers": ["Ontology 활용", "AIP 활용", "Workshop 활용"],
+           "cells": [
+             [{"text": "TestCase→Defect\n→Wave 객체 연결"},
+              {"text": "LLM 테스트 생성\nLLM-as-Judge 검증", "style": "accent"},
+              {"text": "커버리지 히트맵\n결함 추이 대시보드"}],
+             [{"text": "Task 의존성 모델\n계획/실적 시간 객체"},
+              {"text": "Dynamic Scheduling\n리허설 비교 분석"},
+              {"text": "실시간 Critical Path\n완료율 라이브 뷰", "style": "accent"}],
+             [{"text": "프로세스 이벤트\n→ 변형 객체 분류"},
+              {"text": "탐지→시뮬→실행\n(Signavio+α)"},
+              {"text": "As-Is vs To-Be\nGap 시각화"}],
+             [{"text": "마일스톤/이슈/\n리소스 통합 모델"},
+              {"text": "AIP Agent 상태 종합\nRisk 조기경보"},
+              {"text": "RAG 대시보드\n참여도 추적", "style": "accent"}],
+             [{"text": "ReadinessCriterion\n가중 점수 모델"},
+              {"text": "Go/No-Go 권고\nCounterfactual 시뮬"},
+              {"text": "종합 점수 추이\nBlocker 드릴다운"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Ontology(구조) × AIP(지능) × Workshop(시각) 3축이 5대 적용 영역에 교차 적용 — 단일 플랫폼에서 프로젝트 전 구간 통합 관리", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry Architecture, SAP Add-On (PALCONN/PALAGENT), AIP for Program Knowledge Management"
+  }]
+}

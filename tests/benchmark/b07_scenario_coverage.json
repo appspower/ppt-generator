@@ -1,0 +1,62 @@
+{
+  "metadata": {"title": "B07", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "HD현대 E2E 시나리오 그룹 및 시나리오 맵 — Value Chain 기준 프로세스 연계",
+    "breadcrumb": "3. 프로세스 설계 > 3.2 시나리오 맵",
+    "header_message": "HD현대의 업무 기능 관점으로 프로세스를 정립하고, 핵심 Value Chain 기준으로 연결하여 E2E 시나리오 그룹 및 시나리오 맵을 정의함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.55,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "HD현대 E2E 시나리오 그룹", "subtitle": "시나리오 × 추진 그룹 매핑", "style": "default",
+           "bullets": [
+             "I2P: 기본설계→상세설계 (CO)",
+             "S2E: 설계/구매→MP→BOM 관리 (CO, PD, PP)",
+             "P2Pa: 구매요청→발주→입고 (MM)",
+             "P2Pb: 구매요청 접수→출고 (PO)",
+             "R2R: 실적집계/모니터링→원가정산→마감 (FI, CO, MM)",
+             "A2R: 자산등록→설비관리→폐기 (PM)",
+             "HCM: 인사/급여/조직 관리"
+           ], "col": 0},
+          {"type": "card", "header": "HD현대 E2E 시나리오 맵", "subtitle": "Value Chain 기준 프로세스 교차", "style": "accent",
+           "bullets": [
+             "수직축: 시나리오 그룹 (I2P→S2E→P2P→R2R→A2R)",
+             "수평축: SAP 모듈 (CO, PP, MM, SD, FI, PM)",
+             "교차점: 각 시나리오의 모듈별 프로세스 범위",
+             "색상 코딩: 핵심 프로세스(Orange) vs 지원(Grey)",
+             "연계 포인트: 시나리오 간 데이터 흐름 정의",
+             "Gap: 빈 교차점 = 추가 설계 필요 영역",
+             "커버리지 목표: 95%+ (현재 82%)"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.3,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["I2P", "S2E", "P2P", "R2R", "A2R"],
+           "col_headers": ["CO", "PP", "MM", "SD", "FI", "PM"],
+           "cells": [
+             [{"text": "원가추정", "style": "accent"}, {"text": "생산계획"}, {"text": ""}, {"text": ""}, {"text": ""}, {"text": ""}],
+             [{"text": "BOM원가", "style": "accent"}, {"text": "MRP", "style": "accent"}, {"text": "자재관리", "highlight": true}, {"text": ""}, {"text": ""}, {"text": ""}],
+             [{"text": ""}, {"text": ""}, {"text": "구매→입고", "style": "accent"}, {"text": "판매출하"}, {"text": "매입채무"}, {"text": ""}],
+             [{"text": "원가정산", "highlight": true}, {"text": ""}, {"text": "재고마감"}, {"text": ""}, {"text": "결산/보고", "style": "accent"}, {"text": ""}],
+             [{"text": ""}, {"text": ""}, {"text": ""}, {"text": ""}, {"text": "감가상각"}, {"text": "설비관리", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "7개 시나리오 그룹 × 6개 SAP 모듈 교차 매핑으로 E2E 커버리지 95% 목표 — 빈 셀(Gap)은 Phase 2에서 설계 보완", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 E2E 시나리오 정의서, PwC SAP Implementation Methodology"
+  }]
+}

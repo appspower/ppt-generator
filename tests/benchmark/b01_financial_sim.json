@@ -1,0 +1,61 @@
+{
+  "metadata": {"title": "B01", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "현장 변화가 재무적 성과로 즉시 반영되는 경영관리 시스템 (상세)",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.4 경영관리 상세",
+    "header_message": "공정 성과로 재무적으로 즉시 예측하여 경영계획/실행 예산 수립, 목표 달성 평가/이사 분석 및 계획/목표 Rolling, 경영진 의사결정 지원",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.55,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["원가 구조", "표준원가 활용", "목표 달성 평가", "Rolling 계획", "의사결정 지원"],
+           "col_headers": ["경영계획/실행\n예산 수립", "목표 달성\n평가/차이 분석", "계획/목표\nRolling", "경영진\n의사결정 지원"],
+           "cells": [
+             [{"text": "BPP 원가 → 수주원가\n→ 실행예산 체계화"},
+              {"text": "실행원가 vs 목표\nVariance 자동 집계"},
+              {"text": "Y-1 실적 → Y 계획\nRolling Forecast"},
+              {"text": "수익성 시뮬레이션\n투자 의사결정"}],
+             [{"text": "표준원가 및 견적원가\n기준 활용"},
+              {"text": "가격 차이 × 수량 차이\nP×Q 분해", "highlight": true},
+              {"text": "Target Cost 연동\n월별 Tracking"},
+              {"text": "원가 동인 분석\nWhat-if 시나리오"}],
+             [{"text": "수주계약별 목표\n설정 및 배분"},
+              {"text": "공정별 달성률\n자동 집계", "style": "accent"},
+              {"text": "달성률 기반\n계획 자동 수정"},
+              {"text": "경영진 대시보드\n실시간 KPI"}],
+             [{"text": "Rolling 주기 설정\n월/분기/연"},
+              {"text": "편차 임계치\n자동 알림"},
+              {"text": "Rolling Forecast\n전사 취합", "style": "accent"},
+              {"text": "시나리오 비교\nBest/Worst/Base"}],
+             [{"text": "예산 편성 연계\nCapex/Opex"},
+              {"text": "경영 보고 자동화\nBI 연동"},
+              {"text": "계획 버전 관리\nActual vs Plan"},
+              {"text": "Palantir 연동\n실시간 대시보드", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.3,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "건적→Delivery 원가 변동 추적", "style": "default",
+           "bullets": ["공정 성과로 재무를 즉시 예측", "표준원가→실행원가→실적원가 3단계", "P×Q 분해: 가격차이 vs 수량차이", "C/O 효과 구분 관리 (설변 vs 외부)"], "col": 0},
+          {"type": "card", "header": "단계별 파이프라인 산출", "style": "accent",
+           "bullets": ["건적→실적원가 자동 비교", "Rolling Forecast 월 단위 갱신", "목표 달성률 실시간 모니터링", "경영진 의사결정 대시보드 제공"], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "공정 성과 → 재무 즉시 반영 체계: 표준원가 기반 Variance 자동 분해 + Rolling Forecast + Palantir 실시간 대시보드", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 Future Blueprint — Manage Sales & Project Commercials, PwC SAP CO Practice"
+  }]
+}

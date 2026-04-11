@@ -1,0 +1,33 @@
+{
+  "metadata": {"title": "Main v1", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir Foundry/AIP를 활용한 SAP 전환 프로젝트 생산성 향상 — 적용 영역별 구체적 방법론",
+    "breadcrumb": "① Palantir 활용안",
+    "header_style": "minimal",
+    "layout": "fullscreen",
+    "n_cols": 1,
+    "elements": [
+      {"type": "text_block", "text": "Palantir Foundry/AIP 활용을 통해 SAP 전환 프로젝트의 주요 병목 구간에서 생산성을 높일 수 있는 구체적 방법론을 수립하였으며, 아래는 프로젝트 수행 단계별 적용 방안임", "size": "body"},
+      {"type": "framework_matrix",
+       "row_headers": ["테스트 관리\n자동화", "Cutover\n리허설 관리", "프로세스\n마이닝", "프로젝트\n거버넌스"],
+       "col_headers": ["현행 방식의 한계 (Pain Point)", "Palantir 적용 방법론 (구체적 방안)", "정량적 기대효과"],
+       "cells": [
+         [{"text": "• 테스트케이스 수작업 작성 (3~6개월)\n• Blueprint 문서 기반 수동 규칙 추출\n• 단위/통합/UAT 결함 분산 관리\n• 결함 근본원인 파악 지연\n  → 동일 유형 결함 반복 발생"},
+          {"text": "• AIP Interpretation AI: Blueprint PDF에서\n  비즈니스 규칙 자동 추출 → Rule Registry\n• LLM이 입력/기대출력 쌍 테스트케이스 생성\n  (S/4 T-Code + 필드 제약 매핑)\n• LLM-as-Judge: 타겟 스키마 대비 연속 검증\n  (Pass/Fail 0~10점, Rubric 기반)\n• Jira 네이티브 커넥터로 결함 자동 등록"},
+          {"text": "• 테스트 작성 공수 60~70%↓\n  (3~6개월 → 수 일)\n• 검증 정확도 99.8% (2주 내)\n• 미커버 영역 자동 식별\n• 결함 해결 소요시간 40%↓\n• Tricentis와 보완 운영 가능", "style": "accent"}],
+         [{"text": "• Cutover 리허설 Excel 수기 관리\n• Task 간 의존성 파악 부족\n  → 리허설 초과율 30~40%\n• 리허설 간 비교 분석 부재\n• 실시간 진행 가시성 Gap 4~8시간"},
+          {"text": "• Ontology: CutoverTask 객체 모델링\n  (MRP_RUN/잔액이관/마스터동결/IDoc정리 등)\n  의존성 DAG + 제약 조건 자연어 정의\n• Workshop: 워크스트림별 Critical Path 실시간\n  + 계획 vs 실적 자동 비교\n• AIP: Task 지연 시 대안 시퀀스 자동 제안\n  (인간 승인 후 적용 — Human-in-the-Loop)"},
+          {"text": "• Cutover 초과율 10% 이하\n• 다운타임 50% 단축 목표\n• 리허설 간 개선 추이 정량화\n• Dual Maintenance 60~70%↓\n• 실시간 Go/No-Go 신호 제공"}],
+         [{"text": "• ECC 현행 프로세스 문서화 불완전\n  (실제 변형이 문서 대비 30~50% 더 존재)\n• 미인가 Z-Program 우회 프로세스 미식별\n• Blueprint 확정 후 범위 변경 빈발\n• Celonis 대비 실행까지 단절"},
+          {"text": "• Foundry: CDHDR/CDPOS 이벤트 로그 SLT 수집\n  → As-Is 프로세스 변형 자동 탐지\n  (CDHDR.TCODE에서 Z* 트랜잭션 네이티브 캡처)\n• To-Be Blueprint 대비 Gap 자동 도출\n• Celonis 대비 차별점: 탐지→시뮬→실행\n  단일 플랫폼 (Ontology Action → SAP Writeback)"},
+          {"text": "• 미문서화 변형 30~50% 사전 발견\n• Blueprint 이후 범위변경 리스크↓\n• 실사용 Z-Program ~20%만 식별\n  → 불필요 개발 범위 축소\n• 프로세스 최적화 기회 발굴"}],
+         [{"text": "• 프로젝트 현황 주간 취합 2~3일 소요\n• RAID/이슈/마일스톤 분산 관리\n• 리스크 조기 인지 체계 부재\n• Go/No-Go 판단이 주관적·정치적\n• Quality Gate 데이터 수집 1~2주"},
+          {"text": "• Ontology: 마일스톤/이슈/리소스 통합 모델\n  (Jira/SolMan/SharePoint REST API 연동)\n• AIP Agent: \"Top 3 Risk?\" → RAID 로그 인용\n  답변 (Inline Sourcing — 출처 클릭 추적)\n• Readiness Scorecard: 워크스트림별 가중 점수\n  → AI Go/No-Go 권고 + Counterfactual 시뮬\n  (\"Wave 2 이연 시?\" 즉시 시뮬레이션)"},
+          {"text": "• PMO 보고 실시간 자동화\n• 전체 일정 14% 단축 가능\n  (18개월 → 15.5개월)\n• 4시간 운영위 → 15분 리뷰\n• 데이터 기반 의사결정 확보\n• 이탈/리스크 선제 감지", "style": "accent"}]
+       ]},
+      {"type": "takeaway_bar", "message": "4대 영역 모두 Palantir의 Ontology(구조화) + AIP(지능화) + Workshop(시각화) 3축으로 구현 — Quick Win(거버넌스 대시보드)부터 착수하여 점진적 확대 적용 전략 권장", "style": "dark"}
+    ],
+    "footnote": "출처: Palantir AIP ERP Migration Suite, Foundry Connector 2.0 for SAP, Unit8 Case Study, SAP-Palantir Partnership (SAPPHIRE 2025)"
+  }]
+}

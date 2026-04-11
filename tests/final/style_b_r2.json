@@ -1,0 +1,36 @@
+{
+  "metadata": {"title": "Style B R2 — Technical Architecture", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "SAP Add-On(SP30+) 기반 CDHDR/BKPF/VBAK 실시간 연동 — Foundry→AIP→Workshop 3계층",
+    "breadcrumb": "① Palantir 활용안 — 기술 아키텍처",
+    "header_style": "accent",
+    "layout": "sidebar",
+    "sidebar_items": ["① SAP Source", "② Foundry Pipeline", "③ AIP Engine", "④ Workshop Apps", "⑤ vs Celonis/Tricentis"],
+    "sidebar_active": 1,
+    "n_cols": 1,
+    "elements": [
+      {"type": "text_block", "text": "SAP Add-On(PALANTIR/PALCONN, SP30+)이 NetWeaver에 직접 설치되어 ECC↔S/4 동시 연결 — RFC/SLT(CDC)/BEx/OData/HANA View 6종 커넥터로 실시간 데이터 파이프라인 구성", "size": "small"},
+      {"type": "table", "data": {
+        "headers": ["계층", "구성요소", "기술 상세", "연동 방식"],
+        "rows": [
+          ["SAP", "변경문서", "CDHDR.OBJECTID/TCODE/UDATE + CDPOS.FNAME", "SLT CDC"],
+          ["SAP", "FI 전표", "BKPF.BELNR/BUKRS/BLART (회계문서)", "RFC+SLT"],
+          ["SAP", "SD 오더", "VBAK.VBELN/AUART/ERDAT (판매문서)", "RFC+SLT"],
+          ["SAP", "MM 자재", "MKPF.MBLNR/VGART (자재문서)", "RFC+SLT"],
+          ["SAP", "Transport", "E070.TRKORR/TRSTATUS (전송 요청)", "BEx"],
+          ["Foundry", "Ontology", "CutoverTask/TestCase/Defect/ConfigDecision", "Pipeline"],
+          ["Foundry", "이벤트로그", "CDHDR→EventLog 변환, Z-Tcode Z* 자동필터", "Transform"],
+          ["AIP", "Interpretation", "Blueprint PDF→비즈니스 규칙→Rule Registry", "Logic Chain"],
+          ["AIP", "LLM-Judge", "Rubric 0~10 연속검증, 임계값 9", "Logic 함수"],
+          ["AIP", "Agent", "RAID 질의응답, Inline Sourcing 출처 추적", "Agent Studio"],
+          ["App", "Cutover", "Critical Path 라이브, 리허설 계획vs실적", "Workshop"],
+          ["App", "테스트", "커버리지 히트맵, Pass%, 결함 클러스터", "Contour+WS"],
+          ["App", "RAG 대시보드", "Readiness 추이, 참여도/이탈 감지", "Workshop"]
+        ]
+      }},
+      {"type": "takeaway_bar", "message": "Palantir = 구조화(Ontology) + 지능화(AIP) + 시각화(Workshop) 3계층 | Celonis(탐지 전문)·Tricentis(실행 전문)와 보완 포지셔닝", "style": "dark"}
+    ],
+    "footnote": "SAP Connector 2.0: Add-On SP30+(2024.02~), SP32(2024.10~) | ECC↔S/4 듀얼 연결로 전환기 병행운영 지원"
+  }]
+}

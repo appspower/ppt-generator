@@ -1,0 +1,37 @@
+{
+  "metadata": {"title": "B14", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "현장 변화가 재무적 성과로 즉시 반영되는 경영관리 시스템 구축",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.4 경영관리 체계",
+    "header_message": "건적→Delivery 원가 변동 추적 및 시뮬레이션 분석 전략을 통해 단계별 파이프라인 산출을 체계화",
+    "layout": "sidebar",
+    "sidebar_items": ["① 원가변동 추적", "② Rolling 분석", "③ 단계별 파이프라인", "④ C/O 효과 관리"],
+    "sidebar_active": 0,
+    "n_cols": 1,
+    "elements": [
+      {"type": "card", "header": "Key Consideration — 원가 변동 분석 체계", "style": "default",
+       "bullets": [
+         "건적→Delivery간 원가 변동 요인 분석",
+         "  · Key Driver 고려: 환율, 자재가, 인건비 변동",
+         "  · 원가 변동 원인 측정: P×Q 기준 분해",
+         "  · C/O 효과 구분 관리: 설계변경 vs 외부 요인",
+         "원가 Tracking 체계:",
+         "  · 건적 시점 vs 실적 시점 자동 비교",
+         "  · Rolling Forecast 월 단위 갱신",
+         "  · Target Cost vs 실제 원가 Gap 모니터링",
+         "  · 단계별 원가 파이프라인 산출 자동화"
+       ]},
+      {"type": "card", "header": "SAP 구현 방안", "style": "accent",
+       "bullets": [
+         "CO-PA: Costing-based 수익성 분석 (값 필드 30+)",
+         "CKM3N: 자재원장 실제원가 vs 표준원가 추적",
+         "KO88: 생산오더 정산 → Variance 자동 집계",
+         "S/4HANA ML: 실제원가 마감 (CKMLCP) 월차 실행",
+         "Palantir 연동: 원가 변동 실시간 대시보드"
+       ]},
+      {"type": "takeaway_bar", "message": "건적-Delivery 전 구간 원가 추적 + Rolling Forecast + P×Q 분해로 원가 변동 원인을 구조적으로 관리", "style": "dark"}
+    ],
+    "footnote": "출처: HD현대 Future Blueprint — Manage Sales & Project Commercials"
+  }]
+}

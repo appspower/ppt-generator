@@ -1,0 +1,73 @@
+{
+  "metadata": {"title": "B11", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "PwC Korea Edge Center — 축적된 경험과 최신 디지털 기술을 결합한 핵심 플랫폼",
+    "breadcrumb": "1. 제안사 소개 > 1.3 Edge Center",
+    "header_message": "Edge Center는 PwC의 축적된 경험과 최신 디지털 기술을 결합하여, 고객의 ERP 및 디지털 혁신 프로젝트의 성공률과 효율성을 극대화하는 핵심 플랫폼임",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.35,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "PwC Korea 'Edge Center'", "subtitle": "글로벌 PwC Digital CoE · Digital Knowledge Sharing", "style": "default",
+           "bullets": [
+             "PwC IT 에코시스템의 핵심 허브",
+             "Edge Center 기능:",
+             "  • Digital Knowledge Base 운영",
+             "  • 글로벌 Best Practice 집약",
+             "  • 산업별 Reference Architecture",
+             "  • AI/ML Use Case Library",
+             "",
+             "SAP Partnership:",
+             "  다수의 Digital 전문회사로부터 최고 파트너 선정"
+           ], "col": 0},
+          {"type": "card", "header": "주요 산업 디지털 기술 Asset", "subtitle": "산업별 Solution 적용 실적", "style": "accent",
+           "bullets": [
+             "디지털 기술요소별 Solution 적용 및 구현 역량 보유:",
+             "  • AI/ML: Palantir, Azure ML, AWS SageMaker",
+             "  • RPA: UiPath, Blue Prism",
+             "  • Data Analytics: Power BI, Tableau",
+             "  • Cloud: AWS, Azure, GCP",
+             "",
+             "실적 기반 Use Case 보유:",
+             "  Manufacturing/SCM → Finance/Admin →",
+             "  Marketing/Sales → Operations"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.4,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["Digital/AI", "ERP/SAP", "Industry", "Client"],
+           "col_headers": ["역량 영역", "핵심 기술/도구", "적용 실적"],
+           "cells": [
+             [{"text": "AI/ML 분석\nRPA 자동화"},
+              {"text": "Palantir, Azure ML\nUiPath, Power BI"},
+              {"text": "제조 예지정비\n원가 시뮬레이션\n수요 예측 AI", "style": "accent"}],
+             [{"text": "S/4HANA 전환\nECC 최적화"},
+              {"text": "S/4HANA, BTP\nFiori, ABAP"},
+              {"text": "대규모 전환 10+건\nGreenfield/Brownfield", "style": "accent"}],
+             [{"text": "조선/해양\n제조/에너지"},
+              {"text": "Digital Twin\nIoT Platform"},
+              {"text": "HD현대, 삼성중공업\nLS Electric, KTCG"}],
+             [{"text": "글로벌 고객\n국내 대기업"},
+              {"text": "Consulting+기술\n융합 프로젝트"},
+              {"text": "연 50+ 프로젝트\n1,426명 전문가 투입"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Edge Center = PwC 글로벌 Digital CoE + SAP 파트너십 + 산업별 Use Case Library — 축적된 경험 기반 프로젝트 성공률 극대화", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: PwC Korea Edge Center 소개 자료, SAP Partnership 인증 현황"
+  }]
+}

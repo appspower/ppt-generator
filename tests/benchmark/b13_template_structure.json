@@ -1,0 +1,63 @@
+{
+  "metadata": {"title": "B13", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Global Operation Template 구현으로 전사 운영 일관성 확보 및 신속 확산 달성",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.2 Template 구현",
+    "header_message": "산업/야드별 특징이 반영된 Global Operation Template 구현으로 전사 운영 일관성 확보 및 글로벌 확산/신사업 진입 시 HD 운영 체계를 조기 안착함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.45,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "HD현대 Global Operation Template 정의", "subtitle": "Template = 모듈 · 서비스 · 프로세스", "style": "default",
+           "bullets": [
+             "조선산업 중심 전사 표준 및 특화 프로세스 정의",
+             "Biz/신규 법인 확장 시 Operation 재사용 가능 Template 체계",
+             "Activity · Rules/Policy · MasterData · KPI 4개 레이어",
+             "[기준업무] HD현대 조선업 공통 + 야드 특화",
+             "[IT시스템] ERP · WBS · CoA · MoM · QM 통합"
+           ], "col": 0},
+          {"type": "card", "header": "Biz · 법인 대상 Template 신속 확산 적용", "subtitle": "표준 Template 기반 Roll-out 가속화", "style": "accent",
+           "bullets": [
+             "① 조선산업 중심 전사 표준 및 특화 프로세스 정의",
+             "   → Template 기반 신규 법인 90일 내 Go-Live 목표",
+             "② Clean Core 기반의 ERP-Legacy 역할 정립",
+             "   → Clean Core는 SAP 표준 기능 중심,",
+             "   → 특화 기능은 Legacy 또는 Side-car 운영",
+             "   → Extension으로 SAP BTP 활용 ERP 시스템 연동"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.38,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["Template 구조", "확산 전략", "Clean Core"],
+           "col_headers": ["정의/범위", "구성 요소", "기대 효과"],
+           "cells": [
+             [{"text": "글로벌 공통 + 야드 특화\n2-Tier 구조"},
+              {"text": "Activity · Rules\nMasterData · KPI\n4-Layer 아키텍처"},
+              {"text": "신규 법인 90일 Go-Live\n표준화율 85%+ 달성", "style": "accent"}],
+             [{"text": "Phase별 Roll-out\n파일럿 → 확산 → 최적화"},
+              {"text": "법인별 Gap 분석\nFit-to-Standard 적용\nTemplate 버전 관리"},
+              {"text": "확산 기간 50%↓\n일관성 + 유연성 동시", "style": "accent"}],
+             [{"text": "SAP 표준 Core 유지\nExtension은 BTP"},
+              {"text": "Core ERP: 표준 기능\nLegacy: 특화 기능\nBTP: 연동 Extension"},
+              {"text": "업그레이드 영향 최소화\n유지보수 비용 30%↓", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.17,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Template 2-Tier 구조(공통+특화) + Clean Core 원칙으로 글로벌 확산 가속화와 시스템 안정성을 동시 확보", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 Global Operation Template 설계 문서, PwC SAP Roll-out Methodology"
+  }]
+}

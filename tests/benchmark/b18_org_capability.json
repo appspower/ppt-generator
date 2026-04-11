@@ -1,0 +1,67 @@
+{
+  "metadata": {"title": "B18", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "PwC 컨설팅 조직 및 역량 현황 — 1,426명의 분야별 전문가 집단 보유",
+    "breadcrumb": "1. 제안사 소개 > 1.1 조직 및 인원",
+    "header_message": "PwC 컨설팅 Korea는 1,426명의 분야별 전문가로 구성되어 있으며, 단일 Firm 내 국내 최대 규모의 SAP ERP 전문가 집단을 보유함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.45,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "조직도", "subtitle": "PwC Global → Korea Member Firm", "style": "default",
+           "bullets": [
+             "PwC Global",
+             "  └ 국내 최대급 감사 자문 Firm",
+             "    ├ 삼일회계법인 (삼일PwC)",
+             "    │  4,150명+ (회계·세무·감사)",
+             "    └ PwC컨설팅",
+             "       1,426명 (전략·IT·디지털)",
+             "",
+             "Leadership: 대표이사 + Partner 210명",
+             "산업/IT 전문가: 1,300명+"
+           ], "col": 0},
+          {"type": "card", "header": "핵심 역량별 보유 인원", "subtitle": "전문 분야 × 인원 수", "style": "default",
+           "bullets": [
+             "Digital & Artificial Intelligence: 133명",
+             "경영혁신 및 업무 혁신 (SAP ERP): 837명 ★",
+             "Strategy & Workforce: 120명",
+             "시장 전략 (Market Strategy): 126명",
+             "경영 전략 (Financial Strategy): 210명",
+             "─────────────────────",
+             "합계: 1,426명",
+             "",
+             "★ SAP ERP 837명 = 단일 Firm 내 국내 최대",
+             "✓ 조선 Insight가 풍부한 자원의 전문성 보유"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.38,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["Digital/AI", "SAP ERP", "Strategy", "Market", "Financial"],
+           "col_headers": ["인원", "비중", "핵심 역량"],
+           "cells": [
+             [{"text": "133명"}, {"text": "9%"}, {"text": "AI/ML, 데이터 분석, Palantir, RPA"}],
+             [{"text": "837명", "style": "accent"}, {"text": "59%", "style": "accent"}, {"text": "S/4HANA, ECC, CO/FI/MM/PP/SD, ABAP", "style": "accent"}],
+             [{"text": "120명"}, {"text": "8%"}, {"text": "조직설계, 변화관리, HR Transformation"}],
+             [{"text": "126명"}, {"text": "9%"}, {"text": "시장진입, 경쟁분석, 사업전략"}],
+             [{"text": "210명"}, {"text": "15%"}, {"text": "재무전략, M&A, Valuation, Due Diligence"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.17,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "SAP ERP 837명(59%) — 단일 Firm 국내 최대 규모 | 조선업 특화 경험 + Digital/AI 133명과의 융합 역량이 핵심 차별화", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: PwC컨설팅 Korea 인력 현황 (2026.03 기준)"
+  }]
+}

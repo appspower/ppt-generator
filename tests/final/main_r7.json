@@ -1,0 +1,78 @@
+{
+  "metadata": {"title": "Main R7 — Executive Summary", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir로 SAP 전환 일정 14%↓ · 테스트 70%↓ · DT 50%↓",
+    "breadcrumb": "① Palantir 활용안",
+    "header_style": "minimal",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "text_block", "text": "HD현대 SAP S/4HANA 전환 3대 리스크에 Palantir 정조준 — 테스트·Cutover·거버넌스를 단일 플랫폼으로 통합 관리", "size": "body"}
+        ]
+      },
+      {
+        "height_ratio": 0.72,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "테스트 자동화", "subtitle": "공수 70%↓ · 정확도 99.8%", "style": "accent",
+           "bullets": [
+             "[문제] 테스트케이스 수작업 3~6개월",
+             "결함 반복, 커버리지 사각지대",
+             "ECATT/Excel/Tricentis 분산관리",
+             "[해결] AIP Interpretation AI가",
+             "Blueprint→비즈니스 규칙 자동 추출",
+             "LLM이 T-Code별 입력/기대출력 생성",
+             "LLM-as-Judge Rubric 0~10 검증",
+             "Jira 커넥터 결함 자동 등록",
+             "[효과] 작성 3~6개월→수 일 단축",
+             "검증 정확도 99.8% (2주 내)",
+             "결함 해결시간 40%↓",
+             "에너지社: 20K+ 레코드/2주/$4K"
+           ], "col": 0},
+          {"type": "card", "header": "Cutover 최적화", "subtitle": "초과율 10%↓ · 다운타임 50%↓", "style": "default",
+           "bullets": [
+             "[문제] 리허설 Excel 수기 관리",
+             "초과율 30~40%, Gap 4~8시간",
+             "Dual Maintenance 수작업 과다",
+             "[해결] Ontology로 CutoverTask DAG",
+             "MRP/잔액이관/마스터동결 인코딩",
+             "Workshop Critical Path 라이브",
+             "리허설별 계획vs실적 자동 비교",
+             "AIP가 지연 시 대안 시퀀스 제안",
+             "[효과] 초과율 30~40% → 10% 이하",
+             "다운타임 50% 단축 목표",
+             "Dual Maintenance 60~70% 절감",
+             "리허설 추이 자동 정량화"
+           ], "col": 1},
+          {"type": "card", "header": "프로젝트 거버넌스", "subtitle": "보고 실시간 · 일정 14%↓", "style": "default",
+           "bullets": [
+             "[문제] 현황 취합 2~3일",
+             "RAID 분산관리 (Jira/SP/Excel)",
+             "Go/No-Go 판단 주관적·정치적",
+             "[해결] Ontology 통합 Health 대시보드",
+             "Jira/SolMan/SP REST 연동",
+             "AIP Agent 리스크 질의 + 출처 추적",
+             "Readiness Scorecard AI 자동 산출",
+             "Counterfactual 시뮬 즉시 제공",
+             "[효과] 일정 18 → 15.5개월 (14%↓)",
+             "운영위 4시간 → 15분 리뷰",
+             "PMO 보고 실시간 자동화",
+             "Quick Win: 대시보드 2~3주"
+           ], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Quick Win 거버넌스(2~3주) → 테스트 자동화(4~6주) → Cutover 최적화(8~12주) — 단일 플랫폼으로 3대 리스크 점진 해소", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir AIP ERP Migration Suite, Unit8 Case Study (에너지社 20K+/2주/$4K), SAPPHIRE 2025"
+  }]
+}

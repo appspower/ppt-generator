@@ -1,0 +1,50 @@
+{
+  "metadata": {"title": "Style C R3 — Business Case / ROI", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Level 1 투자 3~5주·3명 이하로 PMO 주 6~8시간 절감 — 누적 ROI 6개월 내 BEP 달성",
+    "breadcrumb": "① Palantir 활용안 — 투자 대비 효과",
+    "header_style": "standard",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.28,
+        "layout": "columns", "n_cols": 4,
+        "elements": [
+          {"type": "card", "header": "14%", "subtitle": "전체 일정 단축", "style": "accent",
+           "bullets": ["18개월 → 15.5개월 (2.5개월↓)", "PMO 보고 실시간화로 의사결정 1~2일 단축", "누적 절감: 약 3.6억원(PM 인건비 기준)", "데이터 기반 Go/No-Go 전환"], "col": 0},
+          {"type": "card", "header": "60~70%", "subtitle": "테스트 공수 절감", "style": "default",
+           "bullets": ["수작업 3~6개월 → AI 자동화 수 일", "검증 정확도 99.8%, 결함해결 40%↓", "AI 실행 건당 $4K 미만 (수작업 대비 1/50)", "연간 테스트 비용 약 8~12억 절감 가능"], "col": 1},
+          {"type": "card", "header": "50%", "subtitle": "Cutover 다운타임↓", "style": "default",
+           "bullets": ["일정 초과율 30~40% → 10% 이하", "Dual Maintenance 60~70% 절감", "리허설 추이 자동 정량화·비교", "비계획 다운타임 비용 시간당 약 2억 회피"], "col": 2},
+          {"type": "card", "header": "2~3주", "subtitle": "Quick Win 즉시 ROI", "style": "dark",
+           "bullets": ["투자: Palantir 1명·2~3주 (약 3천만원)", "절감: PMO 주 6~8h → 연간 약 1.5억 가치", "ROI: 투자 대비 5배 이상 (6개월 기준)", "경영진 신뢰 확보 → L2~3 투자 근거"], "col": 3}
+        ]
+      },
+      {
+        "height_ratio": 0.47,
+        "layout": "full",
+        "elements": [
+          {"type": "rag_table", "items": [
+            {"name": "Health 대시보드 (L1)", "status": "green", "trend": "up", "note": "투자 2~3주·1명 | 효과: PMO 주 3~4h 절감, 보고 리드타임 3일→실시간 — ROI 즉시, BEP 1개월"},
+            {"name": "Config Register (L1)", "status": "green", "trend": "up", "note": "투자 2~3주·추가불요 | 효과: 미문서화 Config 결함 10~15%↓ — 후반부 재작업 비용 약 2~4억 회피"},
+            {"name": "주간 보고 자동화 (L1)", "status": "green", "trend": "up", "note": "투자 1~2주·AIP 설정 | 효과: PMO 주 1~2h 절감, 보고 품질 일관성 — L1 합산 투자 3~5주, 누적 ROI 6개월 내 5배"},
+            {"name": "테스트 자동화 (L2)", "status": "amber", "trend": "flat", "note": "투자 4~6주·2명 | 효과: 작성공수 60~70%↓, 연간 8~12억 절감 — 전제: Blueprint 품질 확보"},
+            {"name": "FDD 자동 초안 (L2)", "status": "amber", "trend": "up", "note": "투자 2~3주·AIP | 효과: 건당 2~3h→5분, 연 3,000건 기준 약 9,000h 절감 — 전제: FDD 코퍼스 사전 확보"},
+            {"name": "Cutover 관리 (L3)", "status": "amber", "trend": "flat", "note": "투자 8~12주·2명 | 효과: 초과율 10%↓, DT 50%↓, 비계획 다운타임 비용 회피 — 전제: 리허설 3회+"},
+            {"name": "프로세스 마이닝 (L3)", "status": "amber", "trend": "up", "note": "투자 6~10주·SLT 연계 | 효과: 미문서화 변형 30~50% 사전발견 — 범위변경 비용 5~10억 회피 가능"},
+            {"name": "AI Go/No-Go (L4)", "status": "red", "trend": "flat", "note": "투자 L1~3 완료 후·1명 | 효과: Counterfactual 시뮬 기반 최종 판단 — 전제: 전 WS 데이터 축적 필수"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Green(L1) 3~5주·3천만원 투자 → 6개월 내 5배 ROI | Amber(L2~3) 프로젝트 마일스톤 연계 점진 투자 | Red(L4) 전 단계 데이터 축적 후 최종 지능화", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "투자 기간은 Palantir 전문 인력 기준 | 비용 산정: PM 월 1,400만원, Palantir 엔지니어 주 1,500만원 기준 | 실증: 에너지社 20K+ 레코드/2주/$4K"
+  }]
+}

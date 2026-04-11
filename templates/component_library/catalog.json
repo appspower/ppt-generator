@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "count": 3,
+  "components": [
+    {
+      "id": "smartsheet_services_s4_group_1",
+      "category": "framework",
+      "subcategory": "generic",
+      "name": "Group 1",
+      "source_file": "smartsheet_services.pptx",
+      "source_slide_index": 4,
+      "bbox_emu": [
+        6364525,
+        2126210,
+        4329876,
+        2995448
+      ],
+      "image_content_types": {},
+      "slots": [],
+      "color_palette": [
+        "#FFA800"
+      ],
+      "font_families": [],
+      "text_density": 0,
+      "shape_count": 6,
+      "has_images": false,
+      "has_charts": false,
+      "has_smartart": false,
+      "has_table": false
+    },
+    {
+      "id": "smartsheet_strategy_s2_group_36",
+      "category": "callout",
+      "subcategory": "multi",
+      "name": "Group 36",
+      "source_file": "smartsheet_strategy.pptx",
+      "source_slide_index": 2,
+      "bbox_emu": [
+        3579552,
+        3939078,
+        5032896,
+        1736507
+      ],
+      "image_content_types": {},
+      "slots": [
+        {
+          "slot_id": "slot_0",
+          "semantic_role": "text",
+          "original_text": "Consulting Proposal",
+          "bbox_emu": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "font_size_pt": 24.0,
+          "font_bold": true,
+          "max_chars": 50
+        },
+        {
+          "slot_id": "slot_1",
+          "semantic_role": "text",
+          "original_text": "03",
+          "bbox_emu": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "font_size_pt": 60.0,
+          "font_bold": true,
+          "max_chars": 50
+        }
+      ],
+      "color_palette": [
+        "#B13070"
+      ],
+      "font_families": [
+        "Century Gothic"
+      ],
+      "text_density": 21,
+      "shape_count": 4,
+      "has_images": false,
+      "has_charts": false,
+      "has_smartart": false,
+      "has_table": false
+    },
+    {
+      "id": "smartsheet_strategy_s12_group_18",
+      "category": "framework",
+      "subcategory": "generic",
+      "name": "Group 18",
+      "source_file": "smartsheet_strategy.pptx",
+      "source_slide_index": 12,
+      "bbox_emu": [
+        2159876,
+        1923010,
+        7872249,
+        2995448
+      ],
+      "image_content_types": {},
+      "slots": [],
+      "color_palette": [],
+      "font_families": [],
+      "text_density": 0,
+      "shape_count": 6,
+      "has_images": false,
+      "has_charts": false,
+      "has_smartart": false,
+      "has_table": false
+    }
+  ]
+}

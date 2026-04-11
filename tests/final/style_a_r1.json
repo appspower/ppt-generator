@@ -1,0 +1,49 @@
+{
+  "metadata": {"title": "Style A R1 — PMO Timeline", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "3단계 Quick Win 전략으로 2~3주 내 가치 입증 후 프로젝트 진행에 맞춰 점진 확대",
+    "breadcrumb": "① Palantir 활용안 — 도입 로드맵",
+    "header_style": "standard",
+    "header_message": "각 단계 산출물이 다음 단계의 입력이 되는 의존성 체인 구조 — Level 1 미완료 시 Level 2 이후 착수 불가",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Level 1: 가시화", "description": "2~3주 | Quick Win"},
+            {"label": "Level 2: 자동화", "description": "4~6주 | Build 단계"},
+            {"label": "Level 3: 최적화", "description": "8~12주 | Test 단계"},
+            {"label": "Level 4: 지능화", "description": "9개월+ | Go-Live 후"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.68,
+        "layout": "full",
+        "elements": [
+          {"type": "vertical_flow", "steps": [
+            {"label": "Level 1: 가시화 (착수 즉시, 2~3주)", "style": "accent",
+             "detail": "산출물: ① 프로젝트 Health RAG 대시보드 (Jira REST→Ontology→Workshop)  ② Config Decision Register (Fit/Gap 이력+감사추적)  ③ 주간 보고서 자동 생성 (AIP Logic→Teams 게시)\n선행조건: Jira/ADO API 접근권한 확보 | 담당: Palantir 엔지니어 1명 + PwC PMO\nGate: 경영진 데모 리뷰 → Level 2 착수 승인"},
+            {"label": "Level 2: 자동화 (Build 단계, 4~6주)", "style": "default",
+             "detail": "산출물: ① AIP 테스트케이스 자동 생성 앱 (Blueprint→규칙→TC) ② FDD 자동 초안 (5분/건) ③ 결함 Triage 클러스터링 ④ Rule Registry\n선행조건: L1 Ontology 모델 + Blueprint 문서 품질 확보 | 담당: Palantir 2명 + PwC 테스트 리드\nGate: 테스트 커버리지 80%+ 달성 → Level 3 착수"},
+            {"label": "Level 3: 최적화 (Test 단계, 8~12주)", "style": "default",
+             "detail": "산출물: ① Cutover 오케스트레이션 앱 (DAG+Critical Path) ② 프로세스 마이닝 Gap 리포트 (CDHDR SLT) ③ Readiness Scorecard\n선행조건: L2 테스트 앱 운영 중 + Cutover 계획 스프레드시트 | 담당: Palantir 2명 + PwC Basis/Cutover\nGate: Mock Cutover 3회 완료, 초과율 15%↓ → Level 4"},
+            {"label": "Level 4: 지능화 (Go-Live 이후, 9개월+)", "style": "default",
+             "detail": "산출물: ① AI Go/No-Go 권고 (Counterfactual 시뮬) ② Hypercare 이상 탐지 (SM21/EDIDS/TBTCO) ③ 운영 안정화 대시보드\n선행조건: L1~3 전 데이터 축적 + 전 워크스트림 Ontology 연결 | 담당: Palantir 1명 + HD현대 IT 운영\nGate: Hypercare 종료 후 BAU 전환 판단"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "핵심: Level 1이 Quick Win이자 전체 기반 — 2~3주 내 가치 입증 실패 시 전략 재검토, 성공 시 자연스러운 확대 동력 확보", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "산출물/선행조건/Gate 기준은 프로젝트 킥오프 시 PMO 합의 후 확정 | PwC SAP Practice 기준"
+  }]
+}

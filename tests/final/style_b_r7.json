@@ -1,0 +1,50 @@
+{
+  "metadata": {"title": "Style B R7 — Technical Architecture", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "PALCONN SP32 + SLT CDC로 6대 SAP 테이블 실시간 동기화",
+    "breadcrumb": "① Palantir 활용안 — 기술 아키텍처",
+    "header_style": "accent",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.13,
+        "layout": "full",
+        "elements": [
+          {"type": "text_block", "text": "PALCONN v2.3(SP32, 2024.10 GA)이 NetWeaver ABAP 7.50 SP15+/Kernel 7.89+에 설치 — 6종 커넥터(RFC/SLT-CDC/BEx/OData/HANA View/CDS) 중 SLT Trigger-Based CDC가 핵심, SAP 6대 테이블을 P95<5초로 Foundry Ontology에 동기화 (ECC 6.0 EHP7+ ↔ S/4 2020+ 듀얼 연결로 전환기 병행운영 완전 지원)", "size": "small"}
+        ]
+      },
+      {
+        "height_ratio": 0.72,
+        "layout": "full",
+        "elements": [
+          {"type": "table", "data": {
+            "headers": ["계층", "구성요소", "데이터 흐름 (SAP 테이블 → Foundry 객체)", "연동 / SLA"],
+            "rows": [
+              ["SAP", "변경문서 (SE16N)", "CDHDR.OBJECTID·TCODE·UDATE → CDPOS.FNAME → EventLog 객체", "SLT CDC <5s"],
+              ["SAP", "FI 전표 (FB01)", "BKPF.BELNR·BLART → BSEG.HKONT·DMBTR·WRBTR → FinDoc 객체", "RFC+SLT <5s"],
+              ["SAP", "SD 오더 (VA01)", "VBAK.VBELN·KUNNR → VBAP.MATNR·NETWR → SalesOrder 객체", "RFC+SLT <5s"],
+              ["SAP", "MM 입출고 (MIGO)", "MKPF.MBLNR → MSEG.BWART·MENGE·DMBTR → MaterialDoc 객체", "RFC+SLT <5s"],
+              ["SAP", "구매오더 (ME21N)", "EKKO.EBELN·LIFNR → EKPO.MATNR·NETPR → PurchaseOrder 객체", "RFC+SLT <5s"],
+              ["SAP", "Transport (SE09)", "E070.TRKORR·TRSTATUS → E071.OBJECT → TransportReq 객체", "BEx Extract 15분"],
+              ["Foundry", "Ontology 모델", "7개 객체 통합 (EventLog/FinDoc/SO/PO/MD/TR/Config)", "Pipeline Builder"],
+              ["Foundry", "이벤트 로그 변환", "Z-Tcode 자동 필터 + Case/Activity/Timestamp 매핑", "PySpark Transform"],
+              ["AIP", "Rule Registry", "Blueprint PDF → LLM 구조화 → 비즈니스 규칙 (Precision≥95%)", "Logic Chain"],
+              ["AIP", "LLM-as-Judge", "Rubric 0~10점 + κ≥0.85 신뢰도 + Few-shot 4샘플", "Logic 함수"],
+              ["AIP", "RAID Agent (RAG)", "Inline Sourcing + Top-K=5 청크 + 출처 신뢰도 점수", "Agent Studio P95<8s"],
+              ["App", "Workshop 4종", "Cutover 간트 / 테스트 히트맵 / RAG 추이 / Transport Kanban", "Workshop+Contour"]
+            ]
+          }}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Celonis = 탐지 | Tricentis = 실행 | Palantir = Ontology+AIP+Workshop E2E 오케스트레이션 — 3사 허브 포지셔닝", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "PALCONN v2.3 SP32 (2024.10 GA) | 지원: ECC 6.0 EHP7+ / S/4 2020+ / BW/4 2.0+ | ABAP 7.50 SP15+, Kernel 7.89+"
+  }]
+}

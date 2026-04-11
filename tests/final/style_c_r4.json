@@ -1,0 +1,50 @@
+{
+  "metadata": {"title": "Style C R4 — Business Case / ROI", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "L1 투자 3천만원으로 연 1.5억 절감 — 8개 모듈 점진 투자로 누적 ROI 극대화",
+    "breadcrumb": "① Palantir 활용안 — 투자 대비 효과 (CFO 승인용)",
+    "header_style": "standard",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.28,
+        "layout": "columns", "n_cols": 4,
+        "elements": [
+          {"type": "card", "header": "2.5개월", "subtitle": "전체 일정 단축 (14%)", "style": "accent",
+           "bullets": ["18개월 → 15.5개월 전환 완료", "PM 인건비 기준 약 3.6억원 절감", "의사결정 리드타임 3일 → 실시간", "지연 리스크 조기 감지로 추가 절감"], "col": 0},
+          {"type": "card", "header": "8~12억", "subtitle": "연간 테스트 비용 절감", "style": "default",
+           "bullets": ["테스트 작성 60~70% 자동화", "검증 정확도 99.8% (수작업 대비)", "AI 실행 건당 $4K (수작업의 1/50)", "결함 해결시간 40% 단축"], "col": 1},
+          {"type": "card", "header": "50%", "subtitle": "Cutover 다운타임 감소", "style": "default",
+           "bullets": ["일정 초과율 30~40% → 10% 이하로", "비계획 다운타임 시간당 약 2억 회피", "Dual Maintenance 60~70% 절감", "리허설 자동 정량화로 Go/No-Go 판단"], "col": 2},
+          {"type": "card", "header": "5배+", "subtitle": "Quick Win ROI (6개월)", "style": "dark",
+           "bullets": ["승인 필요: 3천만원 (Palantir 1명·3주)", "즉시 효과: PMO 주 6~8h 절감", "6개월 누적: 약 1.5억원 가치 창출", "성공 시 L2~3 투자 정당성 확보"], "col": 3}
+        ]
+      },
+      {
+        "height_ratio": 0.47,
+        "layout": "full",
+        "elements": [
+          {"type": "rag_table", "items": [
+            {"name": "Health 대시보드 (L1)", "status": "green", "trend": "up", "note": "승인: 2~3주·1명·1,500만원 | 효과: PMO 주 3~4h 절감, 보고 3일→실시간 — BEP 1개월 이내"},
+            {"name": "Config Register (L1)", "status": "green", "trend": "up", "note": "승인: 추가 비용 없음 (L1 인력 활용) | 효과: Config 결함 10~15%↓ — 재작업 비용 2~4억 회피"},
+            {"name": "주간 보고 자동화 (L1)", "status": "green", "trend": "up", "note": "승인: 1~2주·AIP 설정·500만원 | 효과: PMO 주 1~2h 절감, 보고 품질 일관화 — L1 합산 3천만원"},
+            {"name": "테스트 자동화 (L2)", "status": "amber", "trend": "flat", "note": "승인: 4~6주·2명·6천만원 | 효과: 연 8~12억 절감 — 전제: Blueprint 완료 후 착수"},
+            {"name": "FDD 자동 초안 (L2)", "status": "amber", "trend": "up", "note": "승인: 2~3주·AIP·1,500만원 | 효과: 건당 2~3h→5분, 연 9,000h 절감 — 전제: FDD 코퍼스 확보"},
+            {"name": "Cutover 관리 (L3)", "status": "amber", "trend": "flat", "note": "승인: 8~12주·2명·1.2억원 | 효과: DT 50%↓, 초과율 10%↓ — 전제: 리허설 3회 이상 수행"},
+            {"name": "프로세스 마이닝 (L3)", "status": "amber", "trend": "up", "note": "승인: 6~10주·SLT 연계·8천만원 | 효과: 미문서화 변형 30~50% 발견 — 범위변경 비용 5~10억 회피"},
+            {"name": "AI Go/No-Go (L4)", "status": "red", "trend": "flat", "note": "승인: L1~3 완료 후·1명·2천만원 | 효과: Counterfactual 시뮬 최종 판단 — 전제: 전 WS 데이터 필수"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "즉시 승인 요청: L1 3천만원 → 6개월 내 1.5억 회수 (ROI 5배) | L2~3: 마일스톤별 점진 승인 (총 2.7억) | 전체 투자 3억 → 연간 절감 15억+ 기대", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "비용 산정: Palantir 엔지니어 주 1,500만원, PM 월 1,400만원 기준 | 절감액은 보수적 추정치 (하한) | 실증: 에너지社 20K+레코드/2주/$4K"
+  }]
+}

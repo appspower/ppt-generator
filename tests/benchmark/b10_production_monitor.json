@@ -1,0 +1,67 @@
+{
+  "metadata": {"title": "B10", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "생산 계획·실적 데이터 간 연계성 — 물량 실적 집계 프로세스 자동화",
+    "breadcrumb": "11. 프로세스 설계 > 11.1 생산 실적 연계",
+    "header_message": "사내 원적 담당 부서와 사외 외작업체 간 제작 진행 현황 정보 공유를 통해 업체간 원활한 Communication을 강화함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.35,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "공정 실적(진도) 연계 모형 설계", "subtitle": "Illustrative", "style": "default",
+           "bullets": [
+             "물량·지시·실적 연계 모형(S):",
+             "  사내 후공정 실행계획 및 업체에서 신청한",
+             "  검사 신청 정보 조회 기능 구현",
+             "  사내외(지원부) 외작업체에 조회 시 작업 대상에",
+             "  대해 기능 관리 지원",
+             "연계 대상: LADDER, SMARTWELD, Hull 등",
+             "  → 200 PC 이상 외작업체 연동"
+           ], "col": 0},
+          {"type": "card", "header": "제작 진행 모니터링 예시", "subtitle": "Act. 진도율 + Daily Log", "style": "accent",
+           "bullets": [
+             "진행 공정실적 연계 대상:",
+             "  Cutting → Sub-Assembly → Assembly →",
+             "  Erection → Outfitting → Sea Trial",
+             "Act. 진도율 (Progress): 39%",
+             "일일 작업 실적 (Daily Log) 자동 집계",
+             "투입공수: 기본 26 MH | 가동 30 MH",
+             "생산성 지표 자동 산출 + 대시보드"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.35,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["소일정 Act 작업안분 활용", "물량·지시·실적"],
+           "col_headers": ["Authority", "Activity", "일일 작업지시", "원별 작업 실적", "실적 자동 집계"],
+           "cells": [
+             [{"text": "LADDER\nSMARTWELD\nHull 등"},
+              {"text": "절단\nSub-Assy\nAssembly", "highlight": true},
+              {"text": "200 PC/일\n외작업체 배분\n일일 지시 자동"},
+              {"text": "일 실적 집계\n39% Progress\nDaily Log"},
+              {"text": "MH 자동 산출\n기본 26MH\n가동 30MH", "style": "accent"}],
+             [{"text": "소요물량 × Act\n작업안분율 활용"},
+              {"text": "공정별 물량\n배분 계산"},
+              {"text": "작업지시 생성\nERP 연동"},
+              {"text": "실적 수집\n자동 집계"},
+              {"text": "진도율 산출\n대시보드 표시", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "작업지시 프로세스와 물량 실적 집계를 연동하여 진도율 자동 집계 및 진행 현황 실시간 모니터링 체계 구축", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 생산 프로세스 설계 산출물 (Illustrative)"
+  }]
+}

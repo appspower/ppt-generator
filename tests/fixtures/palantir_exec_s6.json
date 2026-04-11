@@ -1,0 +1,48 @@
+{
+  "metadata": {"title": "Palantir 수행계획 S6", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 도입 현황 및 향후 확대 계획 — 단계별 성숙도 로드맵",
+    "breadcrumb": "① Palantir 활용안 (로드맵 관점)",
+    "header_style": "accent",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.3,
+        "layout": "columns", "n_cols": 4,
+        "elements": [
+          {"type": "card", "header": "Level 1: 가시화", "subtitle": "착수 즉시 (0~1개월)", "style": "accent",
+           "bullets": ["프로젝트 Health 대시보드", "마일스톤/이슈 통합 뷰", "주간 상태 보고 자동화", "Config Decision Register"], "col": 0},
+          {"type": "card", "header": "Level 2: 자동화", "subtitle": "Build 단계 (2~4개월)", "style": "default",
+           "bullets": ["테스트케이스 자동 생성", "FDD 초안 자동 작성", "결함 패턴 클러스터링", "인터페이스 테스트 모니터링"], "col": 1},
+          {"type": "card", "header": "Level 3: 최적화", "subtitle": "Test 단계 (5~8개월)", "style": "default",
+           "bullets": ["Cutover 시퀀스 최적화", "프로세스 마이닝 검증", "Readiness Scorecard", "리허설 자동 비교 분석"], "col": 2},
+          {"type": "card", "header": "Level 4: 지능화", "subtitle": "Go-Live+ (9개월~)", "style": "dark",
+           "bullets": ["AI 기반 Go/No-Go 권고", "What-if 시뮬레이션", "운영 안정화 모니터링", "지속적 프로세스 최적화"], "col": 3}
+        ]
+      },
+      {
+        "height_ratio": 0.4,
+        "layout": "full",
+        "elements": [
+          {"type": "rag_table", "items": [
+            {"name": "프로젝트 대시보드 (Level 1)", "status": "green", "trend": "up", "note": "Foundry Workshop 2~3주 구현, Quick Win 확보"},
+            {"name": "Config Decision Register (Level 1)", "status": "green", "trend": "up", "note": "Ontology 모델링 2~3주, 컨설턴트 직접 입력"},
+            {"name": "테스트 자동화 (Level 2)", "status": "amber", "trend": "flat", "note": "AIP + SAP Add-On 4~6주, Blueprint 문서 품질 의존"},
+            {"name": "Cutover 오케스트레이션 (Level 3)", "status": "amber", "trend": "up", "note": "Ontology + Workshop 8~12주, 리허설 3회 계획"},
+            {"name": "Quality Gate 자동화 (Level 3)", "status": "amber", "trend": "flat", "note": "전 워크스트림 데이터 연결 필요, 8~10주"},
+            {"name": "AI Go/No-Go 권고 (Level 4)", "status": "red", "trend": "flat", "note": "Level 1~3 데이터 축적 후 가능, 선행 구현 필수"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Level 1(가시화) Quick Win으로 Palantir 가치 조기 입증 → Level 2~3 단계적 확대 → Level 4 AI 지능화로 프로젝트 관리 혁신 달성", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry 도입 로드맵, PwC SAP Practice 내부 성숙도 모델"
+  }]
+}

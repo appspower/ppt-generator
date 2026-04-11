@@ -1,0 +1,53 @@
+{
+  "metadata": {"title": "B17", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Business Value Realization — PI Goal에서 Business KPI까지 4단계 캐스케이드",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.7 Value Realization",
+    "header_message": "PI Goal 재정의와 목표 달성 수준에 따른 사업 KPI 영향 추적 메커니즘 설계를 통해 사업 가치를 향상하는 PI를 실현하고자 함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.55,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["PI Goal", "Financial Driver", "P&L Impact", "Business KPI"],
+           "col_headers": ["정의", "세부 항목", "연계 메커니즘"],
+           "cells": [
+             [{"text": "차세대 ERP 구축을 통한\nPI Goal 달성을 넘어\n사업 목표에 미치는\n효과까지 가시화"},
+              {"text": "Biz Value Realization\n체계 구축", "style": "accent"},
+              {"text": "PI Goal 달성률 →\nFinancial Driver 변동\n→ P&L 영향 산출"}],
+             [{"text": "경쟁사 수준 달성\n원가절감율 x%\n리드타임 단축 y%", "highlight": true},
+              {"text": "재료비 절감\n노무비 효율화\nOverhead 최적화"},
+              {"text": "PI Goal 달성 →\n원가 요소별\n개선 금액 산출"}],
+             [{"text": "Financial PI Goal\nP&L Impact 산출", "highlight": true},
+              {"text": "매출원가 ↓\n판관비 ↓\n영업이익 ↑"},
+              {"text": "각 Financial Driver →\nP&L 계정 매핑\n→ 영업이익 기여분"}],
+             [{"text": "사업 KPI 달성도\n실시간 추적"},
+              {"text": "매출 성장률\n영업이익률\nROIC\nFCF", "style": "accent"},
+              {"text": "Value 기반 PI 실효성\n실행 관리 고도화\n의사결정 효과 향상"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.25,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "캐스케이드 구조", "style": "default",
+           "bullets": ["PI Goal → Financial Driver → P&L Impact → Biz KPI", "각 단계 정량적 연계 (금액/비율)", "달성률 기반 자동 시뮬레이션"], "col": 0},
+          {"type": "card", "header": "기대효과", "style": "accent",
+           "bullets": ["PI 실효성 → Value 기반 관리 전환", "실행 관리 고도화 → 실시간 KPI 추적", "의사결정 효과 향상 → 선제적 대응"], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.2,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "PI Goal → Financial Driver → P&L Impact → Business KPI 4단계 캐스케이드로 프로젝트 가치를 정량적으로 증명", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 Business Value Realization Framework, PwC Value Management Office"
+  }]
+}

@@ -1,0 +1,73 @@
+{
+  "metadata": {"title": "Style A v1", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "SAP 전환 4단계별 Palantir 투입 전략 — Blueprint에서 Go-Live까지 병목 구간 정조준",
+    "breadcrumb": "① Palantir 활용안 (단계별 관점)",
+    "header_style": "standard",
+    "header_message": "프로젝트 라이프사이클 각 단계에서 가장 생산성 향상 효과가 큰 Palantir 모듈을 선별 투입하여 전체 프로젝트 기간 14% 단축과 품질 확보를 동시 달성",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Blueprint (설계)", "description": "프로세스 마이닝 + FDD"},
+            {"label": "Build (구축)", "description": "Config Register + 거버넌스"},
+            {"label": "Test (테스트)", "description": "AIP 테스트 자동화"},
+            {"label": "Go-Live (전환)", "description": "Cutover + Readiness"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.6,
+        "layout": "columns", "n_cols": 2,
+        "col_ratios": [0.55, 0.45],
+        "elements": [
+          {"type": "card", "header": "Blueprint + Build — 설계·구축 단계 적용", "subtitle": "CDHDR 이벤트 로그 + AIP FDD + Config Register", "style": "accent",
+           "bullets": [
+             "[프로세스 마이닝] As-Is 분석",
+             "  · CDHDR/CDPOS → SLT 스트리밍 → 이벤트 로그 수집",
+             "  · Z-Transaction 네이티브 캡처 (CDHDR.TCODE)",
+             "  · To-Be Blueprint 대비 Gap 자동 도출",
+             "  · Celonis 대비: 탐지→시뮬→실행 단일 플랫폼",
+             "",
+             "[FDD 자동 초안] 기능설계서 가속",
+             "  · AIP Logic: 프로세스/Gap/입출력 → FDD 템플릿 매핑",
+             "  · 초안 5분 (수작업 2~3시간 대비) → Cycle 40~50%↓",
+             "",
+             "[Config Decision Register]",
+             "  · Fit/Gap 결정 이력 Ontology 추적",
+             "  · 테스트 실패 시 원인 역추적 가능"
+           ], "col": 0},
+          {"type": "card", "header": "Test + Go-Live — 테스트·전환 단계 적용", "subtitle": "LLM-as-Judge + Cutover Ontology + Readiness", "style": "default",
+           "bullets": [
+             "[테스트 자동화] AIP ERP Migration Suite",
+             "  · Interpretation AI: Blueprint → 비즈니스 규칙 추출",
+             "  · LLM: 입력/기대출력 테스트케이스 자동 생성",
+             "  · LLM-as-Judge: 0~10 점수, Rubric 기반 연속 검증",
+             "  · 검증 정확도 99.8%, 작성 공수 60~70%↓",
+             "",
+             "[Cutover 오케스트레이션]",
+             "  · CutoverTask Ontology (MRP_RUN/잔액이관/마스터동결)",
+             "  · Workshop 실시간 Critical Path + 리허설 자동 비교",
+             "  · 초과율 30~40% → 10% 이하 목표",
+             "",
+             "[Go-Live Readiness Scorecard]",
+             "  · 워크스트림별 가중 점수 → AI Go/No-Go 권고",
+             "  · 4시간 운영위 → 15분 데이터 기반 리뷰"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "4단계 전 구간 Palantir 적용: Blueprint(마이닝+FDD) → Build(Register+거버넌스) → Test(AIP 자동화) → Go-Live(Cutover+Readiness) — 통합 14%+ 일정 단축", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir Foundry Docs, AIP ERP Migration Suite, SAP Connector 2.0, PwC SAP Practice"
+  }]
+}

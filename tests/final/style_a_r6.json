@@ -1,0 +1,49 @@
+{
+  "metadata": {"title": "Style A R6 — PMO Timeline", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "3단계 Quick Win 전략으로 2~3주 내 가치 입증 후 점진 확대",
+    "breadcrumb": "① Palantir 활용안 — 도입 로드맵",
+    "header_style": "standard",
+    "header_message": "각 단계 산출물이 다음 단계의 입력 — Level 1 미완료 시 Level 2 이후 착수 불가 (의존성 체인)",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Level 1: 가시화", "description": "2~3주 | Quick Win"},
+            {"label": "Level 2: 자동화", "description": "4~6주 | Build"},
+            {"label": "Level 3: 최적화", "description": "8~12주 | Test"},
+            {"label": "Level 4: 지능화", "description": "9개월+ | Go-Live"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.68,
+        "layout": "full",
+        "elements": [
+          {"type": "vertical_flow", "steps": [
+            {"label": "Level 1: 가시화 (착수 즉시, 2~3주)", "style": "accent",
+             "detail": "산출물: ① Foundry Health RAG Dashboard ② Config Decision Register ③ Weekly Report Auto-Gen\n선행조건: Jira/ADO API 권한 발급 + PM 계정 활성화 | 인력: Palantir FE 1명 + PwC PMO 1명 (풀타임)\nGate: 대시보드 갱신 ≤5분 + RAG 정확도 ≥90% + 경영진 서면 승인 → 3/3 Pass 시 L2 착수"},
+            {"label": "Level 2: 자동화 (Build 단계, 4~6주)", "style": "default",
+             "detail": "산출물: ① AIP Test Case Generator ② FDD Auto-Draft (5분/건) ③ Defect Triage ④ Rule Registry\n선행조건: L1 Ontology + Blueprint 문서 + 시나리오 100건↑ | 인력: Palantir BE 2명 + PwC 테스트 리드 1명\nGate: 커버리지 ≥80% + 자동생성 정확도 ≥95% + FDD 통과율 ≥70% → 3/3 Pass 시 L3 착수"},
+            {"label": "Level 3: 최적화 (Test 단계, 8~12주)", "style": "default",
+             "detail": "산출물: ① Cutover Orchestration App ② Process Mining Gap Report ③ Readiness Scorecard\n선행조건: L2 테스트 앱 안정화 + Cutover 마스터 시트 | 인력: Palantir BE 1명 + DE 1명 + PwC Basis 1명\nGate: Mock Cutover 3회 + 초과율 ≤15% + Readiness ≥85점 → 3/3 Pass 시 L4 착수"},
+            {"label": "Level 4: 지능화 (Go-Live 이후, 9개월+)", "style": "default",
+             "detail": "산출물: ① AI Go/No-Go Engine ② Hypercare Anomaly Detector (SM21/EDIDS/TBTCO) ③ Ops Dashboard\n선행조건: L1~3 데이터 축적 + 전 워크스트림 Ontology 연결 | 인력: Palantir 1명(파트) + HD현대 IT Ops 2명\nGate: Hypercare KPI 7일 SLA + Critical 장애 0건 + BAU 승인서 → 3/3 Pass 시 BAU 전환 확정"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Level 1이 Quick Win이자 전체 기반 — 2~3주 내 가치 입증 실패 시 전략 재검토, 성공 시 자연스러운 확대 동력 확보", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "산출물/선행조건/Gate 기준은 킥오프 시 PMO 합의 후 확정 | 인력 규모는 Palantir 리소스 가용성에 따라 조정"
+  }]
+}

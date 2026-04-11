@@ -1,0 +1,74 @@
+{
+  "metadata": {"title": "B08", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Big Bang vs Hybrid Go-Live 전략 비교 — Risk 최소화 Safe Landing 방안 제시",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.5 Go-Live 전략",
+    "header_message": "제안사의 대규모 빅뱅 수행 경험을 바탕으로 RFP의 동시 오픈 요건을 충족하되, 대규모 전환 충격을 흡수할 수 있는 Big Bang 전략을 검토하여 최적 실행안을 제시하고자 함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.12,
+        "layout": "full",
+        "elements": [
+          {"type": "bullet", "items": ["검토 배경: 글로벌 ERP 성공 경험으로 검증된 GSI 기반 전사 시스템 오픈 및 확산 방법론 제시", "핵심 판단 기준: 데이터 정합성, 전환 기간, 운영 리스크, 비용 효율성"]}
+        ]
+      },
+      {
+        "height_ratio": 0.55,
+        "layout": "columns", "n_cols": 2,
+        "elements": [
+          {"type": "card", "header": "Big Bang Go-Live", "subtitle": "전 모듈 동시 전환 | 27.1Q~28.1H", "style": "default",
+           "bullets": [
+             "Go-Live 전략 목표:",
+             "  · Risk의 중요 '생산' 안정화 우선",
+             "  · 데이터 정합 전략 수립 필수",
+             "  · 사전 검증의 확실화 (3회 리허설)",
+             "Go-Live 범위:",
+             "  · ERP: S/4HANA Core 전 모듈",
+             "  · PLM: 설계→생산 연계 동시 전환",
+             "  · Legacy: 단계적 폐기 (6개월)",
+             "장점: 데이터 정합성 우위, 병행운영 불필요",
+             "단점: 집중 리소스 필요, 실패 시 영향 大"
+           ], "col": 0},
+          {"type": "card", "header": "Big Bang Hybrid Go-Live", "subtitle": "HD현대중공업 선행 | 사업장 확산", "style": "accent",
+           "bullets": [
+             "Go-Live 전략 제안:",
+             "  · HD현대중공업 파일럿 → 타 법인 확산",
+             "  · 대형사업장 우선 → HD현대마린 빠른 Follow",
+             "Go-Live 단계:",
+             "  · Phase 1: HD현대중공업 (28.1Q)",
+             "  · Phase 2: HD현대마린엔진 (28.2Q)",
+             "  · Phase 3: S/4HANA DPF+마린 확산",
+             "  · Legacy 연동: 병행운영 최소화",
+             "장점: 파일럿 경험 활용, 리스크 분산",
+             "★ 추천: Hybrid가 Safe Landing 관점 최적"
+           ], "col": 1}
+        ]
+      },
+      {
+        "height_ratio": 0.18,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["평가"],
+           "col_headers": ["데이터 정합", "전환 기간", "운영 리스크", "비용 효율"],
+           "cells": [
+             [{"text": "Big Bang 우위\n단일 전환", "style": "accent"},
+              {"text": "Big Bang 우위\n12개월 vs 18개월"},
+              {"text": "Hybrid 우위\n리스크 분산", "highlight": true},
+              {"text": "Hybrid 우위\n파일럿 학습효과", "highlight": true}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "권장: Big Bang Hybrid — HD현대중공업 선행 파일럿로 검증 후 타 법인 확산 | Safe Landing을 위한 Risk 최소화 Go-Live 전략", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: PwC Global ERP Go-Live Methodology, HD현대 RFP 요건 분석"
+  }]
+}

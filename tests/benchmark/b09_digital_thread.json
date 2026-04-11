@@ -1,0 +1,58 @@
+{
+  "metadata": {"title": "B09", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Digital Thread 기반 설계 데이터 분석 — 설계부터 생산까지 일관된 데이터 연결",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.6 Manage Engineering",
+    "header_message": "설계부터 업무 전반의 데이터가 연결/순환되어 생산변수 예측, 견적정도 향상 등 본질적 경쟁력 강화",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.5,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["설계 영역", "ERP 연계", "생산 영역"],
+           "col_headers": ["자재/생산\n정보연계·추적성", "SCM\n공급망 데이터", "ERP Core\n통합 관리", "MES/MOM\n생산 실행", "품질/안전\n관리"],
+           "cells": [
+             [{"text": "CAD 3D Model\nBOM 자동 생성\n도면 버전 관리", "style": "accent"},
+              {"text": "PLM→ERP\n설계 BOM 연동\n자재 사양 전달"},
+              {"text": "통합 BOM\nMaster Data\n원가추정 연계"},
+              {"text": "생산 BOM\n작업지시 연계\n도면 자동배포"},
+              {"text": "설계 품질 기준\n검사 항목 연동"}],
+             [{"text": "설계→구매\n사양 자동 전달"},
+              {"text": "구매요청 자동\n발주→입고\nSupplier 연계", "highlight": true},
+              {"text": "S/4HANA Core\nMM/PP/CO/FI\n통합 프로세스", "style": "accent"},
+              {"text": "ERP→MES\n작업지시 전달\n실적 수집"},
+              {"text": "수입검사\n공정검사\n최종검사"}],
+             [{"text": "생산 피드백\n설변 반영"},
+              {"text": "자재 출고\n실적 추적"},
+              {"text": "원가 집계\n마감 정산"},
+              {"text": "공정 실적\nOEE 분석\nYard Twin", "style": "accent"},
+              {"text": "품질 실적\n불량 추적\nSPC"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.3,
+        "layout": "full",
+        "elements": [
+          {"type": "numbered_circle", "style": "accent",
+           "items": [
+             "Digital Thread 핵심: BOM 단위 정보 연결체계 확보하여 일관된 기준으로 오류와 누락 없이 Tracking이 가능한 체계",
+             "설계→ERP→생산 3개 레이어 간 데이터 자동 연결 — 수작업 인터페이스 80% 감소 목표",
+             "Palantir 기반 실시간 분석 연동 — 설계 변경 시 원가/일정 영향 자동 시뮬레이션"
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.2,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "BOM 단위 End-to-End 데이터 연결(Digital Thread)로 설계→생산 전 과정의 가시성 확보 — 본질적 경쟁력 강화의 기반", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 Future Blueprint — Manage Engineering, Digital Thread 아키텍처 설계서"
+  }]
+}

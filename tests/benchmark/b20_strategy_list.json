@@ -1,0 +1,41 @@
+{
+  "metadata": {"title": "B20", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "프로젝트 성공적 수행을 위한 5대 추진 전략 정의",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.1 전략 정의",
+    "header_message": "PwC는 프로젝트 추진 내용과 이의 달성 방안을 고려하여 다음의 프로젝트 추진 전략을 정의함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "text_block", "text": "자체적인 역량 확보를 통해 체계적 시스템 운영 체계로 전환하고, 기존 레거시 시스템을 현대화하여 자재/생산/재무/인사 전 영역의 Integration을 달성", "bold": false, "size": "body"}
+        ]
+      },
+      {
+        "height_ratio": 0.7,
+        "layout": "full",
+        "elements": [
+          {"type": "numbered_circle", "style": "accent",
+           "items": [
+             "글로벌 업무 표준 · 특화된 Template의 모듈화 구현 — 표준 시스템 구현 방안: ERP 표준 적용 + Fit to Standard | 자체 시스템 확장에 준비된 업무 표준 구축",
+             "PI 비전 달성을 위한 BPR 목표 정의 — 그룹 전사 시스템 구현 확보, HD현대그룹 전사 시스템 표준을 적용하되 조선업 특화 Legacy 기능 보존",
+             "Global ERP 성공 경험과 조선업 Best Practice 기반의 시스템 안정적 오픈과 확산 전략 — Go-Live 리스크 최소화, 사업장별 단계적 확산",
+             "One Process, One Data 고려한 성과 지표 중심 AI-On 의사결정 체계 — PI Goal 기반 KPI 정의, 데이터 기반 실시간 의사결정 지원",
+             "AI-First Process 설계방법론과 AI Use Case 활용한 혁신 — Palantir 프로세스 마이닝 + AI 에이전트 기반 자동화 기반 확보"
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "5대 전략을 통해 글로벌 표준 + 조선업 특화 + AI 기반 혁신을 동시에 달성하는 통합 전환 프레임워크 수립", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: PwC 프로젝트 킥오프 보고서 (2026.03)"
+  }]
+}

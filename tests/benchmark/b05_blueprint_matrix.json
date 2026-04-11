@@ -1,0 +1,35 @@
+{
+  "metadata": {"title": "B05", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Future Blueprint 정의 — 조선업 핵심 경쟁 역량 기반 5대 영역의 목표 상태 설계",
+    "breadcrumb": "2. 프로젝트 추진 전략 > 2.3 Future Blueprint",
+    "header_message": "전통적인 조선업의 핵심 경쟁 역량 영역에 기반하며 달성하고자 하는 Future Blueprint를 정의",
+    "layout": "fullscreen",
+    "n_cols": 1,
+    "elements": [
+      {"type": "framework_matrix",
+       "row_headers": ["Core\nCapability", "Targets", "Future\nBlueprint"],
+       "col_headers": ["Manage\nEngineering", "Sales & Project\nCommercials", "Project & Yard\nOperations", "Purchasing &\nLogistics", "Equipment &\nSafety"],
+       "cells": [
+         [{"text": "설계 역량\nCAD/PLM 통합"},
+          {"text": "수주 경쟁력\n견적/계약 관리"},
+          {"text": "야드 운영\nMES/공정 최적화"},
+          {"text": "조달 효율\n공급망 관리"},
+          {"text": "설비 안전\n예방정비 체계"}],
+         [{"text": "Enduring Growth\n지속 가능한 성장", "highlight": true},
+          {"text": "Enduring Growth\n지속 가능한 성장", "highlight": true},
+          {"text": "Execution Excellence\n압도적인 실행력", "highlight": true},
+          {"text": "Execution Excellence\n압도적인 실행력", "highlight": true},
+          {"text": "Execution Excellence\n압도적인 실행력", "highlight": true}],
+         [{"text": "3D Model 기반 통합 설계\nSingle Source of Truth\nCAD→PLM→ERP 자동 연계"},
+          {"text": "Risk 기반 수주 의사결정\n원가 Component 가시화\nAI 수익성 예측"},
+          {"text": "Smart Yard 실현\nReal-time 진도 관리\nDigital Twin 연동", "style": "accent"},
+          {"text": "Supplier 360 플랫폼\n실시간 재고 최적화\n수요 예측 AI 적용"},
+          {"text": "IoT 기반 설비 모니터링\n예지정비 체계 구축\n안전 관리 디지털화"}]
+       ]},
+      {"type": "takeaway_bar", "message": "5대 영역 Blueprint의 공통 기반: Manage IT & Decision Support Function — Palantir + S/4HANA 통합 데이터 플랫폼", "style": "dark"}
+    ],
+    "footnote": "출처: HD현대 조선사업의 Future Blueprint 정의서, PwC 전략 컨설팅팀"
+  }]
+}

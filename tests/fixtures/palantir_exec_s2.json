@@ -1,0 +1,60 @@
+{
+  "metadata": {"title": "Palantir 수행계획 S2", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "프로젝트 라이프사이클 전 구간에 Palantir를 단계별 적용하여 생산성 30%+ 향상",
+    "breadcrumb": "① Palantir 활용안 (방법론 관점)",
+    "header_style": "standard",
+    "header_message": "Blueprint→Build→Test→Go-Live 각 단계별로 Palantir Foundry/AIP를 투입하여 병목을 해소하고, 프로젝트 전체 기간 단축과 품질 확보를 동시 달성",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.12,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "Blueprint", "description": "프로세스 마이닝 + FDD 자동화"},
+            {"label": "Build", "description": "Config Register + 거버넌스"},
+            {"label": "Test", "description": "테스트 자동화 + 결함 Triage"},
+            {"label": "Go-Live", "description": "Cutover 오케스트레이션 + Readiness"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.6,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["Blueprint\n(설계)", "Build\n(구축)", "Test\n(테스트)", "Go-Live\n(전환)"],
+           "col_headers": ["적용 방안", "Palantir 구성요소", "구체적 방법론", "기대 효과"],
+           "cells": [
+             [{"text": "As-Is 프로세스 마이닝\n+ FDD 자동 초안"},
+              {"text": "Foundry Pipeline\n+ AIP Logic"},
+              {"text": "ECC 이벤트 로그 수집 → 프로세스 변형\n자동 탐지 → To-Be Gap 도출\nAIP가 FDD 초안 5분 내 생성"},
+              {"text": "미문서화 변형 30~50% 발견\nFDD Cycle Time 40~50%↓", "style": "accent"}],
+             [{"text": "Config Decision Register\n+ 프로젝트 거버넌스"},
+              {"text": "Ontology + Workshop\n+ AIP Agent"},
+              {"text": "Fit/Gap 결정 이력 추적 → 테스트 실패\n원인 역추적 가능\nAIP Agent: \"Top 3 Risk?\" 근거 답변"},
+              {"text": "미문서화 Config 결함 10~15%↓\nPMO 보고 실시간화"}],
+             [{"text": "테스트케이스 자동 생성\n+ 결함 Triage 클러스터링"},
+              {"text": "AIP (LLM-as-Judge)\n+ Text Embedding"},
+              {"text": "Blueprint 문서 → 비즈니스 규칙 추출 →\n입력/기대출력 자동 생성\n결함 Description 벡터화 → 근본원인 분류"},
+              {"text": "테스트 작성 공수 60~70%↓\nTriage 회의 50%↓", "style": "accent"}],
+             [{"text": "Cutover 오케스트레이션\n+ Go-Live Readiness"},
+              {"text": "Ontology + Workshop\n+ AIP Dynamic Sched."},
+              {"text": "CutoverTask 의존성 모델링 →\n실시간 Critical Path → 리허설 자동 비교\nReadiness 종합 점수 + AI 권고"},
+              {"text": "Cutover 초과 10%↓\nGo/No-Go 15분 리뷰", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.13,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "4단계 전 구간 Palantir 적용: Blueprint(마이닝+FDD) → Build(Register+거버넌스) → Test(자동화+Triage) → Go-Live(Cutover+Readiness) — 통합 생산성 30%+ 향상", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir AIP ERP Migration Suite, Foundry SAP Connector Docs, PwC SAP Practice 내부 분석"
+  }]
+}

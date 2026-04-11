@@ -1,0 +1,85 @@
+{
+  "metadata": {"title": "Diverse v3", "client": "HD현대", "date": "2026.04"},
+  "slides": [
+    {
+      "type": "content",
+      "title": "SAP S/4HANA 모듈별 전환 현황 — PP/MM 완료, CO/FI 진행 중",
+      "breadcrumb": "3. 프로젝트 현황 > 3.1 모듈별 진척",
+      "header_style": "accent",
+      "layout": "sidebar",
+      "sidebar_items": ["PP (생산계획)", "MM (자재관리)", "CO (원가관리)", "FI (재무회계)", "SD (영업)"],
+      "sidebar_active": 2,
+      "n_cols": 1,
+      "elements": [
+        {"type": "card", "header": "CO (원가관리) — 현재 Build 단계 진행 중", "subtitle": "진척률 45% | 목표: 2026.Q4 완료", "style": "accent",
+         "bullets": [
+           "원가센터 구조 재설계: 3-Level → 5-Level (완료)",
+           "Activity Type 표준화: 120개 → 45개로 통합 (진행 중)",
+           "Cost Component Split: 8개 요소 정의 (완료)",
+           "CO-PA 값 필드 설계: 30개 필드 매핑 (진행 중)",
+           "계열사 간 이전가격 정책: 3안 비교 검토 중 ★",
+           "Material Ledger 실제원가: Config 완료, 테스트 대기"
+         ]},
+        {"type": "rag_table", "items": [
+           {"name": "원가센터 구조", "status": "green", "trend": "up", "note": "5-Level 확정, Config 완료"},
+           {"name": "Activity Type", "status": "amber", "trend": "flat", "note": "45개 확정, 단가 산출 중"},
+           {"name": "Cost Component", "status": "green", "trend": "up", "note": "8요소 확정, KEPH 매핑 완료"},
+           {"name": "CO-PA 설계", "status": "amber", "trend": "up", "note": "30필드 중 20필드 매핑 완료"},
+           {"name": "이전가격", "status": "red", "trend": "down", "note": "3안 비교 중, 경영진 결재 필요"},
+           {"name": "Material Ledger", "status": "green", "trend": "up", "note": "Config 완료, UAT 대기"}
+         ]},
+        {"type": "takeaway_bar", "message": "CO 모듈 핵심 이슈: 이전가격 정책 미확정 (Red) — 경영진 결재 후 CO-PA 설계 완료 가능, 일정 리스크 2주", "style": "dark"}
+      ],
+      "footnote": "출처: HD현대 ERP 전환 프로젝트 주간 보고 (2026.04.09)"
+    },
+    {
+      "type": "content",
+      "title": "HD현대 S/4HANA 전환 — 5대 핵심 성과 지표 (KPI)",
+      "breadcrumb": "3. 프로젝트 현황 > 3.2 KPI 대시보드",
+      "header_style": "minimal",
+      "layout": "stacked",
+      "sections": [
+        {
+          "height_ratio": 0.3,
+          "layout": "columns", "n_cols": 5,
+          "elements": [
+            {"type": "card", "header": "전체 진척", "style": "accent",
+             "content": [{"type": "kpi", "value": "62%", "text": "계획 대비"}], "col": 0},
+            {"type": "card", "header": "데이터 품질", "style": "default",
+             "content": [{"type": "kpi", "value": "94%", "text": "클렌징 완료율"}], "col": 1},
+            {"type": "card", "header": "RICEF 완료", "style": "default",
+             "content": [{"type": "kpi", "value": "312", "text": "523건 중"}], "col": 2},
+            {"type": "card", "header": "테스트 커버리지", "style": "default",
+             "content": [{"type": "kpi", "value": "71%", "text": "목표 90%"}], "col": 3},
+            {"type": "card", "header": "이슈 미결", "style": "dark",
+             "content": [{"type": "kpi", "value": "14건", "text": "Critical 3건"}], "col": 4}
+          ]
+        },
+        {
+          "height_ratio": 0.5,
+          "layout": "full",
+          "elements": [
+            {"type": "framework_matrix",
+             "row_headers": ["PP 생산", "MM 자재", "CO 원가", "FI 재무", "SD 영업"],
+             "col_headers": ["Blueprint", "Build", "Test", "Go-Live", "Status"],
+             "cells": [
+               [{"text": "완료"}, {"text": "완료"}, {"text": "진행 중\n(UAT 2차)", "highlight": true}, {"text": "Q4 예정"}, {"text": "On Track", "style": "accent"}],
+               [{"text": "완료"}, {"text": "완료"}, {"text": "완료"}, {"text": "Q4 예정"}, {"text": "On Track", "style": "accent"}],
+               [{"text": "완료"}, {"text": "진행 중\n(45%)", "highlight": true}, {"text": "미착수"}, {"text": "Q1 '27"}, {"text": "At Risk"}],
+               [{"text": "완료"}, {"text": "진행 중\n(70%)"}, {"text": "미착수"}, {"text": "Q1 '27"}, {"text": "On Track"}],
+               [{"text": "완료"}, {"text": "진행 중\n(30%)", "highlight": true}, {"text": "미착수"}, {"text": "Q1 '27"}, {"text": "Delayed"}]
+             ]}
+          ]
+        },
+        {
+          "height_ratio": 0.2,
+          "layout": "full",
+          "elements": [
+            {"type": "takeaway_bar", "message": "PP/MM On Track | CO 이전가격 이슈 해소 필요 (Red→Amber 전환 목표: 4월 내) | SD Build 가속화 필요 (현재 30%)", "style": "dark"}
+          ]
+        }
+      ],
+      "footnote": "출처: HD현대 프로젝트 주간 보고 (2026.04.09), PMO 대시보드"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "metadata": {"title": "Palantir 수행계획 S3", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 적용 영역별 구현 방법론 상세 — Ontology + AIP + Workshop 3축 체계",
+    "breadcrumb": "① Palantir 활용안 (구현 관점)",
+    "header_style": "accent",
+    "layout": "sidebar",
+    "sidebar_items": ["테스트 자동화", "Cutover 관리", "프로세스 마이닝", "프로젝트 거버넌스", "Quality Gate"],
+    "sidebar_active": 0,
+    "n_cols": 1,
+    "elements": [
+      {"type": "card", "header": "테스트 관리 자동화 — AIP ERP Migration Suite", "subtitle": "검증 정확도 99.8% · 테스트 작성 공수 60~70%↓", "style": "accent",
+       "bullets": [
+         "Step 1: ABAP 커넥터로 ECC 테이블 구조/필드 매핑/과거 트랜잭션 수집",
+         "Step 2: AIP Interpretation AI가 Blueprint 문서에서 비즈니스 규칙 자동 추출",
+         "Step 3: LLM이 규칙 기반 기능 테스트케이스 생성 (입력/기대출력 쌍 → S/4 T-Code 매핑)",
+         "Step 4: LLM-as-Judge가 타겟 스키마/값 제약 대비 자동 검증 (파이프라인 연속 실행)",
+         "Step 5: 이슈를 SME 대시보드에 표출, 담당자가 자연어로 수정 → 파이프라인 자동 반영",
+         "Step 6: 결함 Jira 자동 등록 (네이티브 커넥터), 데이터 객체/Wave/책임팀 링크"
+       ]},
+      {"type": "card", "header": "기술 전제조건 및 구현 일정", "style": "default",
+       "bullets": [
+         "전제: SAP Add-On (PALCONN) 설치, Foundry 데이터 파이프라인 구성",
+         "구현 기간: 4~6주 (Foundry 엔지니어 1~2명)",
+         "LLM 테스트 품질: Blueprint 문서 품질에 의존 → 문서 정비 선행 필요",
+         "Jira/ADO 커넥터: 기존 결함 관리 도구와 양방향 연동"
+       ]},
+      {"type": "takeaway_bar", "message": "테스트 자동화가 Quick Win — 4~6주 내 구현 가능하며, 테스트 작성 공수 60~70% 절감으로 즉각적 생산성 향상 체감", "style": "dark"}
+    ],
+    "footnote": "출처: Palantir AIP ERP Migration Suite Documentation, Unit8 Case Study (2025)"
+  }]
+}

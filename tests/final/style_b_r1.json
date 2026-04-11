@@ -1,0 +1,35 @@
+{
+  "metadata": {"title": "Style B R1 — Technical Architecture", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "SAP Add-On(SP30+) 기반 CDHDR/BKPF/VBAK 실시간 연동 — Foundry→AIP→Workshop 3계층 아키텍처",
+    "breadcrumb": "① Palantir 활용안 — 기술 아키텍처",
+    "header_style": "accent",
+    "layout": "sidebar",
+    "sidebar_items": ["SAP Source Layer", "Foundry Pipeline", "AIP Engine", "Workshop Apps"],
+    "sidebar_active": 0,
+    "n_cols": 1,
+    "elements": [
+      {"type": "table", "data": {
+        "headers": ["계층", "구성요소", "기술 상세", "연동 방식"],
+        "rows": [
+          ["SAP Source", "ECC 변경문서", "CDHDR.OBJECTID/TCODE/UDATE\nCDPOS.FNAME (변경필드)", "SLT CDC 스트리밍"],
+          ["SAP Source", "FI 전표", "BKPF.BELNR/BUKRS/BLART\n(회계문서 헤더)", "RFC + SLT"],
+          ["SAP Source", "SD 오더", "VBAK.VBELN/AUART/ERDAT\n(판매문서 헤더)", "RFC + SLT"],
+          ["SAP Source", "MM 자재", "MKPF.MBLNR/VGART\n(자재문서 헤더)", "RFC + SLT"],
+          ["SAP Source", "Transport", "E070.TRKORR/TRSTATUS\n(전송 요청)", "BEx Query"],
+          ["Foundry", "Ontology 객체", "CutoverTask/TestCase/Defect\nConfigDecision/Readiness", "Pipeline Builder"],
+          ["Foundry", "이벤트 로그", "CDHDR→EventLog 변환\nZ-Tcode 자동 분류 (Z* 필터)", "Transform + SLT"],
+          ["AIP", "Interpretation AI", "Blueprint PDF→비즈니스 규칙\nRule Registry 타입화 저장", "AIP Logic Chain"],
+          ["AIP", "LLM-as-Judge", "Rubric 0~10 연속검증\n임계값 9, 추론토큰 디버그", "AIP Logic 함수"],
+          ["AIP", "Agent", "RAID 로그 기반 질의응답\nInline Sourcing 출처 추적", "Agent Studio"],
+          ["Workshop", "Cutover 관리", "Critical Path 라이브 뷰\n리허설 계획vs실적 비교", "Workshop App"],
+          ["Workshop", "테스트 대시보드", "커버리지 히트맵, Pass%\n결함 클러스터 분석", "Contour + Workshop"],
+          ["Workshop", "RAG 대시보드", "Readiness 점수 추이\n이탈/참여도 추적", "Workshop App"]
+        ]
+      }},
+      {"type": "takeaway_bar", "message": "SAP Add-On(PALANTIR/PALCONN SP30+)이 NetWeaver에 직접 설치 — ECC↔S/4 동시 연결로 전환기 듀얼 운영 지원, Celonis(탐지)·Tricentis(실행)와 보완 포지셔닝", "style": "dark"}
+    ],
+    "footnote": "SAP Connector 2.0: RFC, SLT(CDC), BEx, Function Module, HANA View 지원 | Add-On SP30+(2024.02~), SP32(2024.10~)"
+  }]
+}

@@ -1,0 +1,79 @@
+{
+  "metadata": {"title": "Diverse v2 - Minimal Header", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "조선업 원가 경쟁력 확보 전략 — 3대 원가 동인별 절감 로드맵",
+    "breadcrumb": "5. 원가관리 > 5.2 원가 절감 전략",
+    "header_style": "minimal",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.12,
+        "layout": "full",
+        "elements": [
+          {"type": "chevron_process", "steps": [
+            {"label": "재료비 (45%)", "description": "전략구매 최적화"},
+            {"label": "노무비 (25%)", "description": "야드 자동화"},
+            {"label": "제조경비 (30%)", "description": "설비 효율화"}
+          ]}
+        ]
+      },
+      {
+        "height_ratio": 0.55,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "재료비 절감 (목표 8~12%↓)", "subtitle": "Supplier 360 + AI 수요예측", "style": "accent",
+           "bullets": [
+             "전략 구매 포트폴리오 재편 (ABC 분류 기반)",
+             "Supplier 360 플랫폼 → 공급업체 성과 실시간 추적",
+             "AI 수요예측 → 선행구매 타이밍 최적화",
+             "글로벌 소싱 확대 (중국·인도 원자재 직구매)",
+             "장기 계약 + Hedging 전략 (환율·원자재가)",
+             "대체 소재 R&D (고강도 경량 강재 적용)"
+           ], "col": 0},
+          {"type": "card", "header": "노무비 절감 (목표 5~8%↓)", "subtitle": "Smart Yard + Humanoid 도입", "style": "default",
+           "bullets": [
+             "용접 로봇 자동화 (현재 15% → 목표 40%)",
+             "블록 이송 자동화 (AGVS 도입)",
+             "디지털 작업지시 → 수기 작업 80% 감소",
+             "야드 시뮬레이션 → 인력 배치 최적화",
+             "기능직 다기능화 교육 (T-Shape 인재)",
+             "외주 관리 표준화 (단가 협상력 확보)"
+           ], "col": 1},
+          {"type": "card", "header": "제조경비 절감 (목표 10~15%↓)", "subtitle": "예지정비 + 에너지 최적화", "style": "default",
+           "bullets": [
+             "IoT 예지정비 → 비계획 다운타임 30~50%↓",
+             "에너지 모니터링 → 전력 사용 15%↓ (AI 최적화)",
+             "설비 가동률 99% 목표 (현재 85%)",
+             "감가상각 최적화 (설비 수명 25% 연장)",
+             "폐기물·스크랩 관리 디지털화",
+             "공용 설비 활용률 분석 → 투자 판단 근거"
+           ], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.18,
+        "layout": "full",
+        "elements": [
+          {"type": "framework_matrix",
+           "row_headers": ["종합"],
+           "col_headers": ["재료비 (45%)", "노무비 (25%)", "제조경비 (30%)", "합계"],
+           "cells": [
+             [{"text": "8~12%↓\n= 3.6~5.4%p", "style": "accent"},
+              {"text": "5~8%↓\n= 1.3~2.0%p"},
+              {"text": "10~15%↓\n= 3.0~4.5%p"},
+              {"text": "총 7.9~11.9%p\n원가 절감", "style": "accent"}]
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "3대 원가 동인 동시 공략으로 총 8~12%p 원가 절감 — 재료비(전략구매) + 노무비(야드자동화) + 경비(예지정비) 통합 추진이 핵심", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 원가 구조 분석 (2025), PwC Manufacturing CoE, 조선업 벤치마크 리포트"
+  }]
+}

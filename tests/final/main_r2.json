@@ -1,0 +1,81 @@
+{
+  "metadata": {"title": "Main R2 — Executive Summary", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "Palantir 투입으로 SAP 전환 일정 14% 단축, 테스트 공수 60~70% 절감, Cutover 다운타임 50% 단축",
+    "breadcrumb": "① Palantir 활용안 — Executive Summary",
+    "header_style": "minimal",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "text_block", "text": "HD현대 SAP S/4HANA 전환 프로젝트의 3대 핵심 리스크에 Palantir Foundry/AIP를 정조준 투입하여 프로젝트 품질과 속도를 동시 확보", "size": "body"}
+        ]
+      },
+      {
+        "height_ratio": 0.72,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "테스트 자동화", "subtitle": "작성 공수 60~70%↓ · 정확도 99.8%", "style": "accent",
+           "bullets": [
+             "현재: 테스트케이스 수작업 작성에",
+             "3~6개월 소요, 결함 반복 발생",
+             "",
+             "Palantir AIP가 Blueprint에서",
+             "비즈니스 규칙을 자동 추출하고",
+             "LLM이 테스트케이스를 생성",
+             "",
+             "LLM-as-Judge가 Rubric 기반",
+             "0~10점 연속 검증, 결함은",
+             "Jira 네이티브 커넥터로 자동 등록",
+             "",
+             "실증: 에너지社 20,000+ 레코드",
+             "2주 내 완료, AI 비용 $4K 미만"
+           ], "col": 0},
+          {"type": "card", "header": "Cutover 최적화", "subtitle": "초과율 10%↓ · 다운타임 50%↓", "style": "default",
+           "bullets": [
+             "현재: 리허설 Excel 수기 관리,",
+             "초과율 30~40%, 가시성 Gap 4~8h",
+             "",
+             "Ontology로 CutoverTask 의존성",
+             "DAG 모델링 — MRP/잔액이관/",
+             "마스터동결 등 자연어 제약 정의",
+             "",
+             "Workshop에서 Critical Path",
+             "실시간 추적 + 리허설별 비교",
+             "",
+             "AIP가 지연 시 대안 시퀀스",
+             "자동 제안 (Human-in-the-Loop)",
+             "Dual Maintenance 60~70%↓"
+           ], "col": 1},
+          {"type": "card", "header": "프로젝트 거버넌스", "subtitle": "보고 실시간 · 일정 14%↓ (2.5개월)", "style": "default",
+           "bullets": [
+             "현재: 주간 현황 취합 2~3일,",
+             "RAID 분산관리, Go/No-Go 주관적",
+             "",
+             "Ontology 통합 모델로 실시간",
+             "Health Dashboard 구현",
+             "(2~3주 Quick Win — 즉시 가치)",
+             "",
+             "AIP Agent가 RAID 로그 기반",
+             "리스크 질의 응답 + 출처 추적",
+             "",
+             "Readiness Scorecard 자동 산출",
+             "→ AI Go/No-Go 권고",
+             "4시간 운영위 → 15분 리뷰"
+           ], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.1,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "Quick Win(거버넌스 대시보드 2~3주) → Test(AIP 자동화 4~6주) → Go-Live(Cutover 최적화) 순 점진 투입, 단일 플랫폼 통합 관리", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: Palantir AIP ERP Migration Suite, Unit8 Case Study, SAP-Palantir Partnership (SAPPHIRE 2025)"
+  }]
+}

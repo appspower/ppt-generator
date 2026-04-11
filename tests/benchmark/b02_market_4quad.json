@@ -1,0 +1,76 @@
+{
+  "metadata": {"title": "B02", "client": "HD현대", "date": "2026.04"},
+  "slides": [{
+    "type": "content",
+    "title": "HD현대 조선 사업 추진 현황 — 글로벌 확장, 포트폴리오 다각화, FoS 디지털 전환",
+    "breadcrumb": "1. 사업에 대한 이해 > 1.2 사업 추진 현황",
+    "header_message": "최근 HD현대 조선 사업은 운영 구조(글로벌 Multi-Yard), 사업의 범위(함정, MRO 등), 기술 실현(FoS 디지털 전환) 측면에서 확장이 맞물리며 운영 복잡도와 난이도가 구조적으로 상승함",
+    "layout": "stacked",
+    "sections": [
+      {
+        "height_ratio": 0.7,
+        "layout": "columns", "n_cols": 3,
+        "elements": [
+          {"type": "card", "header": "Group-Wide Expansion", "subtitle": "글로벌 Multi-Yard 확장", "style": "default",
+           "bullets": [
+             "단일 Yard 중심 → Multi-Yard &",
+             "Global Operation 체계 전환",
+             "",
+             "• Yard 간 물량 재배치가 Key",
+             "• 설계/조달 표준화 필수",
+             "• 해외 Yard 운영 복잡도 증가:",
+             "  - 필리핀 Subic Bay",
+             "  - 루마니아 Mangalia",
+             "  - 중국 Qingdao",
+             "• 실적/원가의 통합 관리 체계 필요"
+           ], "col": 0},
+          {"type": "card", "header": "Biz Portfolio Diversification", "subtitle": "사업 구조 다각화", "style": "accent",
+           "bullets": [
+             "단일 선박 건조 중심 탈피 →",
+             "복합 사업 구조로 다각화",
+             "",
+             "Product Portfolio:",
+             "  • 상선 (Merchant Ship) — Core",
+             "  • 해양 (MRO/FPU) — Growth",
+             "  • 함정 (Naval/Defense) — New",
+             "  • 특수선 (Offshore) — Niche",
+             "",
+             "각 사업별 프로세스·원가·일정 체계 차별화 필요"
+           ], "col": 1},
+          {"type": "card", "header": "Path to FoS & Beyond", "subtitle": "디지털/차세대 기반 전환", "style": "default",
+           "bullets": [
+             "FoS 디지털 전환:",
+             "  Step 1: 현재 보이는 조선소 (Twin FoS)",
+             "  Step 2: FoS 전략 = 디지털 플랫폼",
+             "",
+             "핵심 기술 스택:",
+             "  • Siemens PLM → 3D 기반 설계",
+             "  • AI/ML → Palantir 분석 플랫폼",
+             "  • Humanoid → 야드 자동화",
+             "",
+             "• MASS/자율운항 선박 기술 실현",
+             "• Palantir 기반 실시간 의사결정"
+           ], "col": 2}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "numbered_circle", "style": "accent",
+           "items": [
+             "글로벌 확장 + 포트폴리오 다각화 + FoS 디지털 전환이 동시 진행 → 운영 복잡도 구조적 상승 → 통합 ERP 체계 필수"
+           ]}
+        ]
+      },
+      {
+        "height_ratio": 0.15,
+        "layout": "full",
+        "elements": [
+          {"type": "takeaway_bar", "message": "3대 확장 축(Multi-Yard/Portfolio/FoS) 동시 진행에 따른 운영 복잡도 관리가 본 프로젝트의 핵심 과제", "style": "dark"}
+        ]
+      }
+    ],
+    "footnote": "출처: HD현대 사업 현황 분석, PwC 전략컨설팅팀"
+  }]
+}
