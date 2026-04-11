@@ -127,21 +127,21 @@ def comp_bullet_list(
     title_size: float = 11,
     item_size: float = 9,
 ) -> float:
-    """불릿 목록 — 제목(선택) + 항목들."""
+    """불릿 목록 — 제목(선택) + 항목들. 밀도 우선 배치."""
     r = region
     cy = 0.0
 
     if title:
-        c.text(title, x=0.1, y=cy, w=r.w - 0.2, h=0.3,
+        c.text(title, x=0.1, y=cy, w=r.w - 0.2, h=0.22,
                size=title_size, bold=True, color="grey_900", anchor="top", region=r)
-        cy += 0.35
+        cy += 0.22
 
     for item in items:
-        item_h = max(0.22, estimate_text_height(
+        item_h = max(0.18, estimate_text_height(
             f"▪  {item}", font_pt=item_size, box_width_inches=r.w - 0.3))
         c.text(f"▪  {item}", x=0.1, y=cy, w=r.w - 0.2, h=item_h,
                size=item_size, color="grey_900", anchor="top", region=r)
-        cy += item_h + 0.04
+        cy += item_h + 0.02
 
     return cy
 
@@ -854,36 +854,38 @@ def comp_styled_card(
     c.box(x=0, y=0, w=r.w, h=r.h,
           fill=s["bg"], border=s["border"], border_color=s["bc"] or "grey_mid", region=r)
 
-    cy = 0.12
+    cy = 0.08
 
     # 큰 번호 (numbered 스타일)
     if number and style == "numbered":
-        c.text(number, x=0.12, y=cy, w=0.6, h=0.5,
+        c.text(number, x=0.12, y=cy, w=0.6, h=0.38,
                size=28, bold=True, color="accent", anchor="top", region=r)
-        cy += 0.5
+        cy += 0.35
 
     # KPI 큰 숫자
     if kpi_value:
-        c.text(kpi_value, x=0.15, y=cy, w=r.w - 0.3, h=0.45,
+        c.text(kpi_value, x=0.12, y=cy, w=r.w - 0.24, h=0.35,
                size=24, bold=True, color=s["tc"], font="Georgia", anchor="top", region=r)
-        cy += 0.5
+        cy += 0.35
 
     # 제목
-    c.text(title, x=0.15, y=cy, w=r.w - 0.3, h=0.28,
+    c.text(title, x=0.12, y=cy, w=r.w - 0.24, h=0.22,
            size=10, bold=True, color=s["tc"], anchor="top", region=r)
-    cy += 0.32
+    cy += 0.24
 
     # 본문
     if body:
-        c.text(body, x=0.15, y=cy, w=r.w - 0.3, h=r.h - cy - 0.1,
+        c.text(body, x=0.12, y=cy, w=r.w - 0.24, h=r.h - cy - 0.08,
                size=8, color=s["sc"], anchor="top", region=r)
 
-    # 불릿
+    # 불릿 — 밀도 우선 배치
     if bullets:
         for bul in bullets:
-            c.text(f"▪  {bul}", x=0.15, y=cy, w=r.w - 0.3, h=0.2,
+            bul_h = max(0.18, estimate_text_height(
+                f"▪  {bul}", font_pt=8, box_width_inches=r.w - 0.36))
+            c.text(f"▪  {bul}", x=0.12, y=cy, w=r.w - 0.24, h=bul_h,
                    size=8, color=s["sc"], anchor="top", region=r)
-            cy += 0.22
+            cy += bul_h + 0.02
 
     return r.h
 
@@ -1125,11 +1127,14 @@ def comp_chevron_flow(
                   fill=fi, text=text, text_color=tc, text_size=9,
                   region=r)
 
-    # 상세 카드 (선택)
+    # 상세 카드 (선택) — 높이를 콘텐츠에 맞게 제한
     if show_details and n > 0:
-        detail_y = chev_h + 0.10
-        detail_h = r.h - detail_y
-        card_gap = 0.10
+        detail_y = chev_h + 0.08
+        # 카드 높이: 항목 수 기반 동적 계산 (최소 1.0", 최대 2.5")
+        max_items = max(len(p.get("details", [])) for p in phases)
+        content_h = 0.08 + max_items * 0.20 + 0.08  # 패딩 + 항목들 + 패딩
+        detail_h = min(max(content_h, 1.0), min(2.5, r.h - detail_y))
+        card_gap = 0.06
         card_w = (r.w - card_gap * (n - 1)) / n
         for i, p in enumerate(phases):
             dx = i * (card_w + card_gap)
@@ -1139,11 +1144,11 @@ def comp_chevron_flow(
             details = p.get("details", [])
             for di, item in enumerate(details):
                 c.text(f"▪ {item}",
-                       x=dx + 0.07, y=detail_y + 0.06 + di * 0.22,
-                       w=card_w - 0.14, h=0.20,
-                       size=7, color="grey_900", anchor="top", region=r)
+                       x=dx + 0.06, y=detail_y + 0.06 + di * 0.20,
+                       w=card_w - 0.12, h=0.18,
+                       size=8, color="grey_900", anchor="top", region=r)
 
-    return chev_h if not show_details else r.h
+    return chev_h if not show_details else detail_y + detail_h
 
 
 # ============================================================
@@ -1315,17 +1320,18 @@ def comp_comparison_grid(
     if n_cols == 0 or n_rows == 0:
         return 0.0
 
-    label_w = min(r.w * 0.22, 1.8)
-    grid_x = label_w + 0.08
+    label_w = min(r.w * 0.18, 1.4)
+    col_gap = 0.04
+    grid_x = label_w + col_gap
     grid_w = r.w - grid_x
-    col_w = (grid_w - 0.08 * (n_cols - 1)) / n_cols
+    col_w = (grid_w - col_gap * (n_cols - 1)) / n_cols
 
-    header_h = 0.50
-    row_h = (r.h - header_h - 0.05) / n_rows
+    header_h = 0.45
+    row_h = (r.h - header_h - 0.02) / n_rows
 
     # 헤더
     for i, col in enumerate(columns):
-        ox = grid_x + i * (col_w + 0.08)
+        ox = grid_x + i * (col_w + col_gap)
         is_hl = col.get("highlight", False)
         fill = "grey_900" if is_hl else "grey_700"
         c.box(x=ox, y=0, w=col_w, h=header_h,
@@ -1355,7 +1361,7 @@ def comp_comparison_grid(
 
         # 셀
         for ci, col in enumerate(columns):
-            ox = grid_x + ci * (col_w + 0.08)
+            ox = grid_x + ci * (col_w + col_gap)
             is_hl = col.get("highlight", False)
             cell_fill = row_fills_hl[alt] if is_hl else row_fills_normal[alt]
             crits = col.get("criteria", [])
