@@ -1425,3 +1425,353 @@ def comp_architecture_stack(
                        region=r)
 
     return r.h
+
+
+# ============================================================
+# Compound Component 6: Pyramid
+# ============================================================
+
+def comp_pyramid(
+    c: Canvas,
+    *,
+    layers: list[dict],
+    style: str = "gradient",
+    region: Region,
+) -> float:
+    """피라미드 레이어 — 상위일수록 좁은 사다리꼴 스택.
+
+    pyramid_layers에서 추출. 전략 위계, 성숙도 모델, 조직 계층.
+    """
+    r = region
+    n = len(layers)
+    if n == 0:
+        return 0.0
+
+    gap = 0.05
+    layer_h = (r.h - gap * (n - 1)) / n
+    w_min = r.w * 0.30
+    w_max = r.w * 0.95
+    fills = ["grey_900", "grey_800", "grey_700", "grey_400", "grey_200"]
+    txts = ["white", "white", "white", "white", "grey_900"]
+
+    for i, layer in enumerate(layers):
+        ratio = i / max(n - 1, 1)
+        lw = w_min + (w_max - w_min) * ratio
+        lx = (r.w - lw) / 2
+        ly = i * (layer_h + gap)
+        fi = fills[min(i, len(fills) - 1)]
+        tc = txts[min(i, len(txts) - 1)]
+        c.box(x=lx, y=ly, w=lw, h=layer_h, fill=fi, border=None, region=r)
+        c.text(layer["title"], x=lx + 0.1, y=ly, w=lw - 0.2, h=layer_h * 0.55,
+               size=11, bold=True, color=tc, align="center", anchor="middle", region=r)
+        if layer.get("detail"):
+            c.text(layer["detail"], x=lx + 0.1, y=ly + layer_h * 0.50,
+                   w=lw - 0.2, h=layer_h * 0.45, size=8, color=tc,
+                   align="center", anchor="top", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 7: Cycle Arrows
+# ============================================================
+
+def comp_cycle_arrows(
+    c: Canvas,
+    *,
+    center: str,
+    center_sub: str = "",
+    stages: list[dict],
+    center_color: str = "grey_900",
+    region: Region,
+) -> float:
+    """원형 순환 다이어그램 — PDCA, 플라이휠.
+
+    cycle_diagram에서 추출. 순환 프로세스, 반복 개선 구조.
+    """
+    import math
+    r = region
+    n = len(stages)
+    if n == 0:
+        return r.h
+
+    cx, cy = r.w / 2, r.h / 2
+    center_d = min(r.w, r.h) * 0.22
+    c.circle(x=cx - center_d / 2, y=cy - center_d / 2, d=center_d,
+             fill=center_color, border=None,
+             text=center, text_color="white", text_size=11, text_bold=True, region=r)
+    if center_sub:
+        c.text(center_sub, x=cx - center_d / 2, y=cy + center_d * 0.15,
+               w=center_d, h=0.22, size=7, color="grey_200",
+               align="center", anchor="top", region=r)
+
+    ring_r = min(r.w, r.h) * 0.20
+    card_r = min(r.w, r.h) * 0.40
+    card_w = min(r.w * 0.24, 1.7)
+    card_h = min(r.h * 0.22, 0.85)
+    angle_offset = -math.pi / 2
+
+    for i, st in enumerate(stages):
+        angle = angle_offset + (2 * math.pi * i / n)
+        next_angle = angle_offset + (2 * math.pi * (i + 1) / n)
+        mid_angle = (angle + next_angle) / 2
+
+        arr_a = angle_offset + (2 * math.pi * (i + 0.75) / n)
+        a2_a = angle_offset + (2 * math.pi * (i + 1.05) / n)
+        c.arrow(x1=cx + (ring_r + 0.15) * math.cos(arr_a),
+                y1=cy + (ring_r + 0.15) * math.sin(arr_a),
+                x2=cx + (ring_r + 0.15) * math.cos(a2_a),
+                y2=cy + (ring_r + 0.15) * math.sin(a2_a),
+                color="grey_400", width=0.75, region=r)
+
+        card_cx = cx + card_r * math.cos(mid_angle)
+        card_cy = cy + card_r * math.sin(mid_angle)
+        card_x, card_y = card_cx - card_w / 2, card_cy - card_h / 2
+
+        c.line(x1=cx + (ring_r + 0.25) * math.cos(mid_angle),
+               y1=cy + (ring_r + 0.25) * math.sin(mid_angle),
+               x2=card_cx, y2=card_cy, color="grey_mid", width=0.5, region=r)
+
+        c.box(x=card_x, y=card_y, w=card_w, h=card_h,
+              fill="white", border=0.75, border_color="grey_mid", region=r)
+        c.text(st["title"], x=card_x + 0.06, y=card_y + 0.06,
+               w=card_w - 0.12, h=0.22, size=9, bold=True,
+               color="grey_900", anchor="top", region=r)
+        if st.get("detail"):
+            c.text(st["detail"], x=card_x + 0.06, y=card_y + 0.28,
+                   w=card_w - 0.12, h=card_h - 0.34, size=7,
+                   color="grey_700", anchor="top", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 8: Waterfall
+# ============================================================
+
+def comp_waterfall(
+    c: Canvas,
+    *,
+    start: dict,
+    steps: list[dict],
+    end: dict,
+    unit: str = "",
+    region: Region,
+) -> float:
+    """증감 바 차트 (Waterfall/Bridge).
+
+    waterfall_bridge에서 추출. 비용 분해, 매출 Bridge, 시간 분석.
+    """
+    r = region
+    all_items = [start] + steps + [end]
+    n = len(all_items)
+    if n == 0:
+        return 0.0
+
+    bar_gap = 0.06
+    bar_w = (r.w - bar_gap * (n - 1)) / n
+    cumulative = [start["value"]]
+    for s in steps:
+        cumulative.append(cumulative[-1] + s["value"])
+    all_values = cumulative + [end["value"]]
+    max_val = max(abs(v) for v in all_values) if all_values else 1
+
+    label_h = 0.30
+    chart_h = r.h - label_h - 0.05
+    baseline_y = chart_h * 0.72
+
+    def val_to_y(v):
+        if max_val == 0:
+            return baseline_y
+        return baseline_y - v * (chart_h * 0.60) / max_val
+
+    c.line(x1=0, y1=baseline_y, x2=r.w, y2=baseline_y,
+           color="grey_mid", width=0.5, region=r)
+
+    running = start["value"]
+    for i, item in enumerate(all_items):
+        bx = i * (bar_w + bar_gap)
+        is_start, is_end = (i == 0), (i == n - 1)
+
+        if is_start or is_end:
+            val = item["value"]
+            bar_top = val_to_y(val)
+            bh = abs(baseline_y - bar_top)
+            c.box(x=bx, y=min(bar_top, baseline_y), w=bar_w, h=max(bh, 0.04),
+                  fill="grey_800", border=None, region=r)
+        else:
+            step_val = item["value"]
+            prev_cum = running
+            running += step_val
+            bar_top = val_to_y(max(prev_cum, running))
+            bar_bot = val_to_y(min(prev_cum, running))
+            c.box(x=bx, y=bar_top, w=bar_w, h=max(abs(bar_bot - bar_top), 0.04),
+                  fill="positive" if step_val > 0 else "negative", border=None, region=r)
+            if i > 0:
+                prev_x = (i - 1) * (bar_w + bar_gap) + bar_w
+                c.line(x1=prev_x, y1=val_to_y(prev_cum), x2=bx, y2=val_to_y(prev_cum),
+                       color="grey_400", width=0.5, region=r)
+
+        c.text(item["label"], x=bx, y=chart_h + 0.03, w=bar_w, h=label_h,
+               size=7, bold=True, color="grey_900", align="center", anchor="top", region=r)
+
+        val = item["value"]
+        prefix = "+" if (not is_start and not is_end) and val > 0 else ""
+        val_str = f"{prefix}{val:,.0f}{unit}"
+        vy = val_to_y(abs(val) if (is_start or is_end) else max(running, running - val)) - 0.22
+        c.text(val_str, x=bx, y=vy, w=bar_w, h=0.20,
+               size=8, bold=True, color="grey_900", align="center", anchor="top", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 9: Before-After
+# ============================================================
+
+def comp_before_after(
+    c: Canvas,
+    *,
+    before_title: str = "AS-IS",
+    after_title: str = "TO-BE",
+    before_items: list[dict],
+    after_items: list[dict],
+    arrow_label: str = "",
+    region: Region,
+) -> float:
+    """좌우 대비 패널 — AS-IS / TO-BE 변화 표현.
+
+    before_after에서 추출. 전환, 개선, 혁신 시나리오.
+    """
+    r = region
+    panel_w = (r.w - 0.65) / 2
+    header_h = 0.42
+
+    c.box(x=0, y=0, w=panel_w, h=r.h,
+          fill="grey_200", border=0.75, border_color="grey_mid", region=r)
+    c.box(x=0, y=0, w=panel_w, h=header_h,
+          fill="grey_700", border=None, region=r)
+    c.text(before_title, x=0.1, y=0, w=panel_w - 0.2, h=header_h,
+           size=12, bold=True, color="white", anchor="middle", region=r)
+
+    ax = panel_w + 0.65
+    c.box(x=ax, y=0, w=panel_w, h=r.h,
+          fill="white", border=0.75, border_color="grey_mid", region=r)
+    c.box(x=ax, y=0, w=panel_w, h=header_h,
+          fill="grey_900", border=None, region=r)
+    c.text(after_title, x=ax + 0.1, y=0, w=panel_w - 0.2, h=header_h,
+           size=12, bold=True, color="white", anchor="middle", region=r)
+
+    arrow_y = r.h / 2
+    c.arrow(x1=panel_w + 0.05, y1=arrow_y, x2=ax - 0.05, y2=arrow_y,
+            color="grey_900", width=2.0, region=r)
+    if arrow_label:
+        c.text(arrow_label, x=panel_w + 0.05, y=arrow_y - 0.28,
+               w=0.55, h=0.22, size=7, bold=True, color="grey_900",
+               align="center", anchor="bottom", region=r)
+
+    n_items = max(len(before_items), len(after_items))
+    item_h = min(0.80, (r.h - header_h - 0.15) / max(n_items, 1))
+
+    for i, item in enumerate(before_items):
+        iy = header_h + 0.10 + i * item_h
+        c.text(item["label"], x=0.12, y=iy, w=panel_w - 0.24, h=0.20,
+               size=9, bold=True, color="grey_900", anchor="top", region=r)
+        if item.get("detail"):
+            c.text(item["detail"], x=0.12, y=iy + 0.20, w=panel_w - 0.24, h=0.25,
+                   size=8, color="grey_700", anchor="top", region=r)
+        if item.get("kpi"):
+            c.text(item["kpi"], x=0.12, y=iy + item_h - 0.22, w=panel_w - 0.24, h=0.18,
+                   size=8, bold=True, color="negative", anchor="top", region=r)
+
+    for i, item in enumerate(after_items):
+        iy = header_h + 0.10 + i * item_h
+        c.text(item["label"], x=ax + 0.12, y=iy, w=panel_w - 0.24, h=0.20,
+               size=9, bold=True, color="grey_900", anchor="top", region=r)
+        if item.get("detail"):
+            c.text(item["detail"], x=ax + 0.12, y=iy + 0.20, w=panel_w - 0.24, h=0.25,
+                   size=8, color="grey_700", anchor="top", region=r)
+        if item.get("kpi"):
+            c.text(item["kpi"], x=ax + 0.12, y=iy + item_h - 0.22, w=panel_w - 0.24, h=0.18,
+                   size=8, bold=True, color="positive", anchor="top", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 10: Gantt Bars
+# ============================================================
+
+def comp_gantt_bars(
+    c: Canvas,
+    *,
+    phases: list[str],
+    streams: list[dict],
+    milestones: list[dict] = None,
+    region: Region,
+) -> float:
+    """멀티 스트림 Gantt 타임라인.
+
+    gantt_roadmap에서 추출. 프로젝트 일정, 프로그램 로드맵.
+    """
+    r = region
+    milestones = milestones or []
+    n_phases = len(phases)
+    n_streams = len(streams)
+    if n_phases == 0 or n_streams == 0:
+        return 0.0
+
+    label_w = min(r.w * 0.20, 1.6)
+    grid_x = label_w + 0.05
+    grid_w = r.w - grid_x
+    phase_h = 0.35
+    col_w = grid_w / n_phases
+    body_y = phase_h + 0.06
+    body_h = r.h - body_y
+    row_h = body_h / n_streams
+
+    pfills = ["grey_800", "grey_700", "grey_400", "grey_200"]
+    ptxt = ["white", "white", "white", "grey_900"]
+    for j, phase in enumerate(phases):
+        px = grid_x + j * col_w
+        c.box(x=px, y=0, w=col_w, h=phase_h,
+              fill=pfills[j % len(pfills)], border=None, region=r)
+        c.text(phase, x=px, y=0, w=col_w, h=phase_h,
+               size=8, bold=True, color=ptxt[j % len(ptxt)],
+               align="center", anchor="middle", region=r)
+
+    for j in range(1, n_phases):
+        c.line(x1=grid_x + j * col_w, y1=body_y,
+               x2=grid_x + j * col_w, y2=body_y + body_h,
+               color="grey_mid", width=0.3, region=r)
+
+    for i, stream in enumerate(streams):
+        sy = body_y + i * row_h
+        sf = "grey_100" if i % 2 == 0 else "white"
+        c.box(x=0, y=sy, w=label_w, h=row_h, fill=sf,
+              border=0.5, border_color="grey_mid", region=r)
+        c.text(stream["name"], x=0.05, y=sy, w=label_w - 0.10, h=row_h,
+               size=8, bold=True, color="grey_900", anchor="middle", region=r)
+        c.box(x=grid_x, y=sy, w=grid_w, h=row_h, fill=sf,
+              border=0.5, border_color="grey_mid", region=r)
+        bp = row_h * 0.18
+        for bar in stream.get("bars", []):
+            bx = grid_x + bar["start"] * col_w + 0.03
+            bw = (bar["end"] - bar["start"]) * col_w - 0.06
+            is_hl = bar.get("highlight", False)
+            c.box(x=bx, y=sy + bp, w=bw, h=row_h - 2 * bp,
+                  fill="grey_900" if is_hl else "grey_400", border=None, region=r)
+            if bar.get("label"):
+                c.text(bar["label"], x=bx + 0.04, y=sy + bp,
+                       w=bw - 0.08, h=row_h - 2 * bp,
+                       size=7, bold=is_hl, color="white", anchor="middle", region=r)
+
+    for ms in milestones:
+        mx = grid_x + ms["phase"] * col_w
+        c.line(x1=mx, y1=body_y - 0.03, x2=mx, y2=body_y + body_h + 0.03,
+               color="negative", width=1.5, region=r)
+        c.text(ms.get("label", ""), x=mx - 0.4, y=body_y + body_h + 0.04,
+               w=0.8, h=0.18, size=6, bold=True, color="negative",
+               align="center", anchor="top", region=r)
+
+    return r.h
