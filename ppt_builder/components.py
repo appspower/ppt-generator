@@ -33,33 +33,37 @@ def comp_kpi_card(
     trend: str = "flat",  # "up"/"down"/"flat"
     region: Region,
 ) -> float:
-    """단일 KPI 카드 — region 전체를 사용."""
+    """단일 KPI 카드 — 콤팩트 배치, 최대 1.5" 높이."""
     r = region
-    c.box(x=0, y=0, w=r.w, h=r.h,
+    # 카드 높이를 콘텐츠에 맞게 제한 (최대 1.5")
+    card_h = min(r.h, 1.5)
+    # 세로 중앙 정렬
+    y_offset = (r.h - card_h) / 2
+
+    c.box(x=0, y=y_offset, w=r.w, h=card_h,
           fill="white", border=0.75, border_color="grey_mid", region=r)
 
     # 좌측 stripe
     stripe_color = ("positive" if trend == "up"
                     else "negative" if trend == "down"
                     else "grey_700")
-    c.box(x=0, y=0, w=0.08, h=r.h, fill=stripe_color, border=None, region=r)
+    c.box(x=0, y=y_offset, w=0.08, h=card_h,
+          fill=stripe_color, border=None, region=r)
 
-    # 큰 숫자
+    # 고정 위치 배치 (비율 대신 절대값)
     v_size = 26 if len(value) <= 4 else 20
-    c.text(value, x=0.2, y=0.12, w=r.w - 0.3, h=r.h * 0.4,
+    c.text(value, x=0.2, y=y_offset + 0.12, w=r.w - 0.3, h=0.55,
            size=v_size, bold=True, color="grey_900", font="Georgia",
            anchor="top", region=r)
 
-    # 라벨
-    c.text(label, x=0.2, y=r.h * 0.45, w=r.w - 0.3, h=0.25,
+    c.text(label, x=0.2, y=y_offset + 0.70, w=r.w - 0.3, h=0.30,
            size=9, bold=True, color="grey_900", anchor="top", region=r)
 
-    # 디테일
     if detail:
-        c.text(detail, x=0.2, y=r.h * 0.45 + 0.27, w=r.w - 0.3, h=0.2,
+        c.text(detail, x=0.2, y=y_offset + 1.02, w=r.w - 0.3, h=0.25,
                size=7, color="grey_700", anchor="top", region=r)
 
-    return r.h
+    return card_h
 
 
 # ============================================================
@@ -1336,9 +1340,13 @@ def comp_comparison_grid(
                    size=7, color="grey_200", align="center", anchor="top",
                    region=r)
 
-    # 행 라벨 + 셀
+    # 행 라벨 + 셀 (교대 행 색상으로 밀도감 부여)
+    row_fills_normal = ["grey_100", "white"]     # 교대 행
+    row_fills_hl = ["grey_200", "grey_100"]      # 하이라이트 교대 행
+
     for ri, label in enumerate(row_labels):
         ry = header_h + ri * row_h
+        alt = ri % 2
         # 라벨
         c.box(x=0, y=ry, w=label_w, h=row_h,
               fill="grey_100", border=0.5, border_color="grey_mid", region=r)
@@ -1349,7 +1357,7 @@ def comp_comparison_grid(
         for ci, col in enumerate(columns):
             ox = grid_x + ci * (col_w + 0.08)
             is_hl = col.get("highlight", False)
-            cell_fill = "grey_200" if is_hl else "white"
+            cell_fill = row_fills_hl[alt] if is_hl else row_fills_normal[alt]
             crits = col.get("criteria", [])
             val = crits[ri] if ri < len(crits) else ""
             c.box(x=ox, y=ry, w=col_w, h=row_h,
@@ -1451,8 +1459,14 @@ def comp_pyramid(
     layer_h = (r.h - gap * (n - 1)) / n
     w_min = r.w * 0.30
     w_max = r.w * 0.95
-    fills = ["grey_900", "grey_800", "grey_700", "grey_400", "grey_200"]
-    txts = ["white", "white", "white", "white", "grey_900"]
+
+    # 색상: 상위(좁은) 레이어에 accent 컬러로 시각적 무게감 부여
+    if style == "warm":
+        fills = ["accent", "accent_mid", "grey_700", "grey_400", "grey_200"]
+        txts = ["white", "white", "white", "white", "grey_900"]
+    else:  # gradient (default)
+        fills = ["grey_900", "grey_700", "accent_mid", "grey_400", "grey_200"]
+        txts = ["white", "white", "white", "white", "grey_900"]
 
     for i, layer in enumerate(layers):
         ratio = i / max(n - 1, 1)

@@ -25,8 +25,13 @@ def evaluate_pptx(path: str | Path) -> dict:
     issues = []
     metrics = {}
 
+    total_slides = len(prs.slides)
     for si, slide in enumerate(prs.slides):
-        slide_issues = _evaluate_slide(slide, si)
+        slide_issues = _evaluate_slide(
+            slide, si,
+            is_cover=(si == 0),
+            is_conclusion=(si == total_slides - 1),
+        )
         issues.extend(slide_issues)
 
     # 덱 레벨 평가
@@ -45,21 +50,21 @@ def evaluate_pptx(path: str | Path) -> dict:
 
     return {
         "score": score,
-        "pass": score >= 75,
+        "pass": score >= 80,
         "issues": issues,
         "metrics": metrics,
         "slide_count": len(prs.slides),
     }
 
 
-def _evaluate_slide(slide, slide_idx: int) -> list[str]:
+def _evaluate_slide(slide, slide_idx: int, *, is_cover: bool = False, is_conclusion: bool = False) -> list[str]:
     """단일 슬라이드 평가."""
     issues = []
     shapes = slide.shapes
 
-    # 1. Shape 수
+    # 1. Shape 수 (표지/결론은 면제)
     n_shapes = len(shapes)
-    if n_shapes < 5:
+    if n_shapes < 5 and not is_cover and not is_conclusion:
         issues.append(f"LOW: Slide {slide_idx+1}: shape 수 부족 ({n_shapes}개)")
 
     # 2. 텍스트 밀도
@@ -88,15 +93,18 @@ def _evaluate_slide(slide, slide_idx: int) -> list[str]:
                     sz = round(p.font.size / 12700, 0)
                     font_sizes[sz] = font_sizes.get(sz, 0) + chars
 
-    # 3. 텍스트 밀도 (차트 중심 슬라이드 완화: 300+, 텍스트 중심: 500+)
-    has_chart = any(s.has_chart for s in shapes if hasattr(s, 'has_chart'))
-    min_chars = 200 if has_chart else 300
-    if total_chars < 80:
-        issues.append(f"HIGH: Slide {slide_idx+1}: 텍스트 부족 ({total_chars}자)")
-    elif total_chars < min_chars:
-        issues.append(f"MEDIUM: Slide {slide_idx+1}: 텍스트 밀도 낮음 ({total_chars}자, 목표 {min_chars}+)")
-    elif total_chars > 2000:
-        issues.append(f"LOW: Slide {slide_idx+1}: 텍스트 과다 ({total_chars}자)")
+    # 3. 텍스트 밀도 (표지/결론은 면제)
+    if is_cover or is_conclusion:
+        pass  # 표지·결론은 텍스트 밀도 기준 적용하지 않음
+    else:
+        has_chart = any(s.has_chart for s in shapes if hasattr(s, 'has_chart'))
+        min_chars = 200 if has_chart else 300
+        if total_chars < 80:
+            issues.append(f"HIGH: Slide {slide_idx+1}: 텍스트 부족 ({total_chars}자)")
+        elif total_chars < min_chars:
+            issues.append(f"MEDIUM: Slide {slide_idx+1}: 텍스트 밀도 낮음 ({total_chars}자, 목표 {min_chars}+)")
+        elif total_chars > 2000:
+            issues.append(f"LOW: Slide {slide_idx+1}: 텍스트 과다 ({total_chars}자)")
 
     # 4. 폰트 위계 체크
     if font_sizes:
@@ -110,25 +118,33 @@ def _evaluate_slide(slide, slide_idx: int) -> list[str]:
         if accent_ratio > 0.25:
             issues.append(f"MEDIUM: Slide {slide_idx+1}: accent 과다 ({accent_ratio:.0%})")
 
-    # 6. 빈 공간 체크
-    max_bottom = 0
-    for s in shapes:
-        if s.top and s.height:
-            bottom = (s.top + s.height) / 914400
-            if bottom > max_bottom:
-                max_bottom = bottom
-    empty_bottom = 7.5 - max_bottom
-    if empty_bottom > 1.5:
-        issues.append(f"HIGH: Slide {slide_idx+1}: 하단 빈 공간 과다 ({empty_bottom:.1f}\")")
+    # 6. 빈 공간 체크 (표지/결론은 면제)
+    if not is_cover and not is_conclusion:
+        max_bottom = 0
+        for s in shapes:
+            if s.top and s.height:
+                bottom = (s.top + s.height) / 914400
+                if bottom > max_bottom:
+                    max_bottom = bottom
+        empty_bottom = 7.5 - max_bottom
+        if empty_bottom > 1.5:
+            issues.append(f"HIGH: Slide {slide_idx+1}: 하단 빈 공간 과다 ({empty_bottom:.1f}\")")
 
-    # 7. 제목 체크 (첫 번째 텍스트가 인사이트 문장인지)
-    title_text = ""
-    for s in shapes:
-        if s.has_text_frame and s.text_frame.text.strip():
-            title_text = s.text_frame.text.strip()
-            break
-    if title_text and len(title_text) < 10:
-        issues.append(f"LOW: Slide {slide_idx+1}: 제목이 너무 짧음 (라벨형?)")
+    # 7. 제목 체크 (인사이트 문장인지 — category 라벨은 건너뜀)
+    if not is_cover and not is_conclusion:
+        title_candidates = []
+        for s in shapes:
+            if s.has_text_frame and s.text_frame.text.strip():
+                title_candidates.append(s.text_frame.text.strip())
+        # 첫 번째가 짧으면(category 라벨) 두 번째를 제목으로 간주
+        title_text = ""
+        for t in title_candidates:
+            if len(t) >= 10:
+                title_text = t
+                break
+        # 10자 이상인 텍스트가 하나도 없으면 라벨형
+        if title_candidates and not title_text:
+            issues.append(f"LOW: Slide {slide_idx+1}: 제목이 너무 짧음 (라벨형?)")
 
     # 8. Overflow 추정 — 텍스트 프레임 밀도 (Track C 베이스라인에서 발견한 사각지대 #1)
     # 텍스트가 컨테이너를 넘치는지 python-pptx로 정확히 알 수 없지만,
@@ -184,22 +200,23 @@ def _evaluate_slide(slide, slide_idx: int) -> list[str]:
             f"카테고리 {len(shape_categories)}종 ({', '.join(shape_categories)}), 컨설팅 PPT는 3종+ 권장"
         )
 
-    # 10. 공간 활용률 — shape 면적 합 / 슬라이드 면적
-    total_shape_area = 0
-    for s in shapes:
-        if s.width and s.height:
-            total_shape_area += (s.width / 914400) * (s.height / 914400)
-    slide_area = 10 * 7.5  # 10x7.5 inches
-    if slide_area > 0:
-        coverage = total_shape_area / slide_area
-        if coverage < 0.35:
-            issues.append(
-                f"HIGH: Slide {slide_idx+1}: 공간 활용률 낮음 ({coverage:.0%})"
-            )
-        elif coverage < 0.50:
-            issues.append(
-                f"MEDIUM: Slide {slide_idx+1}: 공간 활용률 부족 ({coverage:.0%}, 목표 50%+)"
-            )
+    # 10. 공간 활용률 — shape 면적 합 / 슬라이드 면적 (표지/결론은 면제)
+    if not is_cover and not is_conclusion:
+        total_shape_area = 0
+        for s in shapes:
+            if s.width and s.height:
+                total_shape_area += (s.width / 914400) * (s.height / 914400)
+        slide_area = 10 * 7.5  # 10x7.5 inches
+        if slide_area > 0:
+            coverage = total_shape_area / slide_area
+            if coverage < 0.35:
+                issues.append(
+                    f"HIGH: Slide {slide_idx+1}: 공간 활용률 낮음 ({coverage:.0%})"
+                )
+            elif coverage < 0.50:
+                issues.append(
+                    f"MEDIUM: Slide {slide_idx+1}: 공간 활용률 부족 ({coverage:.0%}, 목표 50%+)"
+                )
 
     return issues
 

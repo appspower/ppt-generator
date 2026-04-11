@@ -1,204 +1,266 @@
-# 07. PPT 생성 워크플로우 — 6단계 에이전트 프로세스
+# 07. PPT 생성 워크플로우 — 바이블
 
-> Claude Code가 PPT를 생성할 때 반드시 따라야 하는 체계적 프로세스.
-> 업계 성공 사례(PPTAgent, McKinsey Lilli, auxi) 기반 설계.
-
-## 핵심 원칙
-
-1. **빈 캔버스에서 생성하지 않는다** — 반드시 기존 템플릿/컴포넌트를 편집
-2. **선택은 체계적으로** — 감이 아닌 메타데이터 기반 매칭
-3. **만들고 끝이 아니다** — 생성 → 평가 → 수정 루프 필수
+> **이 문서는 PPT 생성의 유일한 프로세스 기준이다.**
+> 모든 PPT 생성 작업은 이 6+1단계를 반드시 따른다.
+> 단계를 건너뛰거나 순서를 바꾸지 않는다.
+> 각 단계의 GATE를 통과하지 못하면 다음 단계로 진행하지 않는다.
 
 ---
 
-## 6단계 프로세스
+## 핵심 원칙 (3가지)
 
-### Step 1: ANALYZE (내용 분석)
+1. **빈 캔버스에서 생성하지 않는다** — 반드시 매칭 테이블(slide_designer.md §3) 기반으로 선택
+2. **평가 없이 완료하지 않는다** — evaluate.py + 시각 검증(PDF/PNG) 모두 통과해야 함
+3. **점수를 조작하지 않는다** — 점수가 낮으면 슬라이드를 고치지, evaluate.py에 예외를 추가하지 않는다
+
+---
+
+## 반복된 실패 패턴 (이것을 하지 않는다)
+
+| 패턴 | 왜 안 되는가 |
+|---|---|
+| evaluate 점수 낮음 → evaluate.py에 예외 추가 | 점수가 올라가지만 품질은 그대로 |
+| 특정 슬라이드 이상 → 그 슬라이드 코드만 직접 수정 | 다음 덱에서 같은 문제 반복 |
+| "다음 세션에서 고치겠다"고 FAIL 상태로 커밋 | 품질 미달 산출물이 기준이 됨 |
+| evaluate 점수만 보고 시각 확인 안 함 | 96점이어도 텍스트 잘림, 빈 공간, 겹침 등 시각 문제 존재 |
+| 새 기능 추가 후 기존 덱으로만 테스트 | 기존 덱에 최적화될 뿐, 범용성 검증 안 됨 |
+
+---
+
+## 6+1단계 프로세스
+
+### Step 0: BRIEF (주제 수령)
 
 ```
 입력: 사용자 요청 ("~에 대해 PPT 만들어줘")
-
 수행:
-  1. 주제 파악
-  2. 웹 리서치 (필요 시)
-  3. 핵심 메시지 도출 (3~5개)
-  4. 데이터/수치 수집
-  5. 관점 분류:
-     - 비교 관점? (A vs B)
-     - 순서 관점? (1→2→3)
-     - 분류 관점? (영역별)
-     - 분석 관점? (다차원)
-     - 혼합? (2개 이상 관점)
+  1. 주제, 청중, 목적, 분량 확인
+  2. 불명확하면 사용자에게 질문
+출력: 명확한 Brief (주제/청중/목적/슬라이드 수)
+```
+
+**GATE**: 주제, 청중, 목적이 모두 명확한가? → 불명확하면 질문
+
+---
+
+### Step 1: ANALYZE (심층 리서치)
+
+```
+입력: Brief
+수행:
+  1. 주제에 대한 웹 리서치 (최소 3개 출처)
+  2. 핵심 메시지 도출 (3~5개, 각각 한 문장)
+  3. 데이터/수치 수집 (각 메시지별 최소 1개 수치)
+  4. 관점 분류: 비교/순서/분류/분석/혼합
+  5. 결과를 content_inventory 형태로 정리
 
 출력: content_inventory
   {
     "topic": "...",
-    "key_messages": ["...", "..."],
-    "data_points": [...],
+    "audience": "...",
+    "purpose": "...",
+    "key_messages": ["문장형 메시지 1", "문장형 메시지 2", ...],
+    "data_points": [{"fact": "...", "source": "...", "year": 2024}, ...],
     "perspectives": ["comparison", "process"],
-    "complexity": "high",
-    "target_slides": 1
+    "target_slides": 10
   }
 ```
+
+**GATE**: 핵심 메시지가 3개 이상이고, 각각 출처가 있는 수치를 동반하는가?
+
+---
 
 ### Step 2: PLAN (슬라이드 계획)
 
 ```
 입력: content_inventory
-
 수행:
-  1. 슬라이드별 목적 정의
-  2. 각 슬라이드의 content_type 분류
-  3. 핵심 메시지 배분
-  4. 복합 구성 필요성 판단 (블록 수에 따라 레이아웃 결정)
-  5. 프레임 선택 (레이아웃 15개 중)
-  
-  ★ 덱 리듬 규칙 (필수):
-  6. 같은 레이아웃 연속 사용 금지 — 직전 슬라이드와 다른 레이아웃
-  7. 고밀도 슬라이드(3+ 컴포넌트) 3장 연속 금지 — 중간에 Hero/단순 삽입
-  8. 10장 이상 덱에서 레이아웃 4종+ 사용
-
-분류 기준:
-  - item_count: 콘텐츠 항목 수
-  - has_data: 숫자/차트 데이터 유무
-  - comparison_type: 없음/2안/3안/다차원
-  - process_type: 없음/순차/병렬/순환
-  - density: low/medium/high
+  1. 슬라이드별 목적과 핵심 메시지 배분
+  2. 각 슬라이드의 Action Title 초안 작성 (완전한 문장)
+  3. content_type 분류 (comparison_2, process_linear, data_kpi 등)
+  4. 덱 리듬 규칙 적용:
+     - 같은 레이아웃 연속 사용 금지
+     - 고밀도(3+ 컴포넌트) 3장 연속 금지
+     - 10장 이상 덱에서 레이아웃 4종+ 사용
 
 출력: slide_plan
   [{
     "slide_num": 1,
-    "purpose": "현황과 문제점을 한눈에 보여준다",
-    "content_type": "comparison",
-    "item_count": 5,
-    "has_data": true,
-    "key_message": "...",
-    "frame": "stacked"
+    "purpose": "...",
+    "action_title": "매출 20% 성장은 디지털 전환에 기인",
+    "content_type": "data_hero",
+    "key_data": ["20%", "₩500억"],
+    "density": "medium"
   }]
 ```
+
+**GATE**: 모든 슬라이드 제목이 완전한 문장(주어+서술어)인가? 덱 리듬 규칙을 충족하는가?
+
+---
 
 ### Step 3: SELECT (레이아웃 + 컴포넌트 선택)
 
 ```
-입력: slide_plan + docs/slide_designer.md
-
+입력: slide_plan + docs/slide_designer.md §3 매칭 테이블
 수행:
-  1. 각 슬라이드의 메시지 유형 분류 (비교/프로세스/구조/성과/전략)
-  2. slide_designer.md §3 매칭 테이블에서 레이아웃 + 컴포넌트 조합 선택
-  3. PLAN의 덱 리듬 규칙 확인 (연속 동일 레이아웃 아닌지)
-  4. slide_designer.md §5 SELF-CHECK 실행
-
-규칙:
-  - 같은 레이아웃 연속 2회 사용 금지
-  - 컴포넌트 카테고리 2종+ 사용 (text+text 금지)
-  - 데이터가 있으면 시각화 컴포넌트 우선
-  - 항목 5개 이상이면 grid_nxm 또는 comp_comparison_grid
+  1. 각 슬라이드의 content_type으로 매칭 테이블 조회
+  2. 레이아웃 + 주인공 컴포넌트 + 조연 컴포넌트 선택
+  3. HARD RULES 확인 (slide_designer.md §1):
+     □ Action Title이 완전한 문장인가?
+     □ 컴포넌트 카테고리 2종+ 사용했는가?
+     □ 직전 슬라이드와 다른 레이아웃인가?
+     □ 빈 존이 없는가?
+     □ TakeawayBar 포함했는가?
+     □ 출처 포함했는가?
 
 출력: composition_selection
   [{
     "slide_num": 1,
     "layout": "l_layout",
-    "components": {
-      "left_full": "comp_hero_block",
-      "right_top": "comp_kpi_row",
-      "right_bottom": "comp_bullet_list"
-    },
-    "rationale": "성과 메시지 + Hero 숫자 + 증거 → l_layout"
+    "components": {"left_full": "comp_kpi_card", "right_top": "comp_native_chart", ...},
+    "rationale": "성과 메시지 + Hero 숫자 → l_layout"
   }]
 ```
 
-### Step 4: GENERATE (SlideComposer 코드 생성 + 렌더링)
+**GATE**: HARD RULES 6개 항목을 모두 통과하는가? 통과하지 못하면 선택 변경.
+
+---
+
+### Step 4: GENERATE (코드 생성 + 렌더링)
 
 ```
-입력: slide_plan + composition_selection
-
+입력: composition_selection
 수행:
-  1. 각 슬라이드별 SlideComposer 초기화
-  2. composer.layout() 호출로 zones 획득
-  3. 각 zone에 comp_xxx() 호출로 컴포넌트 배치
-  4. composer.takeaway() + composer.footer() 추가
-  5. .pptx 생성
+  1. 각 슬라이드별 SlideComposer 코드 작성
+  2. composer.header() → composer.layout() → comp_xxx() → composer.takeaway() → composer.footer()
+  3. .pptx 파일 생성
 
-규칙:
-  - Assertion Title: 핵심 인사이트를 문장으로 (라벨 금지)
+코드 작성 규칙:
+  - Action Title: 핵심 인사이트를 문장으로 (라벨 금지)
   - 불릿: 3~5개 적정 (2개 이하면 내용 보충)
-  - KPI: 반드시 비교 기준 포함 ("40%↓" + "전년 대비")
+  - KPI: 반드시 비교 기준 포함 ("40% ↓" + "전년 대비")
   - TakeawayBar: 거의 항상 포함
   - 출처(footnote): 반드시 포함
+
+출력: .pptx 파일
 ```
 
-### Step 5: EVALUATE (자체 평가)
+**GATE**: 코드가 에러 없이 실행되고 .pptx가 생성되는가?
+
+---
+
+### Step 5: EVALUATE (자동 평가 + 시각 검증)
+
+> **이 단계가 가장 중요하다. 두 가지 검증을 모두 수행해야 한다.**
+
+#### 5-A: 자동 평가 (evaluate.py)
 
 ```
-입력: 생성된 .pptx
-
-수행 (python 스크립트):
-  1. shape 수 확인
-  2. 텍스트 밀도 계산 (chars/inch)
-  3. 폰트 위계 확인 (2단계 이상 차이?)
-  4. 카드 높이 일관성
-  5. 빈 공간 비율
-  6. 색상 사용률 (accent 10% 이하?)
-
-체크리스트:
-  □ 제목이 인사이트 문장인가? (라벨 아닌가?)
-  □ 빈 공간이 30% 이하인가?
-  □ 폰트 크기가 3단계 이상 위계를 보이는가?
-  □ 오렌지 배경이 전체의 10% 이하인가?
-  □ TakeawayBar가 있는가?
-  □ 출처가 있는가?
-  □ 텍스트가 잘리지 않았는가?
-
-출력: evaluation_report
-  {
-    "score": 72,
-    "issues": ["빈 공간 35%", "accent 과다 사용"],
-    "pass": false
-  }
+입력: .pptx 파일
+수행: python -m ppt_builder.evaluate <file.pptx>
+통과 기준: score >= 80 (PASS)
 ```
+
+#### 5-B: 시각 검증 (PDF/PNG + 눈으로 확인)
+
+```
+입력: .pptx 파일
+수행:
+  1. PowerPoint COM으로 PDF 또는 PNG 변환
+  2. Read 도구로 각 슬라이드를 직접 열어서 눈으로 확인
+  3. 아래 체크리스트를 모든 슬라이드에 적용
+
+시각 체크리스트:
+  □ 텍스트가 잘리지 않는가? (제목 2줄 잘림, 박스 밖 overflow)
+  □ 빈 공간이 30% 이하인가? (큰 빈 영역이 눈에 보이면 FAIL)
+  □ 색상 대비가 적절한가? (회색 위 흰 글씨 등 가독성)
+  □ 컴포넌트가 겹치지 않는가? (takeaway_bar와 다른 요소)
+  □ 레이아웃 균형이 맞는가? (한쪽만 빽빽, 다른쪽은 텅 빈 경우)
+  □ PwC 완성본(templates/KakaoTalk_*.jpg) 대비 밀도가 유사한가?
+```
+
+**GATE**: 5-A score >= 80 **그리고** 5-B 시각 체크리스트 전항목 통과.
+하나라도 FAIL이면 Step 6으로 진행.
+
+---
 
 ### Step 6: REFINE (수정)
 
 ```
-입력: evaluation_report
-
+입력: Step 5의 이슈 목록 (자동 평가 issues + 시각 체크리스트 FAIL 항목)
 수행:
-  - score >= 80: 통과, 사용자에게 전달
-  - score < 80: 이슈별 수정 후 Step 4로 돌아감
-  - 최대 2회 반복 (3회째는 강제 통과 + 이슈 목록 첨부)
+  1. 이슈를 심각도별 정렬 (텍스트 overflow > 빈 공간 > 색상 > 라벨형 제목)
+  2. 슬라이드 코드 수정 (테스트 파일의 sNN_xxx 함수)
+  3. Step 4로 돌아가서 재생성
+  4. Step 5를 다시 수행
 
 수정 우선순위:
-  1. 텍스트 오버플로 → 텍스트 축약
-  2. 빈 공간 과다 → 콘텐츠 추가 또는 레이아웃 변경
-  3. accent 과다 → 색상 절제 적용
-  4. 제목 라벨형 → Assertion Title로 재작성
+  1순위: 텍스트 오버플로 → 텍스트 축약 또는 폰트 축소
+  2순위: 빈 공간 과다 → 콘텐츠 추가 또는 레이아웃 변경
+  3순위: accent 과다 → 색상 절제 적용
+  4순위: 라벨형 제목 → Assertion Title로 재작성
+
+반복 규칙:
+  - 최대 2회 반복 (Step 4→5→6을 2번까지)
+  - 3회째에도 80 미만이면: 이슈 목록을 첨부하여 커밋 (강제 통과)
+  - 단, "evaluate.py에 예외를 추가"하는 것은 REFINE이 아니다
 ```
+
+**GATE**: Step 5의 GATE를 통과하는가? → 통과하면 완료. → 실패하면 반복 (최대 2회).
 
 ---
 
-## 빠른 참조: content_type → 레이아웃 + 컴포넌트
+## 품질 기준 요약
 
-| content_type | 레이아웃 | 주인공 컴포넌트 |
+### evaluate.py 점수 기준
+
+| 등급 | 점수 | 의미 |
 |---|---|---|
-| comparison_2 | `full` | `comp_before_after` |
-| comparison_3 | `full` | `comp_comparison_grid` (highlight) |
-| comparison_multi | `full` | `comp_quadrant_matrix` |
-| process_linear | `full` | `comp_chevron_flow` (show_details) |
-| process_cycle | `full` | `comp_cycle_arrows` |
-| process_grid | `grid_nxm` | `comp_numbered_cell` ×N |
-| data_kpi | `t_layout` | `comp_kpi_row`(상) + `comp_native_chart`(하) |
-| data_hero | `l_layout` | `comp_kpi_card`(좌) + `comp_bullet_list`(우) |
-| data_trend | `full` | `comp_waterfall` |
-| data_risk | `two_column` | `comp_heatmap_grid`(좌) + `comp_bullet_list`(우) |
-| data_market | `full` | `comp_funnel` |
-| strategy_value | `full` | `comp_value_chain` |
-| strategy_hero | `l_layout` | `comp_hero_block`(좌) + `comp_kpi_row`(우) |
-| structure_hub | `center_peripheral_4` | `comp_hub_spoke_diagram`(중앙) |
-| structure_stack | `two_column` | `comp_architecture_stack`(좌) + `comp_bullet_list`(우) |
-| structure_tree | `full` | `comp_logic_tree` |
-| structure_pyramid | `two_column` | `comp_pyramid`(좌) + `comp_bullet_list`(우) |
-| timeline | `full` | `comp_gantt_bars` |
-| exec_summary | `l_layout` | `comp_hero_block`(좌) + `comp_kpi_row` + `comp_chevron_flow`(우) |
-| status_tracking | `t_layout` | `comp_kpi_row`(상) + `comp_heatmap_grid`(하) |
+| PASS | 80~100 | 배포 가능 |
+| MARGINAL | 70~79 | 1회 REFINE 필수 |
+| FAIL | 0~69 | 2회 REFINE 필수 |
 
-> 상세 매칭 및 복합 구성 예시는 `docs/slide_designer.md` 참조
+### 시각 검증 기준
+
+| 항목 | 기준 | PwC 참고 |
+|---|---|---|
+| 공간 활용 | shape 면적 50%+ | PwC는 85%+ |
+| 텍스트 밀도 | 슬라이드당 300자+ (표지/결론 제외) | PwC는 400~600자 |
+| 폰트 위계 | 3단계+ (제목/본문/각주) | PwC는 4단계 |
+| 색상 사용 | accent 10% 이하, 전체 3색 이내 | PwC는 오렌지+그레이+흰 |
+| 셀 밀도 | 그리드/테이블 셀에 배경 fill + 3줄+ 텍스트 | PwC는 모든 셀 채움 |
+
+### 표지/결론 슬라이드 예외
+
+표지(S1)와 결론(마지막 슬라이드)은 아래 기준을 면제:
+- shape 수 최소 기준
+- 텍스트 밀도 최소 기준
+- 하단 빈 공간 기준
+- 공간 활용률 기준
+
+**단, evaluate.py 코드에 예외를 추가하는 것이지, 이 워크플로우의 GATE를 면제하는 것이 아니다.**
+
+---
+
+## 새 주제 테스트 프로토콜
+
+컴포넌트나 워크플로우를 수정한 후에는 반드시 **새 주제로 전체 6+1단계를 돌려서 검증**한다.
+
+```
+1. 기존 넷제로 덱이 아닌 완전히 새로운 주제 선정
+2. Step 0부터 Step 6까지 전체 프로세스 수행
+3. 완성된 산출물을 PwC 완성본(templates/KakaoTalk_*.jpg)과 나란히 비교
+4. 갭 분석 → 컴포넌트/워크플로우 개선 → 다시 새 주제로 테스트
+5. 이 루프를 갭이 허용 범위에 들어올 때까지 반복
+```
+
+**기존 덱(넷제로)에 대한 직접 코드 수정은 "REFINE"이지 "개선"이 아니다.**
+진짜 개선은 새 주제에서 자연스럽게 품질이 올라가는 것이다.
+
+---
+
+## 변경 이력
+
+| 일자 | 변경 내용 |
+|---|---|
+| 2026-04-11 | 바이블로 전면 개정. 시각 검증(5-B) 추가. 반복 실패 패턴 문서화. GATE 개념 도입. |

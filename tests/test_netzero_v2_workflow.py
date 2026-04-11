@@ -148,7 +148,7 @@ def s05_investment(prs):
     comp.header(SlideHeader(
         title="연간 $2.1조 투자 중이나 넷제로 달성에는 $4.5조가 필요하다",
         category="Investment"))
-    zones = comp.layout("full")
+    zones = comp.layout("l_layout", left_ratio=0.60, top_ratio=1.0)
 
     comp_waterfall(comp.canvas,
                    start={"label": "현재 투자\n($2.1T)", "value": 2100},
@@ -160,7 +160,16 @@ def s05_investment(prs):
                    ],
                    end={"label": "필요 투자\n($4.5T)", "value": 4500},
                    unit="B",
-                   region=zones["main"])
+                   region=zones["left_full"])
+
+    comp_bullet_list(comp.canvas, title="투자 갭 상세 분석",
+                     items=[
+                         "재생에너지: 2030년까지 연 $800B 추가 필요 — 태양광·풍력 중심",
+                         "전력망: 노후 인프라 교체 + 스마트그리드 확장 $400B",
+                         "산업 전환: 제조업 탈탄소화가 전체 투자의 7%에 불과",
+                         "운송 전환: EV·수소 인프라에 연 $500B — 현재 대비 3배",
+                         "개발도상국 투자: 전체 필요 투자의 40%이나 현재 유입은 15%",
+                     ], region=zones["right_top"])
 
     comp.takeaway("연간 $2.4조의 투자 갭 — 제조업 전환 투자가 전체의 7%에 불과")
     comp.footer(SlideFooter(source="BNEF 2025, IEA Net Zero 2023"))
@@ -173,16 +182,16 @@ def s06_sector(prs):
     comp.header(SlideHeader(
         title="철강은 투자를 선도하나, 시멘트의 탈탄소화가 가장 뒤처져 있다",
         category="Sector Analysis"))
-    zones = comp.layout("full")
+    zones = comp.layout("two_column", split=0.55)
 
     comp_heatmap_grid(comp.canvas,
                       row_labels=["철강", "시멘트", "화학", "자동차"],
                       col_labels=["R&D 투자", "기술 성숙", "2030 목표", "현재 진도"],
                       values=[
-                          [0.3, 0.4, 0.5, 0.5],   # 철강: 중간
-                          [0.9, 0.7, 0.8, 0.9],   # 시멘트: 매우 뒤처짐
-                          [0.4, 0.5, 0.4, 0.6],   # 화학: 중간
-                          [0.1, 0.2, 0.2, 0.1],   # 자동차: 선도
+                          [0.3, 0.4, 0.5, 0.5],
+                          [0.9, 0.7, 0.8, 0.9],
+                          [0.4, 0.5, 0.4, 0.6],
+                          [0.1, 0.2, 0.2, 0.1],
                       ],
                       cell_texts=[
                           ["1.3%", "중간", "가변적", "중간"],
@@ -190,7 +199,15 @@ def s06_sector(prs):
                           ["높음", "중간", "-35%", "중하"],
                           ["4.4%", "성숙", "EV가속", "최상"],
                       ],
-                      region=zones["main"])
+                      region=zones["left"])
+
+    comp_bullet_list(comp.canvas, title="섹터별 핵심 인사이트",
+                     items=[
+                         "[철강] EAF 전환이 핵심 — POSCO HyREX, ArcelorMittal XCarb 등 선도 기업 투자 활발",
+                         "[시멘트] R&D 투자(0.6%)가 최저 — CCUS 없이 프로세스 배출 감축 불가",
+                         "[화학] 바이오·재활용 원료 전환 중 — 높은 투자에도 기술 성숙도 중간",
+                         "[자동차] EV 가속으로 가장 앞서나 — 공급망 탄소 관리(Scope 3)가 차기 과제",
+                     ], region=zones["right"])
 
     comp.takeaway("시멘트 R&D 투자(0.6%)는 자동차(4.4%)의 1/7 — 정책 지원 없이는 전환 불가")
     comp.footer(SlideFooter(source="WEF Net-Zero Industry Tracker 2024"))
@@ -203,7 +220,7 @@ def s07_korea(prs):
     comp.header(SlideHeader(
         title="한국 제조 4사가 각자의 경로로 넷제로 레이스에 진입했다",
         category="Korea"))
-    zones = comp.layout("center_peripheral_4", center_ratio=0.38)
+    zones = comp.layout("l_layout", left_ratio=0.38, top_ratio=0.50)
 
     comp_hub_spoke_diagram(comp.canvas,
                            center="K-제조\n넷제로",
@@ -214,48 +231,73 @@ def s07_korea(prs):
                                {"title": "삼성SDI", "detail": "배터리\n재활용"},
                                {"title": "HD현대", "detail": "친환경\n선박"},
                            ],
-                           region=zones["center"])
+                           region=zones["left_full"])
 
-    sides = {
-        "left": ("POSCO", ["HyREX 2026 파일럿 30만톤", "2030 상업화 100만톤", "투자 ₩121조"]),
-        "right": ("현대차", ["EV 30만대 (YoY +20%)", "SK온 JV $50억", "V2X 전략"]),
-        "top": ("삼성SDI", ["배터리 재활용", "ESS 재활용"]),
-        "bottom": ("HD현대", ["친환경 선박", "암모니아 추진"]),
-    }
-    for pos, (title, items) in sides.items():
-        comp_bullet_list(comp.canvas, title=title, items=items, region=zones[pos])
+    comp_comparison_grid(comp.canvas,
+                         columns=[
+                             {"name": "POSCO", "summary": "수소환원제철",
+                              "criteria": ["HyREX 2026 파일럿 30만톤", "2030 상업화 100만톤", "투자 ₩121조 (2050)"]},
+                             {"name": "현대차", "summary": "EV 전환 가속", "highlight": True,
+                              "criteria": ["EV 30만대 (YoY +20%)", "SK온 JV $50억", "V2X 전략 추진"]},
+                         ],
+                         row_labels=["핵심 프로젝트", "규모/목표", "전략 특징"],
+                         region=zones["right_top"])
 
+    comp_comparison_grid(comp.canvas,
+                         columns=[
+                             {"name": "삼성SDI", "summary": "배터리 순환",
+                              "criteria": ["배터리 재활용 체계 구축", "ESS 재활용 사업화", "순환경제 선도"]},
+                             {"name": "HD현대", "summary": "친환경 선박",
+                              "criteria": ["암모니아 추진선 개발", "LNG 이중연료 수주", "IMO 규제 선제 대응"]},
+                         ],
+                         row_labels=["핵심 프로젝트", "기술 방향", "전략 포지션"],
+                         region=zones["right_bottom"])
+
+    comp.takeaway("4사 모두 2050 넷제로 선언 — 수소(POSCO), EV(현대차), 순환(삼성SDI), 선박(HD현대)")
     comp.footer(SlideFooter(source="GMK Center, Hyundai Newsroom 2024"))
 
 
 def s08_roadmap(prs):
-    """S8: 전환 로드맵 — 4단계."""
+    """S8: 전환 로드맵 — 4단계. 수직 스택: 쉐브론 → KPI 인라인 → 상세 활동 테이블."""
     s = make(prs)
     comp = SlideComposer(s)
     comp.header(SlideHeader(
         title="넷제로 전환은 진단→계획→실행→최적화 4단계로 추진해야 한다",
         category="Roadmap"))
-    zones = comp.layout("t_layout", top_ratio=0.22, right_ratio=0.45)
+
+    # 수동 영역 분할: 쉐브론(0.8") → KPI(0.5") → 비교 테이블(나머지)
+    content = comp.content_region
+    chevron_r = Region(content.x, content.y, content.w, 0.8)
+    kpi_r = Region(content.x, content.y + 0.9, content.w, 0.5)
+    table_r = Region(content.x, content.y + 1.5, content.w, content.h - 1.5)
 
     comp_chevron_flow(comp.canvas, phases=[
         {"tag": "D", "label": "진단"},
         {"tag": "P", "label": "계획"},
         {"tag": "E", "label": "실행"},
         {"tag": "O", "label": "최적화"},
-    ], style="gradient", region=zones["top"])
+    ], style="gradient", region=chevron_r)
 
     comp_kpi_row(comp.canvas, kpis=[
         {"value": "41%", "label": "2030 감축 목표", "trend": "down"},
         {"value": "$2.4T", "label": "연간 투자 갭", "trend": "flat"},
-    ], region=zones["bottom_left"])
+        {"value": "7%", "label": "제조업 투자 비중", "trend": "flat"},
+        {"value": "0.7%", "label": "현재 감축 속도", "trend": "up"},
+    ], region=kpi_r)
 
-    comp_bullet_list(comp.canvas, title="단계별 핵심 활동",
-                     items=[
-                         "[진단] Scope 1·2·3 배출 인벤토리 구축",
-                         "[계획] SBTi 기반 과학적 감축 경로 설정",
-                         "[실행] EAF·열펌프·CCUS 파일럿 투자",
-                         "[최적화] 디지털 트윈 기반 실시간 모니터링",
-                     ], region=zones["bottom_right"])
+    comp_comparison_grid(comp.canvas,
+                         columns=[
+                             {"name": "진단 (D)", "summary": "2026 H1",
+                              "criteria": ["Scope 1·2·3 배출 인벤토리 구축", "탄소발자국 측정 체계 도입", "기준연도 배출량 확정"]},
+                             {"name": "계획 (P)", "summary": "2026 H2",
+                              "criteria": ["SBTi 기반 과학적 감축 경로", "내부 탄소 가격제(ICP) 도입", "기술 로드맵 + 투자 계획"]},
+                             {"name": "실행 (E)", "summary": "2027-2029", "highlight": True,
+                              "criteria": ["EAF·열펌프·CCUS 파일럿", "저탄소 소재 사전 계약", "공급망 Scope 3 관리"]},
+                             {"name": "최적화 (O)", "summary": "2030+",
+                              "criteria": ["디지털 트윈 실시간 모니터링", "배출권 포트폴리오 최적화", "넷제로 경로 재검증"]},
+                         ],
+                         row_labels=["핵심 활동", "제도/체계", "확장 과제"],
+                         region=table_r)
 
     comp.takeaway("진단 단계의 배출 인벤토리 정확도가 전체 전환 성공의 기초")
     comp.footer(SlideFooter(source="SBTi Framework, PwC Analysis"))

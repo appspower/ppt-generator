@@ -32,12 +32,14 @@ Phase 4 - 템플릿 확장 + 품질 고도화
 | `docs/04_DECISION_LOG.md` | 결정 이력 | 추가만 (append-only) |
 | `docs/05_SLIDE_TYPES.md` | 슬라이드 타입 카탈로그 상세 정의 | 필요시 확장 |
 | `docs/06_TEMPLATE_CATALOG.md` | 템플릿+컴포넌트 마스터 리스트 (50+항목) | 구현 시 업데이트 |
-| `docs/07_WORKFLOW.md` | 6단계 PPT 생성 프로세스 (ANALYZE→REFINE) | 프로세스 변경 시 |
+| `docs/07_WORKFLOW.md` | **[바이블]** PPT 생성 유일 프로세스. GATE 미통과 시 다음 단계 진행 금지 | 사용자 합의 시만 변경 |
 | `docs/slide_designer.md` | Claude Code용 화면 구성 판단 가이드 | 패턴 추가 시 |
 | `ppt_builder/template/metadata.json` | 35개 템플릿 메타데이터 (태깅) | 템플릿 추가 시 |
 | `ppt_builder/evaluate.py` | 자동 품질 평가 (Step 5) | 평가 기준 변경 시 |
 
 ## Document Maintenance Rules
+- **PPT 생성 시** → `docs/07_WORKFLOW.md`(바이블)의 6+1단계를 **반드시** 순서대로 따름. GATE 미통과 시 다음 단계 진행 금지
+- **07_WORKFLOW.md 변경** → 사용자와 명시적 합의 후에만 변경. Claude Code가 임의로 예외/완화를 추가하지 않음
 - **기능 추가/변경** → `02_PRD.md` 업데이트 + `04_DECISION_LOG.md` 추가
 - **기술 결정** → `03_TECH_SPEC.md` 업데이트 + `04_DECISION_LOG.md` 추가
 - **코드 작성 완료** → `CLAUDE.md` 현재 상태 섹션 업데이트
