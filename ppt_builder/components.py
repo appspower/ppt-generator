@@ -1340,16 +1340,16 @@ def comp_comparison_grid(
                    size=7, color="grey_200", align="center", anchor="top",
                    region=r)
 
-    # 행 라벨 + 셀 (교대 행 색상으로 밀도감 부여)
-    row_fills_normal = ["grey_100", "white"]     # 교대 행
-    row_fills_hl = ["grey_200", "grey_100"]      # 하이라이트 교대 행
+    # 행 라벨 + 셀 — PwC 수준 밀도: 진한 배경 + top-anchor 멀티라인
+    row_fills_normal = ["grey_200", "grey_100"]   # 눈에 보이는 교대 행
+    row_fills_hl = ["grey_400", "grey_200"]       # 하이라이트 교대 행
 
     for ri, label in enumerate(row_labels):
         ry = header_h + ri * row_h
         alt = ri % 2
         # 라벨
         c.box(x=0, y=ry, w=label_w, h=row_h,
-              fill="grey_100", border=0.5, border_color="grey_mid", region=r)
+              fill="grey_200", border=0.5, border_color="grey_mid", region=r)
         c.text(label, x=0.06, y=ry, w=label_w - 0.12, h=row_h,
                size=8, bold=True, color="grey_900", anchor="middle", region=r)
 
@@ -1362,9 +1362,11 @@ def comp_comparison_grid(
             val = crits[ri] if ri < len(crits) else ""
             c.box(x=ox, y=ry, w=col_w, h=row_h,
                   fill=cell_fill, border=0.5, border_color="grey_mid", region=r)
+            # top-anchor + 패딩: 긴 텍스트가 셀 안에서 자연스럽게 줄바꿈
+            txt_color = "white" if is_hl and alt == 0 else "grey_900"
             c.text(str(val),
-                   x=ox + 0.06, y=ry, w=col_w - 0.12, h=row_h,
-                   size=8, color="grey_900", anchor="middle", region=r)
+                   x=ox + 0.08, y=ry + 0.06, w=col_w - 0.16, h=row_h - 0.12,
+                   size=8, color=txt_color, anchor="top", region=r)
 
     return r.h
 

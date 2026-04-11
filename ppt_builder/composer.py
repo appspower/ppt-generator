@@ -320,8 +320,8 @@ class SlideComposer:
             {"zone_name": Region, ...}
         """
         content = Region(
-            0.3, self._content_y,
-            9.4, self._takeaway_y - self._content_y - 0.1,
+            0.15, self._content_y,
+            9.7, self._takeaway_y - self._content_y - 0.1,
         )
 
         layout_fn = LAYOUTS.get(name)
