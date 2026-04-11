@@ -1775,3 +1775,430 @@ def comp_gantt_bars(
                align="center", anchor="top", region=r)
 
     return r.h
+
+
+# ============================================================
+# Compound Component 11: Value Chain (Porter)
+# ============================================================
+
+def comp_value_chain(
+    c: Canvas,
+    *,
+    support: list[dict],      # [{"title": "HR", "detail": "인재 관리"}, ...]
+    primary: list[dict],      # [{"title": "Inbound", "detail": "...", "highlight": False}, ...]
+    margin_label: str = "Margin",
+    region: Region,
+) -> float:
+    """Porter 가치사슬 — 지원활동(수평 행) + 주요활동(쉐브론) + 마진.
+
+    value_chain에서 추출. 전략 분석, 비즈니스 모델, 경쟁우위 분석.
+    """
+    r = region
+    n_support = len(support)
+    n_primary = len(primary)
+    if n_primary == 0:
+        return 0.0
+
+    margin_w = min(r.w * 0.12, 1.1)
+    body_w = r.w - margin_w - 0.08
+    sup_h = 0.42
+    sup_gap = 0.04
+
+    # 지원활동 (수평 행)
+    for i, sup in enumerate(support):
+        sy = i * (sup_h + sup_gap)
+        c.box(x=0, y=sy, w=body_w, h=sup_h,
+              fill="grey_100", border=0.5, border_color="grey_mid", region=r)
+        c.text(sup["title"], x=0.10, y=sy, w=min(1.8, body_w * 0.25), h=sup_h,
+               size=8, bold=True, color="grey_900", anchor="middle", region=r)
+        if sup.get("detail"):
+            c.text(sup["detail"], x=min(1.8, body_w * 0.25) + 0.15, y=sy,
+                   w=body_w - min(1.8, body_w * 0.25) - 0.25, h=sup_h,
+                   size=7, color="grey_700", anchor="middle", region=r)
+
+    # 주요활동 (쉐브론)
+    prim_y = n_support * (sup_h + sup_gap) + 0.10
+    chev_h = min(0.45, (r.h - prim_y) * 0.35)
+    overlap = 0.08
+    chev_w = (body_w + overlap * (n_primary - 1)) / n_primary
+    cfills = ["grey_800", "grey_700", "grey_400", "grey_200", "grey_400"]
+    ctxt = ["white", "white", "white", "grey_900", "white"]
+
+    for i, prim in enumerate(primary):
+        px = i * (chev_w - overlap)
+        is_hl = prim.get("highlight", False)
+        fill = "grey_900" if is_hl else cfills[i % len(cfills)]
+        tc = "white" if is_hl else ctxt[i % len(ctxt)]
+        c.chevron(x=px, y=prim_y, w=chev_w, h=chev_h,
+                  fill=fill, text=prim["title"], text_color=tc, text_size=8, region=r)
+
+    # 상세 카드
+    detail_y = prim_y + chev_h + 0.08
+    detail_h = r.h - detail_y
+    if detail_h > 0.3:
+        card_w = body_w / n_primary - 0.06
+        for i, prim in enumerate(primary):
+            if prim.get("detail"):
+                dx = i * (body_w / n_primary) + 0.03
+                c.box(x=dx, y=detail_y, w=card_w, h=detail_h,
+                      fill="white", border=0.5, border_color="grey_mid", region=r)
+                c.text(prim["detail"], x=dx + 0.06, y=detail_y + 0.04,
+                       w=card_w - 0.12, h=detail_h - 0.08,
+                       size=7, color="grey_900", anchor="top", region=r)
+
+    # 마진 (우측 세로 블록)
+    total_h = r.h
+    c.box(x=body_w + 0.08, y=0, w=margin_w, h=total_h,
+          fill="grey_800", border=None, region=r)
+    c.text(margin_label, x=body_w + 0.08, y=total_h * 0.3,
+           w=margin_w, h=total_h * 0.4,
+           size=11, bold=True, color="white", align="center", anchor="middle",
+           region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 12: Logic Tree
+# ============================================================
+
+def comp_logic_tree(
+    c: Canvas,
+    *,
+    root: str,
+    branches: list[dict],     # [{"title": "...", "children": ["...", "..."], "highlight": False}, ...]
+    region: Region,
+) -> float:
+    """계층 분기 트리 — MECE 이슈 트리, 수익 분해, 조직도.
+
+    tree_diagram에서 추출. 논리 분해, 의사결정 구조에 사용.
+    """
+    r = region
+    n_br = len(branches)
+    if n_br == 0:
+        return r.h
+
+    root_w = min(r.w * 0.22, 2.0)
+    root_h = min(r.h * 0.18, 0.75)
+    root_x = 0
+    root_y = (r.h - root_h) / 2
+
+    c.box(x=root_x, y=root_y, w=root_w, h=root_h,
+          fill="grey_900", border=None, region=r)
+    c.text(root, x=root_x + 0.08, y=root_y, w=root_w - 0.16, h=root_h,
+           size=11, bold=True, color="white", anchor="middle", region=r)
+
+    br_x = root_w + r.w * 0.06
+    br_w = min(r.w * 0.22, 2.0)
+    br_gap = 0.08
+    br_h = (r.h - br_gap * (n_br - 1)) / n_br
+
+    for i, br in enumerate(branches):
+        by = i * (br_h + br_gap)
+        is_hl = br.get("highlight", False)
+        fill = "grey_800" if is_hl else "grey_200"
+        tc = "white" if is_hl else "grey_900"
+
+        # 루트 → 브랜치 연결선
+        c.line(x1=root_w, y1=root_y + root_h / 2,
+               x2=br_x, y2=by + br_h / 2,
+               color="grey_700", width=0.75, region=r)
+
+        c.box(x=br_x, y=by, w=br_w, h=br_h,
+              fill=fill, border=0.75 if is_hl else 0.5,
+              border_color="grey_900" if is_hl else "grey_mid", region=r)
+        c.text(br["title"], x=br_x + 0.08, y=by + 0.04, w=br_w - 0.16, h=0.25,
+               size=9, bold=True, color=tc, anchor="top", region=r)
+
+        # 자식 노드
+        children = br.get("children", [])
+        if children:
+            leaf_x = br_x + br_w + r.w * 0.04
+            leaf_w = r.w - leaf_x
+            leaf_h = min(0.35, (br_h - 0.04) / max(len(children), 1))
+            lg = (br_h - leaf_h * len(children)) / max(len(children) + 1, 1)
+            for j, child in enumerate(children):
+                ly = by + lg * (j + 1) + leaf_h * j
+                c.line(x1=br_x + br_w, y1=by + br_h / 2,
+                       x2=leaf_x, y2=ly + leaf_h / 2,
+                       color="grey_400", width=0.5, region=r)
+                c.box(x=leaf_x, y=ly, w=leaf_w, h=leaf_h,
+                      fill="grey_100", border=0.5, border_color="grey_mid", region=r)
+                c.text(child, x=leaf_x + 0.06, y=ly, w=leaf_w - 0.12, h=leaf_h,
+                       size=7, color="grey_900", anchor="middle", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 13: Quadrant Matrix (2x2)
+# ============================================================
+
+def comp_quadrant_matrix(
+    c: Canvas,
+    *,
+    quadrants: list[dict],    # [{"title": "Stars", "items": ["...", "..."]}, ...] (TL, TR, BL, BR)
+    x_axis: str = "",
+    y_axis: str = "",
+    x_low: str = "",
+    x_high: str = "",
+    y_low: str = "",
+    y_high: str = "",
+    region: Region,
+) -> float:
+    """2x2 포지셔닝 매트릭스 — BCG, SWOT, 우선순위.
+
+    quadrant_story에서 코어 추출. 축 라벨 + 4 사분면.
+    """
+    r = region
+    quads = quadrants[:4]
+    while len(quads) < 4:
+        quads.append({"title": "", "items": []})
+
+    axis_pad = 0.45
+    grid_x = axis_pad
+    grid_y = 0
+    grid_w = r.w - axis_pad
+    grid_h = r.h - 0.30  # 하단 x축 라벨 공간
+    gap = 0.08
+    cell_w = (grid_w - gap) / 2
+    cell_h = (grid_h - gap) / 2
+
+    fills = ["grey_200", "grey_100", "grey_100", "grey_200"]
+    stripe_fills = ["grey_800", "grey_700", "grey_700", "grey_400"]
+
+    positions = [
+        (grid_x, grid_y),                        # TL
+        (grid_x + cell_w + gap, grid_y),          # TR
+        (grid_x, grid_y + cell_h + gap),          # BL
+        (grid_x + cell_w + gap, grid_y + cell_h + gap),  # BR
+    ]
+
+    for qi, q in enumerate(quads):
+        qx, qy = positions[qi]
+        c.box(x=qx, y=qy, w=cell_w, h=cell_h,
+              fill=fills[qi], border=0.5, border_color="grey_mid", region=r)
+        # 상단 스트라이프
+        c.box(x=qx, y=qy, w=cell_w, h=0.06,
+              fill=stripe_fills[qi], border=None, region=r)
+        # 타이틀
+        c.text(q["title"], x=qx + 0.12, y=qy + 0.12, w=cell_w - 0.24, h=0.25,
+               size=10, bold=True, color="grey_900", anchor="top", region=r)
+        # 아이템
+        for ii, item in enumerate(q.get("items", [])):
+            iy = qy + 0.40 + ii * 0.22
+            if iy + 0.20 > qy + cell_h - 0.05:
+                break
+            c.text(f"▪  {item}", x=qx + 0.12, y=iy, w=cell_w - 0.24, h=0.20,
+                   size=8, color="grey_900", anchor="top", region=r)
+
+    # 축 라벨
+    if y_high:
+        c.text(y_high, x=0, y=grid_y, w=axis_pad - 0.05, h=0.22,
+               size=7, bold=True, color="grey_700", align="right", anchor="top", region=r)
+    if y_low:
+        c.text(y_low, x=0, y=grid_y + grid_h - 0.22, w=axis_pad - 0.05, h=0.22,
+               size=7, bold=True, color="grey_700", align="right", anchor="bottom", region=r)
+    if y_axis:
+        c.text(y_axis, x=0, y=grid_y + grid_h / 2 - 0.10, w=axis_pad - 0.05, h=0.20,
+               size=6, color="grey_700", align="right", anchor="middle", region=r)
+    if x_low:
+        c.text(x_low, x=grid_x, y=grid_h + 0.06, w=cell_w, h=0.20,
+               size=7, bold=True, color="grey_700", align="left", anchor="top", region=r)
+    if x_high:
+        c.text(x_high, x=grid_x + cell_w + gap, y=grid_h + 0.06, w=cell_w, h=0.20,
+               size=7, bold=True, color="grey_700", align="right", anchor="top", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 14: Funnel
+# ============================================================
+
+def comp_funnel(
+    c: Canvas,
+    *,
+    stages: list[dict],       # [{"label": "TAM", "value": "₩500B", "detail": "..."}, ...]
+    style: str = "gradient",
+    region: Region,
+) -> float:
+    """퍼널 다이어그램 — 매출 파이프라인, TAM/SAM/SOM.
+
+    신규 컴포넌트. 위에서 아래로 폭이 줄어드는 사다리꼴.
+    """
+    r = region
+    n = len(stages)
+    if n == 0:
+        return 0.0
+
+    gap = 0.04
+    stage_h = (r.h - gap * (n - 1)) / n
+    w_max = r.w * 0.90
+    w_min = r.w * 0.30
+
+    fills = ["grey_900", "grey_800", "grey_700", "grey_400", "grey_200"]
+    txts = ["white", "white", "white", "white", "grey_900"]
+
+    for i, st in enumerate(stages):
+        ratio = i / max(n - 1, 1)
+        sw = w_max - (w_max - w_min) * ratio
+        sx = (r.w - sw) / 2
+        sy = i * (stage_h + gap)
+        fi = fills[min(i, len(fills) - 1)]
+        tc = txts[min(i, len(txts) - 1)]
+
+        c.box(x=sx, y=sy, w=sw, h=stage_h, fill=fi, border=None, region=r)
+
+        # 라벨 + 값
+        label_text = st.get("label", "")
+        value_text = st.get("value", "")
+        display = f"{label_text}    {value_text}" if value_text else label_text
+        c.text(display, x=sx + 0.10, y=sy, w=sw - 0.20, h=stage_h * 0.55,
+               size=11, bold=True, color=tc, align="center", anchor="middle", region=r)
+
+        if st.get("detail"):
+            c.text(st["detail"], x=sx + 0.10, y=sy + stage_h * 0.52,
+                   w=sw - 0.20, h=stage_h * 0.45,
+                   size=8, color=tc, align="center", anchor="top", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 15: Callout Annotation
+# ============================================================
+
+def comp_callout_annotation(
+    c: Canvas,
+    *,
+    annotations: list[dict],  # [{"x": 0.5, "y": 0.3, "text": "핵심 포인트", "anchor": "right"}, ...]
+    region: Region,
+) -> float:
+    """주석 박스 + 리더 라인 — 차트/도형 위에 주석 오버레이.
+
+    신규 컴포넌트. 데이터 포인트에 설명을 붙여 밀도와 전문성 향상.
+    anchor: "left" | "right" | "top" | "bottom" — 박스가 포인트의 어느 쪽에 위치할지.
+    """
+    r = region
+
+    for ann in annotations:
+        px = ann["x"] * r.w  # 비율 좌표 (0~1)
+        py = ann["y"] * r.h
+        text = ann["text"]
+        anchor_dir = ann.get("anchor", "right")
+        box_w = min(r.w * 0.25, 2.0)
+        box_h = 0.35
+
+        if anchor_dir == "right":
+            bx, by = px + 0.15, py - box_h / 2
+        elif anchor_dir == "left":
+            bx, by = px - box_w - 0.15, py - box_h / 2
+        elif anchor_dir == "top":
+            bx, by = px - box_w / 2, py - box_h - 0.15
+        else:  # bottom
+            bx, by = px - box_w / 2, py + 0.15
+
+        # 리더 라인
+        line_to_x = bx if anchor_dir == "right" else bx + box_w
+        if anchor_dir in ("top", "bottom"):
+            line_to_x = bx + box_w / 2
+            line_to_y = by + box_h if anchor_dir == "top" else by
+        else:
+            line_to_y = by + box_h / 2
+
+        c.line(x1=px, y1=py, x2=line_to_x, y2=line_to_y,
+               color="grey_700", width=0.75, region=r)
+
+        # 주석 박스
+        c.box(x=bx, y=by, w=box_w, h=box_h,
+              fill="white", border=1.0, border_color="grey_700", region=r)
+        c.text(text, x=bx + 0.06, y=by + 0.02, w=box_w - 0.12, h=box_h - 0.04,
+               size=8, bold=True, color="grey_900", anchor="middle", region=r)
+
+    return r.h
+
+
+# ============================================================
+# Compound Component 16: Heatmap Grid
+# ============================================================
+
+def comp_heatmap_grid(
+    c: Canvas,
+    *,
+    row_labels: list[str],
+    col_labels: list[str],
+    values: list[list[float]],  # 0.0~1.0 (0=green, 0.5=yellow, 1.0=red)
+    cell_texts: list[list[str]] = None,  # 셀 안에 표시할 텍스트 (선택)
+    region: Region,
+) -> float:
+    """2D 히트맵 매트릭스 — 리스크 맵, 역량 평가, 우선순위.
+
+    신규 컴포넌트. 연속 색상 스케일(녹→황→적)로 정량 평가.
+    """
+    from ppt_builder.primitives import color as resolve_color
+    from pptx.dml.color import RGBColor
+
+    r = region
+    n_rows = len(row_labels)
+    n_cols = len(col_labels)
+    if n_rows == 0 or n_cols == 0:
+        return 0.0
+
+    cell_texts = cell_texts or [[""]*n_cols for _ in range(n_rows)]
+    label_w = min(r.w * 0.18, 1.5)
+    header_h = 0.35
+    grid_x = label_w + 0.05
+    grid_w = r.w - grid_x
+    grid_h = r.h - header_h
+    col_w = grid_w / n_cols
+    row_h = grid_h / n_rows
+
+    def _heat_color(v: float) -> str:
+        """0.0=green, 0.5=yellow, 1.0=red."""
+        v = max(0.0, min(1.0, v))
+        if v <= 0.5:
+            # green → yellow
+            t = v * 2
+            r_val = int(0x4C + (0xF5 - 0x4C) * t)
+            g_val = int(0xAF + (0xA6 - 0xAF) * t)
+            b_val = int(0x50 + (0x23 - 0x50) * t)
+        else:
+            # yellow → red
+            t = (v - 0.5) * 2
+            r_val = int(0xF5 + (0xE5 - 0xF5) * t)
+            g_val = int(0xA6 + (0x39 - 0xA6) * t)
+            b_val = int(0x23 + (0x3B - 0x23) * t)
+        return f"#{r_val:02X}{g_val:02X}{b_val:02X}"
+
+    # 컬럼 헤더
+    for j, cl in enumerate(col_labels):
+        cx = grid_x + j * col_w
+        c.box(x=cx, y=0, w=col_w, h=header_h,
+              fill="grey_700", border=0.5, border_color="grey_mid", region=r)
+        c.text(cl, x=cx + 0.04, y=0, w=col_w - 0.08, h=header_h,
+               size=8, bold=True, color="white", align="center", anchor="middle", region=r)
+
+    # 행
+    for i, rl in enumerate(row_labels):
+        ry = header_h + i * row_h
+        # 라벨
+        c.box(x=0, y=ry, w=label_w, h=row_h,
+              fill="grey_100", border=0.5, border_color="grey_mid", region=r)
+        c.text(rl, x=0.06, y=ry, w=label_w - 0.12, h=row_h,
+               size=8, bold=True, color="grey_900", anchor="middle", region=r)
+        # 셀
+        for j in range(n_cols):
+            cx = grid_x + j * col_w
+            v = values[i][j] if i < len(values) and j < len(values[i]) else 0.5
+            heat = _heat_color(v)
+            c.box(x=cx, y=ry, w=col_w, h=row_h,
+                  fill=heat, border=0.5, border_color="grey_mid", region=r)
+            ct = cell_texts[i][j] if i < len(cell_texts) and j < len(cell_texts[i]) else ""
+            if ct:
+                txt_color = "white" if v > 0.6 else "grey_900"
+                c.text(ct, x=cx + 0.04, y=ry, w=col_w - 0.08, h=row_h,
+                       size=8, bold=True, color=txt_color,
+                       align="center", anchor="middle", region=r)
+
+    return r.h
