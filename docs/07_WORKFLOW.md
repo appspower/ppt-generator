@@ -51,7 +51,10 @@
   1. 주제에 대한 웹 리서치 (최소 3개 출처)
   2. 핵심 메시지 도출 (3~5개, 각각 한 문장)
   3. 데이터/수치 수집 (각 메시지별 최소 1개 수치)
-  4. 관점 분류: 비교/순서/분류/분석/혼합
+  4. ★ 데이터의 구조적 관점 분류 (각 메시지별):
+     - 이 데이터는 크기 비교인가? 추세 변화인가?
+     - 프로세스/단계인가? 구조/관계인가? 분포/위계인가?
+     - 같은 데이터에서 최소 2가지 관점을 추출
   5. 결과를 content_inventory 형태로 정리
 
 출력: content_inventory
@@ -59,70 +62,67 @@
     "topic": "...",
     "audience": "...",
     "purpose": "...",
-    "key_messages": ["문장형 메시지 1", "문장형 메시지 2", ...],
-    "data_points": [{"fact": "...", "source": "...", "year": 2024}, ...],
-    "perspectives": ["comparison", "process"],
+    "key_messages": ["문장형 메시지 1", ...],
+    "data_points": [{"fact": "...", "source": "...", "data_structure": "비교|추세|프로세스|구조|분포"}, ...],
     "target_slides": 10
   }
 ```
 
-**GATE**: 핵심 메시지가 3개 이상이고, 각각 출처가 있는 수치를 동반하는가?
+**GATE**: 핵심 메시지가 3개 이상이고, 각각 data_structure가 명시되어 있는가?
 
 ---
 
-### Step 2: PLAN (슬라이드 계획)
+### Step 2: PLAN (Action Title 확정 + Exhibit 결정)
+
+> **핵심 변경**: content_type 분류가 아니라, Exhibit-First 사고로 전환.
+> slide_designer.md §2의 판단 트리를 반드시 타야 한다.
 
 ```
 입력: content_inventory
 수행:
-  1. 슬라이드별 목적과 핵심 메시지 배분
-  2. 각 슬라이드의 Action Title 초안 작성 (완전한 문장)
-  3. content_type 분류 (comparison_2, process_linear, data_kpi 등)
-  4. 덱 리듬 규칙 적용:
+  1. 슬라이드별 Action Title 확정 (So What = 청중이 가져갈 결론)
+  2. ★ Exhibit-First 결정 (slide_designer.md §2 Phase B 판단 트리):
+     - "이 So What을 증명하는 데이터의 구조는?" → 판단 트리 → 주인공 컴포넌트 결정
+     - 매칭 테이블을 기계적으로 조회하지 않는다
+  3. 보조 증거 필요성 판단 → 조연 컴포넌트 결정
+  4. 컴포넌트 수·크기가 레이아웃을 결정 (Phase C)
+  5. 덱 리듬 + 다양성 검증 (Phase D):
      - 같은 레이아웃 연속 사용 금지
-     - 고밀도(3+ 컴포넌트) 3장 연속 금지
-     - 10장 이상 덱에서 레이아웃 4종+ 사용
+     - 같은 주인공 컴포넌트 3장 연속 금지
+     - bullet_list 조연 3장 연속이면 다른 조연으로 교체
 
 출력: slide_plan
   [{
     "slide_num": 1,
-    "purpose": "...",
-    "action_title": "매출 20% 성장은 디지털 전환에 기인",
-    "content_type": "data_hero",
-    "key_data": ["20%", "₩500억"],
-    "density": "medium"
+    "action_title": "중국이 희토류 정제 90%를 독점하고 있다",
+    "data_structure": "단일 핵심 숫자 + 다차원 점수",
+    "exhibit": "comp_kpi_card (Hero 90%)",
+    "supporting": "comp_heatmap_grid (원소별 매트릭스)",
+    "layout": "l_layout (대+중 조합)",
+    "rationale": "90%라는 숫자 충격이 핵심 → Hero로 강조, 세부는 heatmap으로 보강"
   }]
 ```
 
-**GATE**: 모든 슬라이드 제목이 완전한 문장(주어+서술어)인가? 덱 리듬 규칙을 충족하는가?
+**GATE**: 모든 슬라이드가 ①Action Title 문장형 ②판단 트리 거쳤는지 ③직전 3장과 다양성 검증 통과했는지?
 
 ---
 
-### Step 3: SELECT (레이아웃 + 컴포넌트 선택)
+### Step 3: SELECT (코드 설계)
 
 ```
-입력: slide_plan + docs/slide_designer.md §3 매칭 테이블
+입력: slide_plan (Exhibit + 레이아웃이 이미 결정된 상태)
 수행:
-  1. 각 슬라이드의 content_type으로 매칭 테이블 조회
-  2. 레이아웃 + 주인공 컴포넌트 + 조연 컴포넌트 선택
-  3. HARD RULES 확인 (slide_designer.md §1):
-     □ Action Title이 완전한 문장인가?
-     □ 컴포넌트 카테고리 2종+ 사용했는가?
-     □ 직전 슬라이드와 다른 레이아웃인가?
-     □ 빈 존이 없는가?
-     □ TakeawayBar 포함했는가?
-     □ 출처 포함했는가?
+  1. SlideComposer 코드 스케치 (어떤 zone에 어떤 comp_xxx)
+  2. SELF-CHECK 수행 (slide_designer.md §5):
+     □ Exhibit가 Action Title을 가장 강력하게 증명하는가?
+     □ 다른 Exhibit로 더 효과적으로 보여줄 수 있지 않은가?
+     □ HARD RULES 6개 통과?
+     □ 다양성 검증 통과?
 
-출력: composition_selection
-  [{
-    "slide_num": 1,
-    "layout": "l_layout",
-    "components": {"left_full": "comp_kpi_card", "right_top": "comp_native_chart", ...},
-    "rationale": "성과 메시지 + Hero 숫자 → l_layout"
-  }]
+출력: composition_selection (코드 스케치)
 ```
 
-**GATE**: HARD RULES 6개 항목을 모두 통과하는가? 통과하지 못하면 선택 변경.
+**GATE**: SELF-CHECK 전항목 + HARD RULES 6개 통과.
 
 ---
 
@@ -274,3 +274,4 @@
 |---|---|
 | 2026-04-11 | 바이블로 전면 개정. 시각 검증(5-B) 추가. 반복 실패 패턴 문서화. GATE 개념 도입. |
 | 2026-04-11 | Step 4 산출물 3종 필수(PPT+PDF+PNG) 명시. 셀/불릿 텍스트 밀도 최소 기준 추가. |
+| 2026-04-11 | Step 1~3 Exhibit-First로 근본 재설계. 데이터 구조 판단 트리 도입. 매칭 테이블 기계적 조회 금지. |
