@@ -936,3 +936,135 @@ def comp_native_chart(
 
     func(c.slide, region=region, **chart_kwargs)
     return region.h
+
+
+# ============================================================
+# Blueprint Phase 1 — 앵커/복합 컴포넌트
+# ============================================================
+
+
+def comp_numbered_cell(
+    c: Canvas,
+    *,
+    number: str,
+    header: str,
+    body: str = "",
+    bg_color: str = "white",
+    number_size: int = 36,
+    region: Region,
+) -> float:
+    """번호+색상 코딩된 그리드 셀.
+
+    CP2 대응 (PwC B00/B01 재현).
+    전체 region을 bg_color로 채우고, 좌상단에 큰 번호, 아래에 헤더+본문.
+    """
+    from ppt_builder.primitives import color as resolve_color
+    r = region
+
+    # 배경
+    c.box(x=0, y=0, w=r.w, h=r.h,
+          fill=bg_color, border=None, region=r)
+
+    # 텍스트 색상: 어두운 배경이면 흰색
+    dark_bgs = {"accent", "accent_mid", "dark", "grey_800", "grey_900", "grey_700"}
+    txt_color = "white" if bg_color in dark_bgs else "grey_900"
+    num_color = "white" if bg_color in dark_bgs else "grey_800"
+
+    # 번호 (좌상단, 크게)
+    c.text(number, x=0.15, y=0.12, w=r.w - 0.3, h=r.h * 0.40,
+           size=number_size, bold=True, color=num_color,
+           font="Georgia", anchor="top", region=r)
+
+    # 헤더
+    hdr_y = r.h * 0.48
+    c.text(header, x=0.15, y=hdr_y, w=r.w - 0.3, h=0.28,
+           size=11, bold=True, color=txt_color, anchor="top", region=r)
+
+    # 본문
+    if body:
+        c.text(body, x=0.15, y=hdr_y + 0.30, w=r.w - 0.3, h=r.h - hdr_y - 0.40,
+               size=8, color=txt_color, anchor="top", region=r)
+
+    return r.h
+
+
+def comp_timeline_marker(
+    c: Canvas,
+    *,
+    labels: list[str],
+    style: str = "arrow",  # "arrow" | "dots" | "bar"
+    highlight_idx: int = -1,
+    region: Region,
+) -> float:
+    """타임라인 밴드 마커.
+
+    CP3 대응 (PwC B08/B10 재현).
+    Region 내에 수평 밴드를 그리고, 라벨을 등간격으로 배치.
+    """
+    r = region
+    n = len(labels)
+    if n == 0:
+        return r.h
+
+    # 그라데이션 밴드 (왼쪽 연한색 → 오른쪽 진한색)
+    seg_w = r.w / n
+    grad_colors = ["grey_200", "grey_400", "grey_700", "accent_mid", "accent"]
+
+    for i in range(n):
+        ci = min(i, len(grad_colors) - 1)
+        gc = grad_colors[ci] if n <= len(grad_colors) else (
+            grad_colors[int(i / n * (len(grad_colors) - 1))]
+        )
+        if i == highlight_idx:
+            gc = "accent"
+        c.box(x=i * seg_w, y=0, w=seg_w + 0.01, h=r.h,
+              fill=gc, border=None, region=r)
+
+    # 라벨
+    for i, lbl in enumerate(labels):
+        txt_clr = "white" if i >= n // 2 else "grey_900"
+        c.text(lbl, x=i * seg_w, y=0, w=seg_w, h=r.h,
+               size=10, bold=True, color=txt_clr, anchor="middle", region=r)
+
+    if style == "dots":
+        # 각 세그먼트 경계에 마커 도트
+        for i in range(1, n):
+            dot_x = i * seg_w - 0.06
+            c.box(x=dot_x, y=r.h / 2 - 0.06, w=0.12, h=0.12,
+                  fill="accent", border=None, region=r)
+
+    return r.h
+
+
+def comp_icon_header_card(
+    c: Canvas,
+    *,
+    icon: str,
+    header: str,
+    body: str,
+    icon_size: float = 0.45,
+    region: Region,
+) -> float:
+    """아이콘 + 헤더 + 본문 카드.
+
+    CP6 대응 (PwC B07/B09 재현).
+    상단에 아이콘, 그 아래에 헤더+본문.
+    """
+    r = region
+
+    # 아이콘 (센터 정렬)
+    icon_x = (r.w - icon_size) / 2
+    c.icon(name=icon, x=icon_x, y=0.05, size=icon_size,
+           color="accent", region=r)
+
+    # 헤더
+    hdr_y = icon_size + 0.15
+    c.text(header, x=0.05, y=hdr_y, w=r.w - 0.1, h=0.25,
+           size=10, bold=True, color="grey_900", anchor="top", region=r)
+
+    # 본문
+    body_y = hdr_y + 0.28
+    c.text(body, x=0.05, y=body_y, w=r.w - 0.1, h=r.h - body_y - 0.05,
+           size=8, color="grey_700", anchor="top", region=r)
+
+    return r.h

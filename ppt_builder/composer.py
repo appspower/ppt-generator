@@ -87,8 +87,164 @@ def _sidebar_left(r: Region, sidebar_w: float = 3.0, gap: float = 0.15) -> dict[
     }
 
 
+# ============================================================
+# 비직사각형 레이아웃 (Blueprint Phase 1)
+# ============================================================
+
+
+def _center_peripheral_4(r: Region, **kw) -> dict[str, Region]:
+    """중앙 + 상하좌우 4개 존.
+
+    CP1 대응: 다이아몬드/도넛 중앙 + 주변 텍스트 블록.
+    Returns: {"center", "top", "right", "bottom", "left"}
+    """
+    cr = kw.get("center_ratio", 0.35)
+    gap = kw.get("gap", 0.15)
+    cw = r.w * cr
+    ch = r.h * cr
+    cx = r.x + (r.w - cw) / 2
+    cy = r.y + (r.h - ch) / 2
+    side_w = (r.w - cw) / 2 - gap
+    top_h = cy - r.y - gap
+    bot_h = (r.y + r.h) - (cy + ch) - gap
+    return {
+        "center": Region(cx, cy, cw, ch),
+        "top": Region(r.x + side_w + gap, r.y, cw, top_h),
+        "bottom": Region(r.x + side_w + gap, cy + ch + gap, cw, bot_h),
+        "left": Region(r.x, r.y, side_w, r.h),
+        "right": Region(cx + cw + gap, r.y, side_w, r.h),
+    }
+
+
+def _center_peripheral_6(r: Region, **kw) -> dict[str, Region]:
+    """중앙 + 6개 주변 존 (좌3 + 우3).
+
+    CP1 대응: 헥사곤 6단계 + 주변 설명.
+    Returns: {"center", "tl", "ml", "bl", "tr", "mr", "br"}
+    """
+    cr = kw.get("center_ratio", 0.30)
+    gap = kw.get("gap", 0.10)
+    cw = r.w * cr
+    ch = r.h * 0.70
+    cx = r.x + (r.w - cw) / 2
+    cy = r.y + (r.h - ch) / 2
+    side_w = (r.w - cw) / 2 - gap
+    row_h = (r.h - gap * 2) / 3
+    return {
+        "center": Region(cx, cy, cw, ch),
+        "tl": Region(r.x, r.y, side_w, row_h),
+        "ml": Region(r.x, r.y + row_h + gap, side_w, row_h),
+        "bl": Region(r.x, r.y + (row_h + gap) * 2, side_w, row_h),
+        "tr": Region(cx + cw + gap, r.y, side_w, row_h),
+        "mr": Region(cx + cw + gap, r.y + row_h + gap, side_w, row_h),
+        "br": Region(cx + cw + gap, r.y + (row_h + gap) * 2, side_w, row_h),
+    }
+
+
+def _grid_nxm(r: Region, **kw) -> dict[str, Region]:
+    """N×M 균등 그리드.
+
+    CP2 대응: 번호+색상 그리드.
+    Returns: {"r0c0", "r0c1", ..., "r{n-1}c{m-1}"}
+    """
+    rows = kw.get("rows", 2)
+    cols = kw.get("cols", 3)
+    gap = kw.get("gap", 0.10)
+    cell_w = (r.w - gap * (cols - 1)) / cols
+    cell_h = (r.h - gap * (rows - 1)) / rows
+    return {
+        f"r{ri}c{ci}": Region(
+            r.x + ci * (cell_w + gap),
+            r.y + ri * (cell_h + gap),
+            cell_w, cell_h,
+        )
+        for ri in range(rows) for ci in range(cols)
+    }
+
+
+def _timeline_band(r: Region, **kw) -> dict[str, Region]:
+    """중앙 타임라인 밴드 + 상하 교차 콘텐츠 존.
+
+    CP3 대응: 타임라인 + 상하 교차.
+    Returns: {"band", "step_0", "step_1", ...}
+    """
+    steps = kw.get("steps", 5)
+    band_ratio = kw.get("band_ratio", 0.08)
+    gap = kw.get("gap", 0.08)
+    band_h = r.h * band_ratio
+    band_y = r.y + (r.h - band_h) / 2
+    step_w = (r.w - gap * (steps - 1)) / steps
+    above_h = band_y - r.y - gap
+    below_h = r.y + r.h - (band_y + band_h) - gap
+
+    zones: dict[str, Region] = {"band": Region(r.x, band_y, r.w, band_h)}
+    for i in range(steps):
+        sx = r.x + i * (step_w + gap)
+        if i % 2 == 0:
+            zones[f"step_{i}"] = Region(sx, band_y + band_h + gap, step_w, below_h)
+        else:
+            zones[f"step_{i}"] = Region(sx, r.y, step_w, above_h)
+    return zones
+
+
+def _asymmetric_lr(r: Region, **kw) -> dict[str, Region]:
+    """비대칭 좌우 분할.
+
+    CP5 대응: 도표 + 상세 해설.
+    Returns: {"diagram", "annotation"}
+    """
+    lr = kw.get("left_ratio", 0.45)
+    gap = kw.get("gap", 0.15)
+    lw = (r.w - gap) * lr
+    rw = r.w - lw - gap
+    return {
+        "diagram": Region(r.x, r.y, lw, r.h),
+        "annotation": Region(r.x + lw + gap, r.y, rw, r.h),
+    }
+
+
+def _t_layout(r: Region, **kw) -> dict[str, Region]:
+    """T자 레이아웃 — 상단 전폭 + 하단 좌우 분할.
+
+    Returns: {"top", "bottom_left", "bottom_right"}
+    """
+    tr = kw.get("top_ratio", 0.35)
+    rr = kw.get("right_ratio", 0.4)
+    gap = kw.get("gap", 0.12)
+    top_h = (r.h - gap) * tr
+    bot_h = r.h - top_h - gap
+    lw = (r.w - gap) * (1 - rr)
+    rw = r.w - lw - gap
+    return {
+        "top": Region(r.x, r.y, r.w, top_h),
+        "bottom_left": Region(r.x, r.y + top_h + gap, lw, bot_h),
+        "bottom_right": Region(r.x + lw + gap, r.y + top_h + gap, rw, bot_h),
+    }
+
+
+def _l_layout(r: Region, **kw) -> dict[str, Region]:
+    """L자 레이아웃 — 좌측 전높이 + 우측 상하 분할.
+
+    CP4 대응: 사이드바 KPI/차트 + 우측 차트/해설.
+    Returns: {"left_full", "right_top", "right_bottom"}
+    """
+    lr = kw.get("left_ratio", 0.35)
+    tr = kw.get("top_ratio", 0.5)
+    gap = kw.get("gap", 0.12)
+    lw = (r.w - gap) * lr
+    rw = r.w - lw - gap
+    top_h = (r.h - gap) * tr
+    bot_h = r.h - top_h - gap
+    return {
+        "left_full": Region(r.x, r.y, lw, r.h),
+        "right_top": Region(r.x + lw + gap, r.y, rw, top_h),
+        "right_bottom": Region(r.x + lw + gap, r.y + top_h + gap, rw, bot_h),
+    }
+
+
 # 레이아웃 레지스트리
 LAYOUTS = {
+    # Era 1 — 직사각형 레이아웃 (기존)
     "full": lambda r, **kw: {"main": r},
     "two_column": _split_h,
     "top_bottom": _split_v,
@@ -101,6 +257,14 @@ LAYOUTS = {
         "sidebar": Region(r.x + r.w - kw.get("sidebar_w", 3.0), r.y,
                           kw.get("sidebar_w", 3.0), r.h),
     },
+    # Era 2 — Blueprint 복합 레이아웃
+    "center_peripheral_4": _center_peripheral_4,
+    "center_peripheral_6": _center_peripheral_6,
+    "grid_nxm": _grid_nxm,
+    "timeline_band": _timeline_band,
+    "asymmetric_lr": _asymmetric_lr,
+    "t_layout": _t_layout,
+    "l_layout": _l_layout,
 }
 
 
@@ -296,6 +460,67 @@ COMPOSITION_RECIPES = {
         },
         "when": "단일 데이터 포인트를 깊이 분석할 때",
     },
+    # Blueprint 복합 레이아웃 레시피
+    "central_diagram_4": {
+        "description": "중앙 다이아몬드/도넛 + 4방향 텍스트 블록",
+        "layout": "center_peripheral_4",
+        "layout_params": {"center_ratio": 0.38},
+        "zones": {
+            "center": {"component": "diamond_anchor OR donut_anchor", "tone": "accent"},
+            "top/right/bottom/left": {"component": "bullet_list OR icon_header_card", "tone": "light"},
+        },
+        "when": "4대 전략, 4분면 분석, 핵심 가치 등 중앙 집중형 메시지",
+    },
+    "central_diagram_6": {
+        "description": "중앙 헥사곤/원형 + 6방향 텍스트 블록",
+        "layout": "center_peripheral_6",
+        "layout_params": {"center_ratio": 0.30},
+        "zones": {
+            "center": {"component": "hexagon_anchor", "tone": "accent"},
+            "tl/ml/bl/tr/mr/br": {"component": "bullet_list", "tone": "light"},
+        },
+        "when": "6단계 프로세스, 6대 역량, 순환 구조 등",
+    },
+    "numbered_process_grid": {
+        "description": "N×M 번호+색상 코딩 그리드",
+        "layout": "grid_nxm",
+        "layout_params": {"rows": 2, "cols": 3, "gap": 0.0},
+        "zones": {
+            "r{i}c{j}": {"component": "numbered_cell", "tone": "gradient"},
+        },
+        "when": "다단계 프로세스, 방법론 개요, 프레임워크 소개",
+    },
+    "timeline_zigzag": {
+        "description": "타임라인 밴드 + 상하 교차 콘텐츠",
+        "layout": "timeline_band",
+        "layout_params": {"steps": 5, "band_ratio": 0.08},
+        "zones": {
+            "band": {"component": "timeline_marker", "tone": "accent"},
+            "step_{i}": {"component": "bullet_list OR icon_header_card", "tone": "light"},
+        },
+        "when": "로드맵, 마일스톤, 연도별 계획 등 시간축 중심 메시지",
+    },
+    "heterogeneous_panels": {
+        "description": "이종 패널 — 차트+KPI+표 등 서로 다른 유형 조합",
+        "layout": "l_layout",
+        "layout_params": {"left_ratio": 0.45, "top_ratio": 0.55},
+        "zones": {
+            "left_full": {"component": "native_chart OR diagram", "tone": "light"},
+            "right_top": {"component": "kpi_card OR stat_row", "tone": "light"},
+            "right_bottom": {"component": "styled_card OR bullet_list", "tone": "subtle"},
+        },
+        "when": "데이터 대시보드, 종합 분석, 여러 관점 동시 제시",
+    },
+    "diagram_annotated": {
+        "description": "대형 도표 + 상세 해설 텍스트",
+        "layout": "asymmetric_lr",
+        "layout_params": {"left_ratio": 0.45},
+        "zones": {
+            "diagram": {"component": "donut_anchor OR native_chart", "tone": "light"},
+            "annotation": {"component": "bullet_list_stacked", "tone": "light"},
+        },
+        "when": "컨소시엄 구조, 조직도+역할 설명, 아키텍처+상세",
+    },
 }
 
 
@@ -308,6 +533,13 @@ def suggest_recipe(content_type: str) -> dict | None:
         "option_comparison": "option_comparison",
         "status_report": "status_dashboard",
         "deep_dive": "deep_analysis",
+        # Blueprint 복합 레시피
+        "central_strategy": "central_diagram_4",
+        "process_cycle": "central_diagram_6",
+        "process_grid": "numbered_process_grid",
+        "roadmap": "timeline_zigzag",
+        "dashboard_mixed": "heterogeneous_panels",
+        "diagram_detail": "diagram_annotated",
     }
     recipe_key = mapping.get(content_type)
     if recipe_key:
