@@ -127,21 +127,46 @@ def comp_bullet_list(
     title_size: float = 11,
     item_size: float = 9,
 ) -> float:
-    """불릿 목록 — 제목(선택) + 항목들. 밀도 우선 배치."""
-    r = region
-    cy = 0.0
+    """불릿 목록 — 콘텐츠-인식 자동 피팅.
 
+    영역을 초과하면 폰트를 축소하여 반드시 수용한다.
+    """
+    r = region
+    text_w = r.w - 0.2
+    gap = 0.02
+    title_h = 0.22 if title else 0.0
+
+    # ── 폰트 자동 결정: 전체가 영역 안에 들어가는 크기 찾기 ──
+    font = item_size
+    for attempt in [item_size, item_size - 1, item_size - 2, 6.5]:
+        font = attempt
+        total = title_h
+        for item in items:
+            ih = max(0.16, estimate_text_height(
+                f"▪  {item}", font_pt=font, box_width_inches=text_w - 0.1))
+            total += ih + gap
+        if total <= r.h:
+            break
+
+    # ── 렌더 ──
+    cy = 0.0
     if title:
-        c.text(title, x=0.1, y=cy, w=r.w - 0.2, h=0.22,
+        c.text(title, x=0.1, y=cy, w=text_w, h=title_h,
                size=title_size, bold=True, color="grey_900", anchor="top", region=r)
-        cy += 0.22
+        cy += title_h
 
     for item in items:
-        item_h = max(0.18, estimate_text_height(
-            f"▪  {item}", font_pt=item_size, box_width_inches=r.w - 0.3))
-        c.text(f"▪  {item}", x=0.1, y=cy, w=r.w - 0.2, h=item_h,
-               size=item_size, color="grey_900", anchor="top", region=r)
-        cy += item_h + 0.02
+        display = f"▪  {item}"
+        item_h = max(0.16, estimate_text_height(
+            display.replace("**", ""), font_pt=font, box_width_inches=text_w - 0.1))
+        # **볼드** 마크업이 있으면 rich_text 사용
+        if "**" in item:
+            c.rich_text(display, x=0.1, y=cy, w=text_w, h=item_h,
+                        size=font, color="grey_900", anchor="top", region=r)
+        else:
+            c.text(display, x=0.1, y=cy, w=text_w, h=item_h,
+                   size=font, color="grey_900", anchor="top", region=r)
+        cy += item_h + gap
 
     return cy
 
@@ -1308,11 +1333,10 @@ def comp_comparison_grid(
     row_labels: list[str],
     region: Region,
 ) -> float:
-    """N열 비교 표 — 컬럼별 헤더(색상 구분) + 행별 비교 데이터.
+    """N열 비교 표 — 콘텐츠-인식 자동 피팅.
 
-    comparison_matrix에서 추출. highlight=True인 컬럼은 강조 배경.
-
-    사용 맥락: 옵션 A/B/C 비교, 솔루션 벤더 비교, AS-IS vs TO-BE
+    텍스트 양에 따라 행 높이를 자동 계산하고,
+    영역을 초과하면 폰트를 축소하여 반드시 수용한다.
     """
     r = region
     n_cols = len(columns)
@@ -1325,11 +1349,34 @@ def comp_comparison_grid(
     grid_x = label_w + col_gap
     grid_w = r.w - grid_x
     col_w = (grid_w - col_gap * (n_cols - 1)) / n_cols
-
     header_h = 0.45
-    row_h = (r.h - header_h - 0.02) / n_rows
+    cell_text_w = col_w - 0.16  # 텍스트 영역 폭 (패딩 제외)
 
-    # 헤더
+    # ── Phase 1: 텍스트 높이 측정 → 폰트 자동 결정 ──
+    font_size = 8
+    for attempt_size in [8, 7, 6.5]:
+        font_size = attempt_size
+        row_heights = []
+        for ri in range(n_rows):
+            max_h = 0.30  # 최소 행 높이
+            for col in columns:
+                crits = col.get("criteria", [])
+                val = str(crits[ri]) if ri < len(crits) else ""
+                if val:
+                    th = estimate_text_height(val, font_pt=font_size, box_width_inches=cell_text_w)
+                    max_h = max(max_h, th + 0.12)  # 패딩 포함
+            row_heights.append(max_h)
+        total_h = header_h + sum(row_heights)
+        if total_h <= r.h:
+            break  # 이 폰트 크기면 영역 안에 들어감
+
+    # 남는 공간이 있으면 행에 균등 분배 (빈틈 없이 채움)
+    remaining = r.h - header_h - sum(row_heights)
+    if remaining > 0:
+        extra_per_row = remaining / n_rows
+        row_heights = [h + extra_per_row for h in row_heights]
+
+    # ── Phase 2: 헤더 렌더 ──
     for i, col in enumerate(columns):
         ox = grid_x + i * (col_w + col_gap)
         is_hl = col.get("highlight", False)
@@ -1342,22 +1389,24 @@ def comp_comparison_grid(
                region=r)
         if col.get("summary"):
             c.text(col["summary"],
-                   x=ox + 0.06, y=0.28, w=col_w - 0.12, h=0.18,
+                   x=ox + 0.06, y=0.28, w=col_w - 0.12, h=0.14,
                    size=7, color="grey_200", align="center", anchor="top",
                    region=r)
 
-    # 행 라벨 + 셀 — PwC 수준 밀도: 진한 배경 + top-anchor 멀티라인
-    row_fills_normal = ["grey_200", "grey_100"]   # 눈에 보이는 교대 행
-    row_fills_hl = ["grey_400", "grey_200"]       # 하이라이트 교대 행
+    # ── Phase 3: 행 렌더 (측정된 높이 사용) ──
+    row_fills_normal = ["grey_200", "grey_100"]
+    row_fills_hl = ["grey_400", "grey_200"]
 
+    ry = header_h
     for ri, label in enumerate(row_labels):
-        ry = header_h + ri * row_h
+        rh = row_heights[ri]
         alt = ri % 2
+
         # 라벨
-        c.box(x=0, y=ry, w=label_w, h=row_h,
+        c.box(x=0, y=ry, w=label_w, h=rh,
               fill="grey_200", border=0.5, border_color="grey_mid", region=r)
-        c.text(label, x=0.06, y=ry, w=label_w - 0.12, h=row_h,
-               size=8, bold=True, color="grey_900", anchor="middle", region=r)
+        c.text(label, x=0.06, y=ry, w=label_w - 0.12, h=rh,
+               size=font_size, bold=True, color="grey_900", anchor="middle", region=r)
 
         # 셀
         for ci, col in enumerate(columns):
@@ -1365,14 +1414,15 @@ def comp_comparison_grid(
             is_hl = col.get("highlight", False)
             cell_fill = row_fills_hl[alt] if is_hl else row_fills_normal[alt]
             crits = col.get("criteria", [])
-            val = crits[ri] if ri < len(crits) else ""
-            c.box(x=ox, y=ry, w=col_w, h=row_h,
+            val = str(crits[ri]) if ri < len(crits) else ""
+            c.box(x=ox, y=ry, w=col_w, h=rh,
                   fill=cell_fill, border=0.5, border_color="grey_mid", region=r)
-            # top-anchor + 패딩: 긴 텍스트가 셀 안에서 자연스럽게 줄바꿈
             txt_color = "white" if is_hl and alt == 0 else "grey_900"
-            c.text(str(val),
-                   x=ox + 0.08, y=ry + 0.06, w=col_w - 0.16, h=row_h - 0.12,
-                   size=8, color=txt_color, anchor="top", region=r)
+            c.text(val,
+                   x=ox + 0.08, y=ry + 0.06, w=cell_text_w, h=rh - 0.12,
+                   size=font_size, color=txt_color, anchor="top", region=r)
+
+        ry += rh
 
     return r.h
 

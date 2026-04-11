@@ -475,6 +475,71 @@ class Canvas:
         self._drawn.append(("text", x, y, w, h, len(body)))
         return tx
 
+    def rich_text(
+        self,
+        body: str,
+        *,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        size: float = 10,
+        color: str | RGBColor = "black",
+        font: str = FONT_BODY,
+        align: Literal["left", "center", "right"] = "left",
+        anchor: Literal["top", "middle", "bottom"] = "top",
+        region: Region | None = None,
+    ):
+        """**볼드** 마크업을 지원하는 텍스트 박스.
+
+        "이것은 **핵심 키워드**이고 나머지는 일반 텍스트" 형태 지원.
+        **로 감싸지 않은 부분은 일반체로 렌더.
+        """
+        import re
+
+        x, y = self._resolve(x, y, region)
+        tx = self.slide.shapes.add_textbox(
+            Inches(x), Inches(y), Inches(w), Inches(h)
+        )
+        tf = tx.text_frame
+        tf.word_wrap = True
+        tf.margin_left = Inches(0.05)
+        tf.margin_right = Inches(0.05)
+        tf.margin_top = Inches(0.02)
+        tf.margin_bottom = Inches(0.02)
+        tf.vertical_anchor = {
+            "top": MSO_ANCHOR.TOP,
+            "middle": MSO_ANCHOR.MIDDLE,
+            "bottom": MSO_ANCHOR.BOTTOM,
+        }[anchor]
+
+        align_map = {
+            "left": PP_ALIGN.LEFT,
+            "center": PP_ALIGN.CENTER,
+            "right": PP_ALIGN.RIGHT,
+        }
+        resolved_color = _color(color)
+
+        for i, line in enumerate(body.split("\n")):
+            p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+            p.alignment = align_map[align]
+            # **볼드** 파싱: 텍스트를 bold/normal 청크로 분리
+            parts = re.split(r"(\*\*[^*]+\*\*)", line)
+            for part in parts:
+                if not part:
+                    continue
+                is_bold = part.startswith("**") and part.endswith("**")
+                text_content = part[2:-2] if is_bold else part
+                run = p.add_run()
+                run.text = text_content
+                run.font.size = Pt(size)
+                run.font.bold = is_bold
+                run.font.color.rgb = resolved_color
+                run.font.name = font
+
+        self._drawn.append(("rich_text", x, y, w, h, len(body)))
+        return tx
+
     # --------------------------------------------------------
     # Composite helpers — 자주 쓰는 조합 (그래도 자유도 유지)
     # --------------------------------------------------------
