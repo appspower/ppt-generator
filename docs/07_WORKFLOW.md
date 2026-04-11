@@ -50,8 +50,13 @@
   1. 슬라이드별 목적 정의
   2. 각 슬라이드의 content_type 분류
   3. 핵심 메시지 배분
-  4. 복합 구성 필요성 판단 (stacked?)
-  5. 프레임 선택 (standard/fullscreen/sidebar)
+  4. 복합 구성 필요성 판단 (블록 수에 따라 레이아웃 결정)
+  5. 프레임 선택 (레이아웃 15개 중)
+  
+  ★ 덱 리듬 규칙 (필수):
+  6. 같은 레이아웃 연속 사용 금지 — 직전 슬라이드와 다른 레이아웃
+  7. 고밀도 슬라이드(3+ 컴포넌트) 3장 연속 금지 — 중간에 Hero/단순 삽입
+  8. 10장 이상 덱에서 레이아웃 4종+ 사용
 
 분류 기준:
   - item_count: 콘텐츠 항목 수
@@ -72,45 +77,51 @@
   }]
 ```
 
-### Step 3: SELECT (템플릿/컴포넌트 선택)
+### Step 3: SELECT (레이아웃 + 컴포넌트 선택)
 
 ```
-입력: slide_plan + template_metadata.json
+입력: slide_plan + docs/slide_designer.md
 
 수행:
-  1. content_type으로 후보 필터링 (보통 3~8개)
-  2. item_count, density로 추가 필터 (2~4개)
-  3. best_for / avoid_when 읽고 최종 선택
-  4. 복합 구성이면 sections별로 각각 선택
+  1. 각 슬라이드의 메시지 유형 분류 (비교/프로세스/구조/성과/전략)
+  2. slide_designer.md §3 매칭 테이블에서 레이아웃 + 컴포넌트 조합 선택
+  3. PLAN의 덱 리듬 규칙 확인 (연속 동일 레이아웃 아닌지)
+  4. slide_designer.md §5 SELF-CHECK 실행
 
 규칙:
-  - 같은 템플릿 연속 2회 사용 금지
-  - 직전에 쓴 프레임과 다른 프레임 선택
+  - 같은 레이아웃 연속 2회 사용 금지
+  - 컴포넌트 카테고리 2종+ 사용 (text+text 금지)
   - 데이터가 있으면 시각화 컴포넌트 우선
-  - 항목 5개 이상이면 매트릭스 or numbered_circle
+  - 항목 5개 이상이면 grid_nxm 또는 comp_comparison_grid
 
-출력: template_selection
+출력: composition_selection
   [{
     "slide_num": 1,
-    "template_id": "framework_matrix" (또는 "stacked"),
-    "sections": [...],  // stacked인 경우
-    "rationale": "5개 항목 × 4차원 → 매트릭스 최적"
+    "layout": "l_layout",
+    "components": {
+      "left_full": "comp_hero_block",
+      "right_top": "comp_kpi_row",
+      "right_bottom": "comp_bullet_list"
+    },
+    "rationale": "성과 메시지 + Hero 숫자 + 증거 → l_layout"
   }]
 ```
 
-### Step 4: GENERATE (JSON 생성 + 렌더링)
+### Step 4: GENERATE (SlideComposer 코드 생성 + 렌더링)
 
 ```
-입력: slide_plan + template_selection
+입력: slide_plan + composition_selection
 
 수행:
-  1. JSON 스키마 작성 (Pydantic 검증)
-  2. python run.py 실행
-  3. .pptx 생성
+  1. 각 슬라이드별 SlideComposer 초기화
+  2. composer.layout() 호출로 zones 획득
+  3. 각 zone에 comp_xxx() 호출로 컴포넌트 배치
+  4. composer.takeaway() + composer.footer() 추가
+  5. .pptx 생성
 
 규칙:
   - Assertion Title: 핵심 인사이트를 문장으로 (라벨 금지)
-  - 불릿: 4~6개 적정 (3개 이하면 내용 보충)
+  - 불릿: 3~5개 적정 (2개 이하면 내용 보충)
   - KPI: 반드시 비교 기준 포함 ("40%↓" + "전년 대비")
   - TakeawayBar: 거의 항상 포함
   - 출처(footnote): 반드시 포함
@@ -165,29 +176,29 @@
 
 ---
 
-## 빠른 참조: content_type → 추천 템플릿
+## 빠른 참조: content_type → 레이아웃 + 컴포넌트
 
-| content_type | 1차 추천 | 2차 추천 |
+| content_type | 레이아웃 | 주인공 컴포넌트 |
 |---|---|---|
-| comparison_2 | before_after, comparison | two_panel |
-| comparison_3 | three_option | left_right_split |
-| comparison_multi | framework_matrix | harvey_ball_matrix |
-| process_linear | chevron_process | decision_flow |
-| process_cycle | circular_loop | center_focus |
-| process_vertical | vertical_flow | swimlane |
-| classification_2_3 | columns + card | left_right_split |
-| classification_4 | 4col_reference, numbered_quadrant | process_grid |
-| classification_5_plus | numbered_circle | framework_matrix |
-| data_kpi | kpi_dashboard | columns + card(KPI) |
-| data_table | dense_table, table_with_bars | framework_matrix |
-| data_trend | waterfall, mekko | three_horizons |
-| data_sensitivity | tornado | harvey_ball_matrix |
-| strategy_framework | porter_five_forces, bcg_matrix | value_chain |
-| org_governance | org_chart, raci | swimlane |
-| environment_scan | pestel, swot | prioritization_2x2 |
-| exec_summary | scr | stacked(chevron + cards) |
-| timeline | gantt_roadmap, timeline | left_right_split |
-| architecture | hub_spoke, center_focus | circular_loop |
-| status_tracking | rag_table, table_with_bars | kpi_dashboard |
-| decision | decision_tree, decision_flow | comparison |
-| financial | waterfall, revenue_tree | value_chain |
+| comparison_2 | `full` | `comp_before_after` |
+| comparison_3 | `full` | `comp_comparison_grid` (highlight) |
+| comparison_multi | `full` | `comp_quadrant_matrix` |
+| process_linear | `full` | `comp_chevron_flow` (show_details) |
+| process_cycle | `full` | `comp_cycle_arrows` |
+| process_grid | `grid_nxm` | `comp_numbered_cell` ×N |
+| data_kpi | `t_layout` | `comp_kpi_row`(상) + `comp_native_chart`(하) |
+| data_hero | `l_layout` | `comp_kpi_card`(좌) + `comp_bullet_list`(우) |
+| data_trend | `full` | `comp_waterfall` |
+| data_risk | `two_column` | `comp_heatmap_grid`(좌) + `comp_bullet_list`(우) |
+| data_market | `full` | `comp_funnel` |
+| strategy_value | `full` | `comp_value_chain` |
+| strategy_hero | `l_layout` | `comp_hero_block`(좌) + `comp_kpi_row`(우) |
+| structure_hub | `center_peripheral_4` | `comp_hub_spoke_diagram`(중앙) |
+| structure_stack | `two_column` | `comp_architecture_stack`(좌) + `comp_bullet_list`(우) |
+| structure_tree | `full` | `comp_logic_tree` |
+| structure_pyramid | `two_column` | `comp_pyramid`(좌) + `comp_bullet_list`(우) |
+| timeline | `full` | `comp_gantt_bars` |
+| exec_summary | `l_layout` | `comp_hero_block`(좌) + `comp_kpi_row` + `comp_chevron_flow`(우) |
+| status_tracking | `t_layout` | `comp_kpi_row`(상) + `comp_heatmap_grid`(하) |
+
+> 상세 매칭 및 복합 구성 예시는 `docs/slide_designer.md` 참조

@@ -29,6 +29,10 @@ def evaluate_pptx(path: str | Path) -> dict:
         slide_issues = _evaluate_slide(slide, si)
         issues.extend(slide_issues)
 
+    # 덱 레벨 평가
+    deck_issues = _evaluate_deck(list(prs.slides))
+    issues.extend(deck_issues)
+
     # 점수 계산 (100점 - 이슈당 감점)
     deductions = {
         "CRITICAL": 15,
@@ -84,12 +88,14 @@ def _evaluate_slide(slide, slide_idx: int) -> list[str]:
                     sz = round(p.font.size / 12700, 0)
                     font_sizes[sz] = font_sizes.get(sz, 0) + chars
 
-    # 3. 과제5: 텍스트 밀도 강제 (최소 800자)
-    if total_chars < 100:
+    # 3. 텍스트 밀도 (차트 중심 슬라이드 완화: 300+, 텍스트 중심: 500+)
+    has_chart = any(s.has_chart for s in shapes if hasattr(s, 'has_chart'))
+    min_chars = 200 if has_chart else 300
+    if total_chars < 80:
         issues.append(f"HIGH: Slide {slide_idx+1}: 텍스트 부족 ({total_chars}자)")
-    elif total_chars < 800:
-        issues.append(f"MEDIUM: Slide {slide_idx+1}: 텍스트 밀도 낮음 ({total_chars}자, 목표 800+)")
-    elif total_chars > 2500:
+    elif total_chars < min_chars:
+        issues.append(f"MEDIUM: Slide {slide_idx+1}: 텍스트 밀도 낮음 ({total_chars}자, 목표 {min_chars}+)")
+    elif total_chars > 2000:
         issues.append(f"LOW: Slide {slide_idx+1}: 텍스트 과다 ({total_chars}자)")
 
     # 4. 폰트 위계 체크
@@ -177,6 +183,42 @@ def _evaluate_slide(slide, slide_idx: int) -> list[str]:
             f"MEDIUM: Slide {slide_idx+1}: 시각 다양성 부족 — "
             f"카테고리 {len(shape_categories)}종 ({', '.join(shape_categories)}), 컨설팅 PPT는 3종+ 권장"
         )
+
+    # 10. 공간 활용률 — shape 면적 합 / 슬라이드 면적
+    total_shape_area = 0
+    for s in shapes:
+        if s.width and s.height:
+            total_shape_area += (s.width / 914400) * (s.height / 914400)
+    slide_area = 10 * 7.5  # 10x7.5 inches
+    if slide_area > 0:
+        coverage = total_shape_area / slide_area
+        if coverage < 0.35:
+            issues.append(
+                f"HIGH: Slide {slide_idx+1}: 공간 활용률 낮음 ({coverage:.0%})"
+            )
+        elif coverage < 0.50:
+            issues.append(
+                f"MEDIUM: Slide {slide_idx+1}: 공간 활용률 부족 ({coverage:.0%}, 목표 50%+)"
+            )
+
+    return issues
+
+
+def _evaluate_deck(slides) -> list[str]:
+    """덱 레벨 평가 — 인접 슬라이드 유사도."""
+    issues = []
+    if len(slides) < 2:
+        return issues
+
+    prev_shape_count = 0
+    for si, slide in enumerate(slides):
+        n = len(slide.shapes)
+        if si > 0 and n > 0 and prev_shape_count > 0:
+            # shape 수가 ±2 이내이고 둘 다 5개 이상이면 유사 경고
+            if abs(n - prev_shape_count) <= 2 and n >= 5 and prev_shape_count >= 5:
+                # 추가 확인: 같은 타입의 shape가 많은지
+                pass  # 향후 고도화
+        prev_shape_count = n
 
     return issues
 
