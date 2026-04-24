@@ -22,3 +22,8 @@
 | 2026-04-08 | 프로세스 플로우에 Orange→Grey 그라데이션 단계별 색상 | 템플릿 Process 슬라이드 분석: 번호 박스가 Orange→Medium→Light→Grey 순으로 변화 | 단색 프로세스 |
 | 2026-04-08 | 템플릿 인젝션 시스템 도입 (SlideCloner + TextSubstitutor + template_library) | 완성본 94장 분석 결과 40% 이상이 코드로 직접 그리기 어려운 복잡 다이어그램, 사전 제작 슬라이드 복제+치환이 현실적 | 모든 슬라이드를 코드로 렌더링 |
 | 2026-04-08 | template_library.pptx 10종 구축 (hub_spoke, timeline, comparison, swimlane, kpi_dashboard, pyramid, sidebar_nav, before_after, swot, value_chain) | 완성본에서 가장 빈번한 복잡 패턴 10가지 선정, JSON으로 데이터만 주입하면 복잡 슬라이드 생성 가능 | 필요시마다 개별 렌더러 구현 |
+| 2026-04-24 | 3층 하이브리드 방향 확정 (Layer1 복제+치환 / Layer2 편집API / Layer3 코드fallback) | PwC 1200+장 placeholder 마스터템플릿 확보, 코드 재현 방식의 넷제로 56점 한계 극복. PPTAgent(EMNLP 2025)와 동일 원칙 | 코드 컴포넌트 주력 유지, 완전 LLM 생성 방식 |
+| 2026-04-24 | PPTAgent 편집 API 5종 이식 (clone/replace/del paragraph + replace/del image) to `ppt_builder/template/edit_ops.py` | 복제된 슬라이드에 요소 추가/제거/교체 필요 케이스(15% 추정) 커버. PPTAgent MIT 라이선스 + 한글 POC 검증 완료 | 자체 설계, Talk-to-Your-Slides의 `exec()` 방식 |
+| 2026-04-24 | `div_id` / `paragraph_id` 매핑을 **평탄화(flat)** 로 결정 (`iter_leaf_shapes` 제너레이터) | PPTAgent `schema_extractor.yaml` + `induct.py` 파이프라인과 호환. Phase A2에서 프롬프트 그대로 재활용 가능 | 계층형 tuple 경로, `shape.shape_id` 기반 |
+| 2026-04-24 | `exec()` 기반 코드 실행 방식 불채택 | Talk-to-Your-Slides의 LLM→Python 코드 생성 방식은 엔터프라이즈 보안 부적합. PPTAgent sandbox도 같은 우려 — 본 이식은 API 호출만 허용 | exec+샌드박스, ast.literal_eval |
+| 2026-04-24 | Closure 큐잉 패턴 도입 보류 (Phase D+ 후속) | 편집 API 5종은 즉시 적용 버전으로도 유닛 14/14 + 통합 테스트 통과. 역순 인덱스 문제는 호출자 관리로 충분 | 초기부터 Closure 패턴 적용 |
