@@ -23,10 +23,5 @@ templates/external/
 .DS_Store
 Thumbs.db
 
-# Reference images (large, not code)
-docs/references/완성본/
-docs/references/슬라이드 렌더러/
-docs/references/폴더 구조/
-docs/references/업무지침_스킬/
-docs/references/spec/
-docs/references/components/
+# Reference images (large binaries — not code)
+docs/references/
