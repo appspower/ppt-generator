@@ -1,4 +1,24 @@
-"""Track 2 Stage B1 — 1,251장에서 원본 덱 경계 감지.
+"""Track 2 Stage B1 — **DEPRECATED (2026-04-24)**.
+
+폐기 사유
+---------
+1,251장이 **합본 덱이 아니라 단일 연속 카탈로그**임이 데이터로 확인됨:
+  - page_number_text: 1부터 942까지 거의 유일하게 증가 (리셋 없음)
+  - layout_name: 953/1,251 (76%) 이 단일 layout `1_Title and Full Content`
+  - 경계 감지 결과 117 중 116이 layout 힌트 오탐 (`"title"` 부분 매칭)
+
+따라서 데이터 기반 LCS 스켈레톤 추출(Stage B2-B3)도 전제가 성립하지 않음.
+
+대안
+----
+`ppt_builder/catalog/skeletons.py` 로 대체.
+SCQA/Minto Pyramid 기반 7개 표준 스켈레톤을 직접 encoding.
+(2025 SOTA VLM-SlideEval 권고 — rule-based coherence gate — 와 정합)
+
+본 파일은 재시도 대비 참고용으로만 유지. 실행 결과(`deck_boundaries.json`)는 무효.
+
+---
+(이하 원본 주석 보존)
 
 가정: PwC 마스터 템플릿은 여러 완성 덱이 합본된 상태.
 따라서 "opening 슬라이드 → 목차 → 본문 → closing" 패턴이 반복됨.

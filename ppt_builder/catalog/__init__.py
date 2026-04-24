@@ -9,11 +9,13 @@ Track 3: Deck coherence 검증 (ppt_builder/evaluate_deck.py 별도)
 from .schemas import (
     DeckBoundary,
     DeckOutline,
+    DeckSkeleton,
     NarrativeRole,
     SlideMeta,
     SlotSchema,
     TagAxes,
 )
+from .skeletons import SKELETONS, get_skeleton, recommend_skeleton
 
 __all__ = [
     "SlideMeta",
@@ -22,4 +24,8 @@ __all__ = [
     "SlotSchema",
     "DeckBoundary",
     "DeckOutline",
+    "DeckSkeleton",
+    "SKELETONS",
+    "get_skeleton",
+    "recommend_skeleton",
 ]
