@@ -25,14 +25,56 @@ from ppt_builder.template.editor import TemplateEditor
 from ppt_builder.catalog.paragraph_query import ParagraphStore
 
 
-def _replace_paragraph_universal(slide, slot, new_text: str) -> None:
-    """edit_ops.replace_paragraph + table 셀 분기 처리.
+def _shrink_font_if_overflow(para, new_text: str, max_chars: int | None,
+                             min_pt: float = 8.0) -> bool:
+    """텍스트가 max_chars 초과 시 폰트 자동 축소.
 
-    table_header / table_cell은 edit_ops가 못 함 — table API 사용.
+    축소 비율 = sqrt(max_chars / len(text)) (면적 기반 비례).
+    min_pt 이하로는 안 내림.
+    Returns: True if shrunk
     """
+    if not max_chars or len(new_text) <= max_chars:
+        return False
+    import math
+    scale = math.sqrt(max_chars / max(len(new_text), 1))
+    runs = list(para.runs)
+    if not runs:
+        return False
+    shrunk_any = False
+    for r in runs:
+        try:
+            cur = r.font.size
+            if cur is None:
+                continue
+            new_pt = max(min_pt, cur.pt * scale)
+            if new_pt < cur.pt - 0.1:  # actually shrinking
+                from pptx.util import Pt
+                r.font.size = Pt(new_pt)
+                shrunk_any = True
+        except Exception:
+            pass
+    return shrunk_any
+
+
+def _replace_paragraph_universal(slide, slot, new_text: str,
+                                 shrink_overflow: bool = True) -> None:
+    """edit_ops.replace_paragraph + table 셀 분기 + overflow 폰트 축소."""
     # 일반 shape: edit_ops 사용
     if slot.shape_kind != "TABLE":
         edit_ops.replace_paragraph(slide, slot.flat_idx, slot.paragraph_id, new_text)
+        if shrink_overflow and slot.max_chars:
+            # 편집된 paragraph 다시 찾아서 폰트 축소
+            for fi, sh in edit_ops.iter_leaf_shapes(slide):
+                if fi != slot.flat_idx:
+                    continue
+                if not getattr(sh, "has_text_frame", False):
+                    return
+                paras = sh.text_frame.paragraphs
+                if slot.paragraph_id < len(paras):
+                    _shrink_font_if_overflow(
+                        paras[slot.paragraph_id], new_text, slot.max_chars
+                    )
+                return
         return
     # TABLE 셀
     target_shape = None
@@ -60,6 +102,8 @@ def _replace_paragraph_universal(slide, slot, new_text: str) -> None:
     else:
         run = para.add_run()
         run.text = new_text
+    if shrink_overflow and slot.max_chars:
+        _shrink_font_if_overflow(para, new_text, slot.max_chars)
 
 # v1과 같은 자산 재사용
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -72,6 +116,156 @@ from benchmark_5_scenarios import (  # noqa: E402
     select_deck,
     _reorder_sldIdLst,
 )
+
+
+# ----------------------------------------------------------------------------
+# Track 1.2: Capacity-aware retrieval
+# ----------------------------------------------------------------------------
+
+def _capacity_fitness(slide_index: int, target_n: int,
+                      store: ParagraphStore) -> float:
+    """슬라이드 parallel 슬롯 capacity + max_chars vs target_n.
+
+    핵심 안전장치: primary 슬롯의 평균 max_chars가 너무 작으면 (narrow 슬롯 함정)
+    어떤 target_n이라도 페널티.
+    """
+    cap = store.slot_capacity(slide_index)
+    primary_caps = [
+        cap.get("chevron_label", 0),
+        cap.get("card_header", 0),
+        cap.get("callout_text", 0),
+        cap.get("card_body", 0),
+    ]
+    primary = max(primary_caps) if primary_caps else 0
+
+    # primary 슬롯의 평균 max_chars 측정 (narrow 슬롯 회피)
+    fillable = store.fillable_slots(slide_index)
+    primary_role = None
+    primary_max = 0
+    for r in ("chevron_label", "card_header", "callout_text", "card_body"):
+        if cap.get(r, 0) == primary and primary > 0:
+            primary_role = r
+            primary_max = primary
+            break
+
+    if primary_role:
+        slots = fillable.get(primary_role, [])
+        max_chars_vals = [s.max_chars for s in slots if s.max_chars]
+        avg_max_chars = (
+            sum(max_chars_vals) / len(max_chars_vals) if max_chars_vals else 0
+        )
+        # narrow 슬롯 패널티 (max_chars < 20 = 약 한국어 5자)
+        if avg_max_chars and avg_max_chars < 20:
+            return 0.3
+    else:
+        avg_max_chars = 0
+
+    if target_n <= 3:
+        # 단일/소량: 풍부한 framework + 충분한 슬롯 폭
+        if primary == 0:
+            return 0.7  # parallel 없는 슬라이드 (cover/표) — fine for n<=3
+        if avg_max_chars >= 30:
+            return 1.0  # 양호한 폭의 framework
+        return 0.6
+
+    # n >= 4: capacity 매칭
+    if primary == 0:
+        return 0.3
+    if primary >= target_n:
+        excess = primary - target_n
+        base = max(0.6, 1.0 - 0.02 * excess)
+    else:
+        shortage = target_n - primary
+        base = max(0.2, 0.6 - 0.15 * shortage)
+    # narrow 패널티 추가 적용
+    if avg_max_chars and avg_max_chars < 30:
+        base *= 0.7
+    return base
+
+
+def select_deck_capacity_aware(labels: list[dict], narrative: list[str],
+                               scenario_content: dict,
+                               store: ParagraphStore) -> list[dict]:
+    """capacity-aware 슬라이드 선정. Step 4 Track 1.2."""
+    used: set[int] = set()
+    plan = []
+    role_use_count: dict[str, int] = {}
+
+    by_role = scenario_content["content_by_role"]
+
+    for role in narrative:
+        # 이 role의 content 항목 수 파악
+        role_items = by_role.get(role, [])
+        target_n = len(role_items) if role_items else 1
+
+        cands, source = candidates_for_role(labels, role, used)
+
+        if cands:
+            # capacity fitness로 재정렬 (top 30개 중에서)
+            top_cands = cands[:30]
+            scored = []
+            for c in top_cands:
+                fitness = _capacity_fitness(c["slide_index"], target_n, store)
+                conf = c.get("overall_confidence", 0)
+                # 합성 점수: capacity 50% + role confidence 50%
+                score = 0.5 * fitness + 0.5 * conf
+                scored.append((score, c, fitness))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            chosen = scored[0][1]
+            chosen_fitness = scored[0][2]
+            used.add(chosen["slide_index"])
+            plan.append({
+                "role": role,
+                "slide_index": chosen["slide_index"],
+                "source": source,
+                "archetype": chosen.get("archetype", []),
+                "macro": chosen.get("macro"),
+                "confidence": chosen.get("overall_confidence", 0),
+                "capacity_fitness": round(chosen_fitness, 2),
+                "target_n_items": target_n,
+                "reuse_count": 0,
+            })
+        else:
+            # fallback to reuse
+            reuse_pool = [
+                l for l in labels if role in l.get("narrative_role", [])
+            ]
+            if not reuse_pool:
+                reuse_pool = [
+                    l for l in labels
+                    if any(a in ARCHETYPE_FALLBACK.get(role, [])
+                           for a in l.get("archetype", []))
+                ]
+            if reuse_pool:
+                # capacity-aware 선택
+                top = reuse_pool[:30]
+                scored = []
+                for c in top:
+                    fitness = _capacity_fitness(c["slide_index"], target_n, store)
+                    score = 0.5 * fitness + 0.5 * c.get("overall_confidence", 0)
+                    scored.append((score, c, fitness))
+                scored.sort(key=lambda x: x[0], reverse=True)
+                chosen = scored[0][1]
+                role_use_count[role] = role_use_count.get(role, 0) + 1
+                plan.append({
+                    "role": role,
+                    "slide_index": chosen["slide_index"],
+                    "source": "reuse",
+                    "archetype": chosen.get("archetype", []),
+                    "macro": chosen.get("macro"),
+                    "confidence": chosen.get("overall_confidence", 0),
+                    "capacity_fitness": round(scored[0][2], 2),
+                    "target_n_items": target_n,
+                    "reuse_count": role_use_count[role],
+                })
+            else:
+                plan.append({
+                    "role": role, "slide_index": None, "source": "none",
+                    "archetype": [], "macro": None, "confidence": 0,
+                    "capacity_fitness": 0, "target_n_items": target_n,
+                    "reuse_count": 0,
+                })
+    return plan
 
 
 CATALOG_PATH = ROOT / "output" / "catalog" / "final_labels.json"
@@ -162,8 +356,8 @@ def build_pptx_v2(plan: list[dict], scenario_content: dict, store: ParagraphStor
         # None 값 제거
         content = {k: v for k, v in content.items() if v}
 
-        # 매핑
-        edits = store.match_content(sidx, content)
+        # 매핑 — truncate + 폰트 축소 병행 (둘 다 안전장치)
+        edits = store.match_content(sidx, content, truncate_overflow=True)
 
         # 실제 슬라이드 편집
         target_slide = editor.prs.slides[step_idx]
@@ -210,11 +404,59 @@ def build_pptx_v2(plan: list[dict], scenario_content: dict, store: ParagraphStor
                     try:
                         _replace_paragraph_universal(target_slide, slot, " ")
                         n_blanked += 1
+                        edited_keys.add(key)
                     except Exception:
                         pass
 
-        # 통계
+        # Track 1.1: 잔존 ~~ 추가 청소 — fillable 외 슬롯도 ~~만 있는 placeholder 비움
+        # (단, page_number는 보존 — 숫자가 의미)
+        n_residual_cleaned = 0
+        all_slots = store.slots(sidx)
+        for slot in all_slots:
+            key = (slot.flat_idx, slot.paragraph_id)
+            if key in edited_keys:
+                continue
+            if slot.role in ("page_number", "footer", "date_text"):
+                continue
+            orig_raw = slot.text_original or ""
+            orig = orig_raw.strip()
+            # ~~만 있는 (또는 거의 ~~만 있는) placeholder
+            is_pure_placeholder = (
+                orig == "~~"
+                or orig.replace("~", "").replace("\x0b", "").strip() == ""
+                or (orig.startswith("~~") and len(orig) <= 4)
+                or (orig.endswith("~~") and len(orig) <= 4)
+            )
+            # number-prefixed placeholder ("1. ~~", "2. ~~")
+            is_numbered_placeholder = (
+                len(orig) <= 8 and "~~" in orig
+                and any(c.isdigit() for c in orig)
+            )
+            if is_pure_placeholder or is_numbered_placeholder:
+                try:
+                    _replace_paragraph_universal(target_slide, slot, " ")
+                    n_residual_cleaned += 1
+                    edited_keys.add(key)
+                except Exception:
+                    pass
+
+        # 통계: visual_clean_ratio = (filled + blanked + ~~ 아닌 슬롯) / fillable
+        # ~~ visible 만 visual debt로 카운트
+        n_initially_clean = 0
+        for role_name, slots in fillable.items():
+            for slot in slots:
+                key = (slot.flat_idx, slot.paragraph_id)
+                if key in edited_keys:
+                    continue  # 이미 채웠거나 비웠음
+                orig = (slot.text_original or "").strip()
+                # 빈 paragraph 또는 ~~ 없는 텍스트 → 시각적 clean
+                if not orig:
+                    n_initially_clean += 1
+                elif "~~" not in orig:
+                    n_initially_clean += 1
+
         fillable_total = sum(capacity.values())
+        visual_clean = n_ok + n_blanked + n_initially_clean
         edit_results.append({
             "step": step,
             "role": role,
@@ -226,9 +468,11 @@ def build_pptx_v2(plan: list[dict], scenario_content: dict, store: ParagraphStor
             "n_edit_ok": n_ok,
             "n_edit_fail": n_fail,
             "n_blanked": n_blanked,
+            "n_initially_clean": n_initially_clean,
+            "n_residual_cleaned": n_residual_cleaned,
             "fill_ratio": (n_ok / fillable_total) if fillable_total else 0,
             "visual_resolution_ratio": (
-                (n_ok + n_blanked) / fillable_total if fillable_total else 0
+                visual_clean / fillable_total if fillable_total else 0
             ),
             "n_overflow_truncated": sum(
                 1 for e in per_edit_log if e.get("original_overflow")
@@ -301,12 +545,14 @@ def compute_v2_metrics(scenario_id: str, plan: list[dict],
     fillable_total = sum(e["n_fillable"] for e in edits)
     edited_total = sum(e["n_edit_ok"] for e in edits)
     blanked_total = sum(e["n_blanked"] for e in edits)
+    initial_clean_total = sum(e.get("n_initially_clean", 0) for e in edits)
     fail_total = sum(e["n_edit_fail"] for e in edits)
     overflow_total = sum(e["n_overflow_truncated"] for e in edits)
 
     fill_ratio = edited_total / fillable_total if fillable_total else 0
     visual_resolution = (
-        (edited_total + blanked_total) / fillable_total if fillable_total else 0
+        (edited_total + blanked_total + initial_clean_total) / fillable_total
+        if fillable_total else 0
     )
     avg_per_slide_fillable = fillable_total / max(len(edits), 1)
     avg_per_slide_filled = edited_total / max(len(edits), 1)
@@ -372,6 +618,7 @@ def run_scenario(scenario_id: str, labels: list[dict], skeletons: dict,
     narrative = sk["narrative_sequence"]
     sc = SCENARIO_CONTENT[scenario_id]
 
+    # 단순 confidence 기반 (capacity-aware는 narrow 슬롯 함정으로 비활성)
     plan = select_deck(labels, narrative)
     n_role = sum(1 for p in plan if p["source"] == "role")
     n_arch = sum(1 for p in plan if p["source"] == "archetype")
