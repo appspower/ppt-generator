@@ -183,6 +183,146 @@ def _capacity_fitness(slide_index: int, target_n: int,
     return base
 
 
+def select_deck_diverse(labels: list[dict], narrative: list[str],
+                        scenario_content: dict,
+                        store: ParagraphStore) -> list[dict]:
+    """Slide diversity-aware deck 선정.
+
+    핵심:
+    - role 풀 직접 매칭 시 top-K 중 narrow 슬롯 함정 회피 + 다양성 균형
+    - 같은 group_signature 패밀리는 회피 (시각 단조로움 방지)
+    - capacity가 컨텐츠 수에 가까운 것 약한 선호
+    """
+    used: set[int] = set()
+    used_signatures: set[str] = set()
+    plan = []
+    role_use_count: dict[str, int] = {}
+    by_role = scenario_content["content_by_role"]
+
+    for role in narrative:
+        target_n = len(by_role.get(role, [])) or 1
+
+        cands, source = candidates_for_role(labels, role, used)
+
+        if cands:
+            # top-30 후보 평가
+            top_cands = cands[:30]
+            scored = []
+            for c in top_cands:
+                sidx = c["slide_index"]
+                # narrow 슬롯 페널티
+                cap = store.slot_capacity(sidx)
+                fillable = store.fillable_slots(sidx)
+                primary_role = None
+                primary_max_chars = 0
+                for r in ("chevron_label", "card_header", "callout_text"):
+                    if cap.get(r, 0) > 0:
+                        primary_role = r
+                        slots = fillable.get(r, [])
+                        max_chars_vals = [s.max_chars for s in slots if s.max_chars]
+                        primary_max_chars = (
+                            sum(max_chars_vals) / len(max_chars_vals)
+                            if max_chars_vals else 0
+                        )
+                        break
+
+                # narrow 페널티 (max_chars < 20 = 약 5자 한국어)
+                narrow_penalty = 0.0
+                if primary_max_chars and primary_max_chars < 20:
+                    narrow_penalty = 0.4
+
+                # capacity fitness (target_n vs primary capacity)
+                primary_cap = max(
+                    cap.get("chevron_label", 0),
+                    cap.get("card_header", 0),
+                    cap.get("callout_text", 0),
+                    cap.get("card_body", 0),
+                )
+                fit = 1.0
+                if target_n >= 2:
+                    if primary_cap == 0:
+                        fit = 0.6
+                    elif primary_cap >= target_n:
+                        fit = max(0.7, 1.0 - 0.02 * (primary_cap - target_n))
+                    else:
+                        fit = max(0.4, 0.7 - 0.1 * (target_n - primary_cap))
+
+                # signature diversity 보너스
+                sig_key = f"{c.get('macro')}:{tuple(sorted(c.get('archetype', [])))}"
+                diversity_bonus = 0.0 if sig_key in used_signatures else 0.1
+
+                score = (
+                    0.4 * c.get("overall_confidence", 0)
+                    + 0.4 * fit
+                    + 0.2 * (1 - narrow_penalty)
+                    + diversity_bonus
+                )
+                scored.append((score, c, sig_key, fit, narrow_penalty))
+
+            scored.sort(key=lambda x: x[0], reverse=True)
+            chosen = scored[0][1]
+            chosen_sig = scored[0][2]
+            used.add(chosen["slide_index"])
+            used_signatures.add(chosen_sig)
+            plan.append({
+                "role": role,
+                "slide_index": chosen["slide_index"],
+                "source": source,
+                "archetype": chosen.get("archetype", []),
+                "macro": chosen.get("macro"),
+                "confidence": chosen.get("overall_confidence", 0),
+                "score": round(scored[0][0], 2),
+                "capacity_fit": round(scored[0][3], 2),
+                "target_n_items": target_n,
+                "reuse_count": 0,
+            })
+        else:
+            # reuse fallback
+            reuse_pool = [
+                l for l in labels if role in l.get("narrative_role", [])
+            ]
+            if not reuse_pool:
+                reuse_pool = [
+                    l for l in labels
+                    if any(a in ARCHETYPE_FALLBACK.get(role, [])
+                           for a in l.get("archetype", []))
+                ]
+            if reuse_pool:
+                # 같은 reuse 풀에서 used_signatures 회피
+                reuse_pool.sort(
+                    key=lambda l: l.get("overall_confidence", 0), reverse=True
+                )
+                chosen = None
+                for c in reuse_pool[:10]:
+                    sig_key = f"{c.get('macro')}:{tuple(sorted(c.get('archetype', [])))}"
+                    if sig_key not in used_signatures:
+                        chosen = c
+                        break
+                if chosen is None:
+                    chosen = reuse_pool[0]
+                role_use_count[role] = role_use_count.get(role, 0) + 1
+                plan.append({
+                    "role": role,
+                    "slide_index": chosen["slide_index"],
+                    "source": "reuse",
+                    "archetype": chosen.get("archetype", []),
+                    "macro": chosen.get("macro"),
+                    "confidence": chosen.get("overall_confidence", 0),
+                    "score": chosen.get("overall_confidence", 0),
+                    "capacity_fit": 0.5,
+                    "target_n_items": target_n,
+                    "reuse_count": role_use_count[role],
+                })
+            else:
+                plan.append({
+                    "role": role, "slide_index": None, "source": "none",
+                    "archetype": [], "macro": None, "confidence": 0,
+                    "score": 0, "capacity_fit": 0,
+                    "target_n_items": target_n, "reuse_count": 0,
+                })
+    return plan
+
+
 def select_deck_capacity_aware(labels: list[dict], narrative: list[str],
                                scenario_content: dict,
                                store: ParagraphStore) -> list[dict]:
@@ -274,6 +414,60 @@ OUTPUT_ROOT = ROOT / "output" / "benchmark_v2"
 
 
 # ----------------------------------------------------------------------------
+# Content auto-split + expand
+# ----------------------------------------------------------------------------
+
+import re
+
+
+def _split_compound_text(text: str, max_segments: int = 8) -> list[str]:
+    """단일 long text를 segment로 분리.
+
+    분리 우선순위: ' / ' > ' + ' > ', ' (공백 동반).
+    각 segment는 최소 4자 이상 유지.
+    """
+    if not text:
+        return []
+    # ' / ' 우선
+    if " / " in text and text.count(" / ") >= 1:
+        parts = [p.strip() for p in text.split(" / ")]
+    elif " + " in text and text.count(" + ") >= 1:
+        parts = [p.strip() for p in text.split(" + ")]
+    elif ", " in text and text.count(", ") >= 2:
+        parts = [p.strip() for p in text.split(", ")]
+    else:
+        return [text]
+
+    parts = [p for p in parts if len(p) >= 3]
+    if len(parts) > max_segments:
+        # 너무 많으면 앞 N개만 + 나머지 합침
+        parts = parts[: max_segments - 1] + [" ".join(parts[max_segments - 1 :])]
+    return parts if len(parts) > 1 else [text]
+
+
+def _expand_to_capacity(items: list[str], target_n: int) -> list[str]:
+    """items를 target_n 개로 expand. 부족 시 split 시도, 여전히 부족 시 그대로.
+
+    절대 augmented 가짜 텍스트 추가 안 함 (사용자 신뢰 우선).
+    """
+    if not items or target_n <= len(items):
+        return items[:target_n] if target_n > 0 else items
+
+    # 단일 long text 분리 시도
+    if len(items) == 1:
+        split = _split_compound_text(items[0], max_segments=target_n)
+        if len(split) > 1:
+            return split[:target_n]
+
+    # 여러 항목인데 일부에 compound가 있으면 추가 분리
+    expanded = []
+    for it in items:
+        sub = _split_compound_text(it)
+        expanded.extend(sub)
+    return expanded[:target_n] if expanded else items
+
+
+# ----------------------------------------------------------------------------
 # Content-by-role expansion: scenario 컨텐츠를 role별 list로 확장
 # ----------------------------------------------------------------------------
 
@@ -300,9 +494,8 @@ def expand_content_for_slide(role: str, scenario_content: dict,
 
     out: dict[str, list[str] | str] = {"title": title}
 
-    # parallel content: 시각 우선순위 슬롯 1개에만 할당
+    # parallel content: 시각 우선순위 슬롯 1개에만 할당 + capacity에 맞춰 expand
     if role not in ("opening", "closing", "divider", "agenda"):
-        # 시각 prominence 우선: chevron > card_header > callout > card_body
         candidates = ["chevron_label", "card_header", "callout_text", "card_body"]
         chosen = None
         for c in candidates:
@@ -310,7 +503,10 @@ def expand_content_for_slide(role: str, scenario_content: dict,
                 chosen = c
                 break
         if chosen:
-            out[chosen] = role_items
+            # 슬롯 수에 맞춰 컨텐츠 expand (부족하면 split, 그래도 부족하면 그대로)
+            target_n = slot_capacity[chosen]
+            expanded = _expand_to_capacity(role_items, target_n)
+            out[chosen] = expanded
 
     return out
 
@@ -618,8 +814,8 @@ def run_scenario(scenario_id: str, labels: list[dict], skeletons: dict,
     narrative = sk["narrative_sequence"]
     sc = SCENARIO_CONTENT[scenario_id]
 
-    # 단순 confidence 기반 (capacity-aware는 narrow 슬롯 함정으로 비활성)
-    plan = select_deck(labels, narrative)
+    # diversity-aware select: top-K 후보 중 capacity 기반 선호 + role 별 풀 안 겹침
+    plan = select_deck_diverse(labels, narrative, sc, store)
     n_role = sum(1 for p in plan if p["source"] == "role")
     n_arch = sum(1 for p in plan if p["source"] == "archetype")
     print(f"  retrieval: role={n_role} archetype={n_arch}")
