@@ -110,12 +110,17 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from benchmark_5_scenarios import (  # noqa: E402
     SCENARIO_CONTENT,
     ARCHETYPE_FALLBACK,
-    load_catalog,
     load_skeletons,
     candidates_for_role,
     select_deck,
     _reorder_sldIdLst,
 )
+
+
+def load_catalog() -> list[dict]:
+    """v5: vision-relabeled 카탈로그 로드."""
+    with open(CATALOG_PATH, encoding="utf-8") as f:
+        return json.load(f)["labels"]
 
 
 # ----------------------------------------------------------------------------
@@ -408,7 +413,7 @@ def select_deck_capacity_aware(labels: list[dict], narrative: list[str],
     return plan
 
 
-CATALOG_PATH = ROOT / "output" / "catalog" / "final_labels.json"
+CATALOG_PATH = ROOT / "output" / "catalog" / "final_labels_v2.json"  # vision-relabeled
 TEMPLATE_PATH = ROOT / "docs" / "references" / "_master_templates" / "PPT 템플릿.pptx"
 OUTPUT_ROOT = ROOT / "output" / "benchmark_v2"
 
