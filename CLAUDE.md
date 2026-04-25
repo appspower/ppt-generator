@@ -19,13 +19,27 @@
 - **Orchestrator**: Claude Code (리서치, 구조화, 실행, 검증)
 
 ## Current Phase
-Phase 4 - 템플릿 확장 + 품질 고도화
+Phase A3 — Mode A + N1-Lite 하이브리드 구현 (확정 방향)
+
+## ⚠️ 방향 확정 (2026-04-25) — 흔들지 않음
+**[docs/PROJECT_DIRECTION.md](docs/PROJECT_DIRECTION.md)** = 단일 진실 소스 (SSoT).
+- **Mode A** (whole-slide reuse) 백본 + **N1-Lite** (single-component reuse) 보조
+- 거부된 옵션: N1-Full (자동 컴포넌트 조합), P3 (회사PC 추가 캡처), Mode B 단독
+- 변경은 헌법 §6 변경 조건 충족 + 사용자 명시적 결정 시에만
+
+**[docs/N1_LITE_IMPLEMENTATION.md](docs/N1_LITE_IMPLEMENTATION.md)** = 세부 구현 사양.
+
+새 세션 시작 시 위 두 문서 + `docs/_research/` 리서치 보고서 2개 필독.
 
 ## Document Hierarchy
 
 | 문서 | 역할 | 변경 빈도 |
 |---|---|---|
 | `CLAUDE.md` (이 파일) | 현재 상태 + 네비게이션 허브 | 매 세션 |
+| **`docs/PROJECT_DIRECTION.md`** | **방향 확정 헌법 (SSoT)** | **거의 불변** |
+| **`docs/N1_LITE_IMPLEMENTATION.md`** | **N1-Lite 세부 구현 사양** | **사양 변경 시** |
+| `docs/_research/component_extraction_research.md` | python-pptx 컴포넌트 추출 SOTA | 거의 불변 |
+| `docs/_research/composition_strategy_research.md` | 조합 전략 SOTA + role 매핑 | 거의 불변 |
 | `docs/01_VISION.md` | 왜 만드는가 - 핵심 원칙과 북극성 | 거의 불변 |
 | `docs/02_PRD.md` | 무엇을 만드는가 - 기능 범위, 슬라이드 타입 | 드물게 변경 |
 | `docs/03_TECH_SPEC.md` | 어떻게 만드는가 - 아키텍처, 폴더 구조 | 가끔 변경 |
