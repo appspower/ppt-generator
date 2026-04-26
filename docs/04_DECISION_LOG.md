@@ -27,3 +27,5 @@
 | 2026-04-24 | `div_id` / `paragraph_id` 매핑을 **평탄화(flat)** 로 결정 (`iter_leaf_shapes` 제너레이터) | PPTAgent `schema_extractor.yaml` + `induct.py` 파이프라인과 호환. Phase A2에서 프롬프트 그대로 재활용 가능 | 계층형 tuple 경로, `shape.shape_id` 기반 |
 | 2026-04-24 | `exec()` 기반 코드 실행 방식 불채택 | Talk-to-Your-Slides의 LLM→Python 코드 생성 방식은 엔터프라이즈 보안 부적합. PPTAgent sandbox도 같은 우려 — 본 이식은 API 호출만 허용 | exec+샌드박스, ast.literal_eval |
 | 2026-04-24 | Closure 큐잉 패턴 도입 보류 (Phase D+ 후속) | 편집 API 5종은 즉시 적용 버전으로도 유닛 14/14 + 통합 테스트 통과. 역순 인덱스 문제는 호출자 관리로 충분 | 초기부터 Closure 패턴 적용 |
+| 2026-04-26 | Phase B v6.7/v6.8 REFINE: density_penalty 강화 (cap 0.7→0.95, slope 0.07→0.10, 가중치 0.15→0.30) | analysis_report_15 (84.6) PNG 시각 검수에서 99-slot 거대 빈 표 부채 확인. 평균 88.7→90.2 (+1.5), 80+ 4/5→**5/5**, 회귀 없음 | hard cutoff (continue skip), 시나리오 컨텐츠 expand, 가중치 미변경 |
+| 2026-04-26 | 컴포넌트 라이브러리 확장 (kpi/icon_grid/divider) **abort** | paragraph_labels 카탈로그에 `kpi_value` role 5개(3 슬라이드)뿐, `icon_label` 0개. 라벨 인프라 한계로 빌드 자연 스킵. 헌법 §6 trigger 미충족 (5/5 80+ 평균 90.2 + visual 100% 달성). 자연 해결 = §6 trigger #3 (새 마스터 자산) 또는 별도 Phase에서 카탈로그 재라벨링 | B 재라벨링 (1,251장 reproc, ROI 낮음), C 휴리스틱 추출 (라이브러리 품질 저하 위험) |
