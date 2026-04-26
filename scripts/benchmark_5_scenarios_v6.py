@@ -143,12 +143,15 @@ def select_mode_a_v6_3(
                     else:
                         fit = 0.2
 
-                # v6.4: total fillable 폭주 페널티 — threshold 5x, cap 0.7
+                # v6.7: total fillable 폭주 페널티 강화 — 거대 빈 표 회피
+                # (analysis_report_15 84.6 진단: 99-slot 표에 컨텐츠 2~3개만 들어감.
+                #  visual_resolution 100% (blanked로 처리됐지만 사용자 인식은 시각
+                #  부채 명확.) cap 0.7 → 0.95, slope 0.07 → 0.10.
                 total_fillable = sum(cap.values())
                 density_penalty = 0.0
                 if total_fillable > target_n * 5:
                     excess_ratio = total_fillable / max(target_n, 1)
-                    density_penalty = min(0.7, 0.07 * (excess_ratio - 5))
+                    density_penalty = min(0.95, 0.10 * (excess_ratio - 5))
 
                 # v6.6: 차트 슬라이드 강 페널티 — chart_data 없으면 더미 숫자 시각 부채.
                 # B2: chart_data가 주어진 role은 반대로 차트 슬라이드를 선호.
@@ -163,12 +166,15 @@ def select_mode_a_v6_3(
                 sig_key = f"{c.get('macro')}:{tuple(sorted(c.get('archetype', [])))}"
                 diversity_bonus = 0.0 if sig_key in used_signatures else 0.1
 
+                # v6.8: density 가중치 강화 — sparse 슬라이드(99-slot에 컨텐츠 2~3개)
+                # 회피. fit/narrow/chart 비중 소폭 ↓. analysis_report_15의 step 5/10
+                # 여전히 큰 빈 표 잔존 → 결정적 push.
                 score = (
                     0.25 * c.get("overall_confidence", 0)
-                    + 0.35 * fit
-                    + 0.10 * (1 - narrow_penalty)
-                    + 0.15 * (1 - density_penalty)
-                    + 0.15 * (1 - chart_penalty)
+                    + 0.30 * fit                              # 0.35→0.30
+                    + 0.05 * (1 - narrow_penalty)             # 0.10→0.05
+                    + 0.30 * (1 - density_penalty)            # 0.15→0.30
+                    + 0.10 * (1 - chart_penalty)              # 0.15→0.10
                     + diversity_bonus
                 )
                 scored.append((score, c, sig_key, fit, narrow_penalty, density_penalty))

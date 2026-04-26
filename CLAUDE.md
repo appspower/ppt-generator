@@ -31,6 +31,11 @@
 **Phase A3 (2026-04-26 동결)** — composite 88.7 (new) / 78.7 (legacy), 80+ 4/5, role 100%, visual 100%.
 보고서: **[docs/PHASE_A3_FINAL_REPORT.md](docs/PHASE_A3_FINAL_REPORT.md)**.
 
+**Phase B addendum (v6.7/v6.8 REFINE)** — analysis_report_15 (84.6) 빈 표 부채 진단 후
+density_penalty 강화 (cap 0.7→0.95, slope 0.07→0.10, 가중치 0.15→0.30).
+결과: 평균 88.7 → **90.2** (+1.5), 80+ 4/5 → **5/5** (analysis_report_15 84.6→85.4).
+회귀 없음 (모든 시나리오 동등 또는 향상).
+
 **다음 후보** (사용자 결정 필요):
 - 컴포넌트 라이브러리 확장 (kpi / icon_grid / divider 추가 추출/디자인)
 - 차트 series style 정리 (현재 마스터 디폴트 회색이라 시각적으로 흐림)
