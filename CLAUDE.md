@@ -19,7 +19,23 @@
 - **Orchestrator**: Claude Code (리서치, 구조화, 실행, 검증)
 
 ## Current Phase
-Phase A3 — Mode A + N1-Lite 하이브리드 구현 (확정 방향)
+**Phase B 완료 (2026-04-26)** — 운영 hardening 6 작업 완료.
+- B1 Pydantic 스키마: `ppt_builder/models/scenario.py` (ScenarioInput / ChartSpec)
+- B2 차트 자동 통합: `chart_data` → `replace_chart_data` 자동 호출 + chart_penalty 해제
+- B3 라이브러리 진입점 + CLI: `ppt_builder/api.py::build_scenario` + `run.py`
+- B4 에러 핸들링 + verbose: BuildError 메시지 + plan dump + `--render-pngs`
+- B5 카탈로그 viewer: `python -m ppt_builder.catalog_view {summary,roles,scenarios,components}`
+- B6 README + USAGE.md: 빠른 시작 + JSON 입력 가이드 + 데이터 재빌드 절차
+- 단위테스트 27/27 (scenario_schema 11 + api_errors 4 + component_ops 12)
+
+**Phase A3 (2026-04-26 동결)** — composite 88.7 (new) / 78.7 (legacy), 80+ 4/5, role 100%, visual 100%.
+보고서: **[docs/PHASE_A3_FINAL_REPORT.md](docs/PHASE_A3_FINAL_REPORT.md)**.
+
+**다음 후보** (사용자 결정 필요):
+- 컴포넌트 라이브러리 확장 (kpi / icon_grid / divider 추가 추출/디자인)
+- 차트 series style 정리 (현재 마스터 디폴트 회색이라 시각적으로 흐림)
+- 새 마스터 템플릿 추가 (사용자 자산 입수 시) → 헌법 §6 trigger
+- N1-Full 일부 도입 검토 — 현재 §6 미트리거
 
 ## ⚠️ 방향 확정 (2026-04-25) — 흔들지 않음
 **[docs/PROJECT_DIRECTION.md](docs/PROJECT_DIRECTION.md)** = 단일 진실 소스 (SSoT).

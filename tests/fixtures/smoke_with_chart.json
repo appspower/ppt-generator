@@ -1,0 +1,25 @@
+{
+  "scenario_name": "Smoke Chart Test",
+  "narrative_sequence": ["opening", "evidence", "recommendation", "closing"],
+  "content_by_role": {
+    "opening": ["분기 실적 검토"],
+    "evidence": [
+      "Q1 매출 100억, Q2 120억, Q3 150억, Q4 180억",
+      "주요 동인: 신제품 출시 + 가격 인상"
+    ],
+    "recommendation": [
+      "신제품 라인 확대",
+      "가격 정책 분기 단위 재검토"
+    ],
+    "closing": ["다음 분기 가이던스 +15%"]
+  },
+  "chart_data": {
+    "evidence": {
+      "categories": ["Q1", "Q2", "Q3", "Q4"],
+      "series": [
+        {"name": "매출(억)", "values": [100, 120, 150, 180]},
+        {"name": "이익(억)", "values": [12, 18, 25, 33]}
+      ]
+    }
+  }
+}
