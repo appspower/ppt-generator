@@ -130,6 +130,26 @@ def test_empty_categories_rejected():
         )
 
 
+def test_chart_series_color_valid_hex_accepted():
+    s = ChartSeriesSpec(name="x", values=[1.0], color="#D04A02")
+    assert s.color == "#D04A02"
+    # 소문자 입력은 대문자로 정규화
+    s2 = ChartSeriesSpec(name="x", values=[1.0], color="#d04a02")
+    assert s2.color == "#D04A02"
+
+
+def test_chart_series_color_invalid_hex_rejected():
+    bad_values = ["D04A02", "#D04A0", "#GG0000", "rgb(208,74,2)", "#D04A02FF"]
+    for bad in bad_values:
+        with pytest.raises(ValidationError):
+            ChartSeriesSpec(name="x", values=[1.0], color=bad)
+
+
+def test_chart_series_color_none_is_default():
+    s = ChartSeriesSpec(name="x", values=[1.0])
+    assert s.color is None
+
+
 def test_existing_scenario_dict_loads():
     """benchmark_5_scenarios.SCENARIO_CONTENT 형식 호환 확인."""
     raw = {

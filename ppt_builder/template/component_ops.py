@@ -459,28 +459,55 @@ def create_blank_slide_with_master_theme(target_prs) -> Slide:
     return slide
 
 
+def _apply_series_color(series, color_hex: str) -> None:
+    """차트 series에 hex color 적용. fill + line 양쪽 시도 (chart type 무관).
+
+    bar/column/pie: fill.fore_color.rgb 가 막대/조각 색을 바꾼다.
+    line/scatter: line.color.rgb 가 선 색을 바꾼다.
+    둘 다 try (실패 무시) — chart type별 분기 없이 안전.
+    """
+    from pptx.dml.color import RGBColor
+
+    rgb = RGBColor.from_string(color_hex.lstrip("#").upper())
+    try:
+        series.format.fill.solid()
+        series.format.fill.fore_color.rgb = rgb
+    except Exception:
+        pass
+    try:
+        series.format.line.color.rgb = rgb
+    except Exception:
+        pass
+
+
 def replace_chart_data(
     slide: Slide,
     flat_idx: int,
     categories: list[str],
     series: list[tuple[str, list[float]]],
+    *,
+    series_colors: list[str | None] | None = None,
 ) -> None:
-    """차트 더미 데이터 교체. python-pptx CategoryChartData 사용.
+    """차트 더미 데이터 교체 (+ 옵션 색상 적용). python-pptx CategoryChartData 사용.
 
     Args:
         slide: 대상 슬라이드
         flat_idx: 차트 shape의 iter_leaf_shapes 평탄 인덱스
         categories: x축 카테고리 (예: ['Q1', 'Q2', 'Q3'])
         series: [(name, [val1, val2, val3]), ...] (예: [('Sales', [100, 200, 300])])
+        series_colors: series 순서대로 hex '#RRGGBB' 또는 None. None인 시리즈는
+            차트 원본 색 유지. series 길이와 맞아야 한다.
 
     Raises:
-        SlideEditError: shape이 chart 아니거나 flat_idx 범위 밖
+        SlideEditError: shape이 chart 아니거나 flat_idx 범위 밖,
+            series_colors 길이가 series와 다른 경우
 
     예시:
         replace_chart_data(
             slide, flat_idx=2,
             categories=['Q1', 'Q2', 'Q3'],
             series=[('매출', [4200, 4500, 4800]), ('이익', [380, 410, 450])],
+            series_colors=['#D04A02', None],  # 매출만 PwC 오렌지, 이익은 원본 색
         )
     """
     from pptx.chart.data import CategoryChartData
@@ -498,11 +525,26 @@ def replace_chart_data(
             f"flat_idx={flat_idx} is not a chart "
             f"(type={type(target).__name__})"
         )
+    if series_colors is not None and len(series_colors) != len(series):
+        raise SlideEditError(
+            f"series_colors length {len(series_colors)} != series length {len(series)}"
+        )
+
     cd = CategoryChartData()
     cd.categories = categories
     for name, values in series:
         cd.add_series(name, values)
     target.chart.replace_data(cd)
+
+    if series_colors:
+        for i, color in enumerate(series_colors):
+            if not color:
+                continue
+            try:
+                _apply_series_color(target.chart.series[i], color)
+            except Exception:
+                # 차트 type이 series 색 변경을 지원하지 않는 경우 silent skip
+                pass
 
 
 def has_chart(slide: Slide) -> bool:

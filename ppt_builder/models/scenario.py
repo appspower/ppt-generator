@@ -21,9 +21,12 @@
 
 from __future__ import annotations
 
+import re
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+_HEX_COLOR_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
 
 NarrativeRole = Literal[
@@ -51,11 +54,32 @@ ALL_ROLES: tuple[str, ...] = (
 
 
 class ChartSeriesSpec(BaseModel):
-    """차트 단일 시리즈."""
+    """차트 단일 시리즈.
+
+    color
+    -----
+    hex `#RRGGBB` 형식으로 시리즈 색상 명시. None이면 마스터 차트 원본 색 유지.
+    명시된 시리즈만 색이 변경됨 — 자동 palette는 적용 안 함 (사용자 의도 보호).
+    """
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(min_length=1)
     values: list[float] = Field(min_length=1)
+    color: str | None = Field(
+        default=None,
+        description="hex #RRGGBB 형식 (예: '#D04A02'). None이면 차트 원본 색 유지.",
+    )
+
+    @field_validator("color")
+    @classmethod
+    def _validate_hex(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        if not _HEX_COLOR_RE.match(v):
+            raise ValueError(
+                f"color must be hex '#RRGGBB' format, got: {v!r}"
+            )
+        return v.upper()
 
 
 class ChartSpec(BaseModel):

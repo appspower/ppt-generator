@@ -158,7 +158,7 @@ else:
 
 1. **선정**: 해당 role의 첫 슬라이드에 차트 슬라이드 우선 선택
    (chart_penalty 해제 → 차트 슬라이드 자체에 보너스).
-2. **주입**: 빌드 후 첫 chart shape에 `replace_chart_data`로 categories + series 적용.
+2. **주입**: 빌드 후 첫 chart shape에 `replace_chart_data`로 categories + series + (옵션) 색상 적용.
 
 같은 role이 여러 step에 나오면 첫 step에만 주입. 차트 슬라이드를 못 찾으면
 `chart_injected[role] = False`로 보고 (빌드는 성공).
@@ -168,14 +168,37 @@ else:
   "evidence": {
     "categories": ["Q1", "Q2", "Q3", "Q4"],
     "series": [
-      {"name": "매출(조)", "values": [4.0, 4.2, 4.4, 4.5]},
-      {"name": "이익(억)", "values": [380, 410, 450, 480]}
+      {"name": "매출(조)", "values": [4.0, 4.2, 4.4, 4.5], "color": "#D04A02"},
+      {"name": "이익(억)", "values": [380, 410, 450, 480], "color": "#2D2D2D"}
     ]
   }
 }
 ```
 
-검증: `series[*].values` 길이가 `categories` 길이와 다르면 거부됨.
+### 검증
+- `series[*].values` 길이 == `categories` 길이
+- `color` (옵션): `#RRGGBB` hex 형식만 허용 (대소문자 무관, 자동 대문자화)
+- `color` 미지정 시 마스터 차트 원본 색 유지 — **자동 palette는 적용 안 함**
+  (사용자 의도 보호)
+
+### PwC 컨설팅 권장 palette 예시
+
+| 용도 | hex | 비고 |
+|---|---|---|
+| Primary accent | `#D04A02` | PwC orange — 강조 시리즈 |
+| Secondary | `#2D2D2D` | 차분한 dark gray |
+| Tertiary | `#003D5B` | deep navy |
+| Neutral | `#7D7D7D` | mid gray (참조 시리즈) |
+
+### 알려진 한계
+
+- **마스터 차트의 plot/style preset이 series 색을 override할 수 있음**: 색은
+  XML 레벨에서 정확히 적용되지만 (e2e 테스트 통과), 일부 차트는 PNG 미리보기에서
+  막대가 흐리게 보일 수 있다. PowerPoint에서 직접 열면 명시한 색으로 표시됨.
+- **차트 type은 Mode A 마스터 슬라이드의 type을 따름**: chart_data가 column
+  chart에 주어지면 column으로 렌더 (line으로 변환 안 됨).
+- pie/doughnut 차트는 series별 single color 보다 카테고리별 color가 자연스러움 —
+  현재 `series_colors`는 series 단위 적용이라 pie/doughnut에선 효과 제한적.
 
 ---
 

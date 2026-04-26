@@ -86,7 +86,12 @@ scenario = ScenarioInput(
     chart_data={
         "evidence": ChartSpec(
             categories=["Q1", "Q2", "Q3", "Q4"],
-            series=[ChartSeriesSpec(name="매출(조)", values=[4.0, 4.2, 4.4, 4.5])],
+            series=[
+                ChartSeriesSpec(
+                    name="매출(조)", values=[4.0, 4.2, 4.4, 4.5],
+                    color="#D04A02",  # PwC accent (옵션)
+                )
+            ],
         )
     },
 )

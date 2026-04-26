@@ -98,7 +98,7 @@ def test_e2e_skeleton_id_path(out_dir: Path):
 
 @requires_data
 def test_e2e_chart_data_injection_visible_in_pptx(out_dir: Path):
-    """chart_data 주입 결과가 실제 .pptx 차트의 categories에 반영됐는지 확인."""
+    """chart_data 주입 + color 적용이 실제 .pptx에 반영됐는지 확인."""
     from pptx import Presentation
     from pptx.shapes.graphfrm import GraphicFrame
 
@@ -118,7 +118,9 @@ def test_e2e_chart_data_injection_visible_in_pptx(out_dir: Path):
                 categories=["Q1_E2E", "Q2_E2E", "Q3_E2E", "Q4_E2E"],
                 series=[
                     ChartSeriesSpec(
-                        name="e2e_매출", values=[111.0, 222.0, 333.0, 444.0],
+                        name="e2e_매출",
+                        values=[111.0, 222.0, 333.0, 444.0],
+                        color="#D04A02",  # PwC accent — color 주입 검증
                     )
                 ],
             )
@@ -133,26 +135,39 @@ def test_e2e_chart_data_injection_visible_in_pptx(out_dir: Path):
             f"plan: {[(p['mode'], p.get('source')) for p in result.plan]}"
         )
 
-    # .pptx를 다시 열어서 차트 categories가 실제로 교체됐는지 확인
+    # .pptx를 다시 열어서 차트 categories + values + color 검증
     prs = Presentation(str(out))
-    found_e2e_categories = False
+    found = False
     for slide in prs.slides:
         for sh in slide.shapes:
             if isinstance(sh, GraphicFrame) and sh.has_chart:
                 chart = sh.chart
                 cats = list(chart.plots[0].categories)
                 if any("Q1_E2E" in str(c) for c in cats):
-                    found_e2e_categories = True
-                    # series values도 확인
-                    series_values = list(chart.series[0].values)
-                    assert series_values[0] == 111.0, (
-                        f"series[0] != 111.0: {series_values}"
+                    found = True
+                    series0 = chart.series[0]
+                    assert list(series0.values)[0] == 111.0, (
+                        f"series[0] != 111.0: {list(series0.values)}"
+                    )
+                    # color 적용 확인 (fill 또는 line 둘 중 하나는 #D04A02)
+                    rgb_str = None
+                    try:
+                        rgb_str = str(series0.format.fill.fore_color.rgb).upper()
+                    except Exception:
+                        pass
+                    if rgb_str != "D04A02":
+                        try:
+                            rgb_str = str(series0.format.line.color.rgb).upper()
+                        except Exception:
+                            pass
+                    assert rgb_str == "D04A02", (
+                        f"expected D04A02, got fill/line rgb={rgb_str}"
                     )
                     break
-        if found_e2e_categories:
+        if found:
             break
 
-    assert found_e2e_categories, (
+    assert found, (
         "chart_injected['evidence']=True지만 .pptx에서 Q1_E2E 카테고리 발견 못함"
     )
 

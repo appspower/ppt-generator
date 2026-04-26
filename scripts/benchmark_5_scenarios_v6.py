@@ -639,17 +639,23 @@ def _fill_mode_a_slide(
 
 
 def _inject_chart_data(target_slide, chart_spec) -> bool:
-    """target_slide의 첫 차트 shape에 chart_spec(ChartSpec) 데이터 주입.
+    """target_slide의 첫 차트 shape에 chart_spec(ChartSpec) 데이터 + 색상 주입.
 
     찾으면 True. flat_idx는 iter_leaf_shapes에서 첫 GraphicFrame.has_chart 것을 사용.
+    chart_spec.series[*].color가 명시되면 해당 시리즈 색 변경.
     """
     from pptx.shapes.graphfrm import GraphicFrame
     for fi, sh in edit_ops.iter_leaf_shapes(target_slide):
         if isinstance(sh, GraphicFrame) and getattr(sh, "has_chart", False):
             categories = list(chart_spec.categories)
             series = [(s.name, list(s.values)) for s in chart_spec.series]
+            colors = [getattr(s, "color", None) for s in chart_spec.series]
+            colors_arg = colors if any(colors) else None
             try:
-                replace_chart_data(target_slide, fi, categories, series)
+                replace_chart_data(
+                    target_slide, fi, categories, series,
+                    series_colors=colors_arg,
+                )
                 return True
             except Exception as e:  # noqa: BLE001
                 print(f"  [warn] replace_chart_data failed @flat_idx={fi}: "
